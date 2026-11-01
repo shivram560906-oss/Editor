@@ -125,10 +125,11 @@ html,body{overflow-x:hidden}
 }
 @media(max-width:520px){.g{grid-template-columns:1fr}.ck{margin-top:8px}}
 .cr input[type=range]{width:90px}.cr select{max-width:140px}
+#hnew{margin-left:auto}#hrules{margin-left:0}
 </style>
 </head>
 <body>
-<header><h1>शिवराम गोबिन्द टेक्स्ट इडिटर प्रो</h1><span>Write once, get a finished video. Jyotish, dharmik, stories.</span><button id="hrules" class="ghost">Writing rules</button></header>
+<header><h1>शिवराम गोबिन्द टेक्स्ट इडिटर प्रो</h1><span>Write once, get a finished video. Jyotish, dharmik, stories.</span><button id="hnew" class="p">New +</button><button id="hrules" class="ghost">Writing rules</button></header>
 <div class="wrap">
   <aside id="prev">
     <div id="stage"><canvas id="cv" width="720" height="1280"></canvas>
@@ -143,7 +144,7 @@ html,body{overflow-x:hidden}
       <h3>Write or paste your whole text</h3>
       <div id="tb_raw"></div>
       <textarea id="raw" spellcheck="false"></textarea>
-      <details class="guide" id="guide" open><summary>Writing rules <small>(click to hide)</small></summary>
+      <details class="guide" id="guide"><summary>Writing rules <small>(click to open or close)</small></summary>
         <ol>
           <li><b>First line</b> is always the main heading.</li>
           <li><code>## text</code> makes a <b>title</b>.</li>
@@ -934,6 +935,12 @@ stage.onmousemove=()=>{if(inShow())showBar()};
   if(document.fullscreenElement===stage||document.webkitFullscreenElement===stage)startShow();
   else{stage.style.cursor='';if(playing)pause()}}));
 stage.onclick=()=>{if(inShow()){toggle();showBar()}};
+$('hnew').onclick=()=>{
+  if(($('raw').value.trim()||clips.length)&&!confirm('Start fresh? This clears the text, slides and pictures. Your look, watermarks and music stay.'))return;
+  if(playing)pause();
+  $('raw').value='';slides=[mk('','','')];clips=[];sel=0;selC=-1;selT='s';cur=0;
+  layout();renderCl();renderEd();refresh();tab('auto');$('raw').focus();$('st').textContent='Ready for new text. Write it, then press Make slides.';
+};
 $('hrules').onclick=()=>{tab('auto');$('guide').open=true;$('guide').scrollIntoView({behavior:'smooth',block:'nearest'})};
 
 /* drag and resize pictures directly in the preview */

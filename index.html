@@ -127,17 +127,32 @@ html,body{overflow-x:hidden}
 @media(max-width:520px){.g{grid-template-columns:1fr}.ck{margin-top:8px}}
 .cr input[type=range]{width:90px}.cr select{max-width:140px}
 #hnew{margin-left:auto}#hrules{margin-left:0}
+#hhome{margin-left:auto}#hnew{margin-left:0}
+#sv{font-size:11px;color:var(--mut);min-height:14px;margin-top:2px}#sv.err{color:#c0392b}
+#home{position:fixed;inset:0;z-index:9999;background:var(--bg);overflow:auto;display:none}#home.on{display:block}
+.hw{max-width:760px;margin:0 auto;padding:18px 16px 48px}.hw h1{font-size:20px;margin:0 0 14px;line-height:1.3}.hw h2{font-size:14px;margin:24px 0 10px;color:var(--mut)}
+.big{width:100%;padding:16px;font-size:17px;border-radius:14px}
+.pc{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px;cursor:pointer}
+.pc.last{border:2px solid var(--ac)}
+.pc img,.pc .ph0{width:60px;height:96px;object-fit:contain;border-radius:8px;background:#000;flex:0 0 auto}
+.pc .pi{flex:1;min-width:0}.pc b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
+.pc small{color:var(--mut);display:block;font-size:12px}
+.pc .pa{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.pc .pa button{padding:6px 10px;font-size:12px;min-height:32px}
+.badge{display:inline-block;background:var(--ac);color:var(--acfg);border-radius:20px;font-size:11px;padding:2px 10px;margin-bottom:4px}
+.tr #xres{width:auto;flex:1 1 120px;max-width:200px}.tr #bk{flex:0 0 auto}
+#h_msg{font-size:13px;color:var(--mut);margin-top:10px;min-height:18px}
 </style>
 </head>
 <body>
-<header><h1>शिवराम गोबिन्द टेक्स्ट इडिटर प्रो</h1><button id="hnew" class="p">New +</button></header>
+<header><h1>शिवराम गोबिन्द टेक्स्ट इडिटर प्रो</h1><button id="hhome" class="ghost">Projects</button><button id="hnew" class="p">New +</button></header>
+<div id="home"></div>
 <div class="wrap">
   <aside id="prev">
     <div id="stage"><canvas id="cv" width="720" height="1280"></canvas>
       <div id="fsbar" aria-label="Presentation controls"><button id="f_prev" title="Previous slide (Left)">&#9664;</button><button id="f_play" title="Play or pause (Space)">Pause</button><button id="f_next" title="Next slide (Right)">&#9654;</button><span id="f_n"></span><button id="f_exit" title="Exit (Esc)">Exit</button></div>
     </div>
-    <div class="tr"><button id="s_prev" title="Previous slide" aria-label="Previous slide">&#9664;</button><button id="bp" class="p">Play</button><button id="s_next" title="Next slide" aria-label="Next slide">&#9654;</button><span id="sn" class="mutn"></span><button id="fs" title="Full screen preview (F)">Full screen</button><button id="br" class="p">Download video</button></div>
-    <div id="st"></div>
+    <div class="tr"><button id="s_prev" title="Previous slide" aria-label="Previous slide">&#9664;</button><button id="bp" class="p">Play</button><button id="s_next" title="Next slide" aria-label="Next slide">&#9654;</button><span id="sn" class="mutn"></span><button id="fs" title="Full screen preview (F)">Full screen</button><select id="xres" title="Video quality"><option value="720">720p (fast)</option><option value="1080">1080p (HD, slower)</option></select><button id="bk" title="Save this project as a backup file">Backup</button><button id="br" class="p">Download video</button></div>
+    <div id="st"></div><div id="sv"></div>
   </aside>
   <section class="ctl">
     <div id="tabs"></div>
@@ -317,13 +332,14 @@ g|Forest Quote|bokeh|forest|T|f|card|left|fbt
 g|Mono Minimal|minimal|mono|M|t|none|left|tfb
 g|Sunset Story|waves|sunset|B|p|none|center|psd`.split('\n').map(l=>l.split('|'));
 const S={fmt:'916',bg:'glow',pal:'tihar',font:'Noto Sans Devanagari',an:'fade',panel:'none',al:'center',ans:'fbz',te:'shadow'};
+const MOB=matchMedia('(pointer:coarse)').matches||Math.min(screen.width,innerWidth)<700;let RS=MOB?.75:1,lastD=0,aiAsked=false,rfq=0;
 let W=720,H=1280,U=1,seed=7,P=[],total=1,cur=0,sel=0,selC=-1,selT='s',raf=0,playing=false,t0=0,from=0,snapOn=true,cat='j';
 const mk=(title,sub,body)=>({title:title||'',sub:sub||'',body:body||'',an:'',font:'',te:'',hc:'',bc:'',dur:0,sz:1,oy:0});
 let slides=[mk('x','','y')],clips=[],exporting=false,cdrag=null,musFile=null,cancelExp=false;
 
 /* tabs and design controls */
 [['auto','1 Write'],['man','2 Slides'],['look','3 Look'],['media','4 Media'],['wm','5 Watermark']].forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;b.dataset.t=k;b.onclick=()=>tab(k);$('tabs').appendChild(b)});
-function tab(k){document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==k));document.querySelectorAll('.pn').forEach(p=>p.classList.toggle('on',p.id=='p_'+k))}
+function tab(k){curTab=k;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==k));document.querySelectorAll('.pn').forEach(p=>p.classList.toggle('on',p.id=='p_'+k))}
 for(const k in OPT){const d=document.createElement('div');d.innerHTML=`<label for="${k}">${LBL[k]}</label><select id="${k}">`+Object.entries(OPT[k]).map(([v,n])=>`<option value="${v}">${n}</option>`).join('')+'</select>';$(k=='font'||k=='te'?'gridT':'grid').appendChild(d);
  d.lastChild.onchange=e=>{S[k]=e.target.value;if(k=='fmt')setFmt();refresh()}}
 [['j','Jyotish'],['d','Dharmik'],['g','General']].forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;b.dataset.c=k;b.onclick=()=>{cat=k;renderTpl()};$('cats').appendChild(b)});
@@ -350,9 +366,9 @@ function renderWm(){
     <div><label>Size</label><input type="range" data-k="size" min="6" max="40" value="${w.size}"></div>
     <div><label>Transparency (low = more see-through)</label><input type="range" data-k="op" min="10" max="100" value="${w.op}"></div></div>${w.thumb?`<div class="hint">Logo: <img class="wt" src="${w.thumb}" alt=""></div>`:''}</div>`).join('');
   $('wml').querySelectorAll('.wc').forEach(c=>{const i=+c.dataset.i,w=WMS[i];
-    c.querySelectorAll('[data-k]').forEach(el=>el.oninput=()=>{const k=el.dataset.k;w[k]=el.type=='range'?+el.value:el.value;if(!playing)draw(cur)});
+    c.querySelectorAll('[data-k]').forEach(el=>el.oninput=()=>{const k=el.dataset.k;if(k=='rb'&&el.value=='ai'&&!okAI()){el.value=w.rb||'none';return}w[k]=el.type=='range'?+el.value:el.value;if(!playing)draw(cur)});
     c.querySelector('[data-f]').onchange=e=>{const f=e.target.files[0];if(!f)return;
-      readImg(f,(im,th)=>{w.img=im;w.thumb=th;w.pc=null;$('wm').checked=true;renderWm();if(!playing)draw(cur);$('st').textContent='Logo loaded.'},()=>{$('st').textContent='Could not read this logo. Use PNG, JPG, WebP, GIF or SVG.'})};
+      readImg(f,(im,th)=>{w.img=im;w.thumb=th;w.pc=null;w.ai=null;w.fid=uid();$('wm').checked=true;renderWm();if(!playing)draw(cur);$('st').textContent='Logo loaded.'},()=>{$('st').textContent='Could not read this logo. Use PNG, JPG, WebP, GIF or SVG.'})};
     c.querySelector('[data-x]').onclick=()=>{WMS.splice(i,1);renderWm();if(!playing)draw(cur)}});
 }
 $('wadd').onclick=()=>{const w=newWm();w.pos=['br','bl','tr','tl','bc','tc'][WMS.length%6];WMS.push(w);$('wm').checked=true;renderWm()};
@@ -563,6 +579,7 @@ function rmBg(d,m,tol){
   let mx=0;for(const z of sizes)if(z>mx)mx=z;
   for(let i=0;i<N;i++){const l=lab[i];if(l&&sizes[l]<mx*.05)p[i*4+3]=0}
 }
+function okAI(){if(!MOB||aiAsked)return true;aiAsked=confirm('AI background removal downloads about 40 MB and uses a lot of memory. On some phones it can make the page slow or crash. Continue? (Offline mode is lighter.)');return aiAsked}
 let aiMod=null;const note=t=>{$('st').textContent=t};
 /* AI mode: a segmentation model (runs in the browser, first use downloads it) */
 function runAI(o){
@@ -584,7 +601,7 @@ function runAI(o){
 function procImg(o){
   const im=o.img,m=o.rb||'none';if(!im||m=='none')return im;
   if(m=='ai'){if(o.ai&&o.ai.src===im)return o.ai.v||im;runAI(o);return im}
-  const key=m+':'+(o.tol??25);if(o.pc&&o.pc.k==key)return o.pc.v;
+  if(!o.rb||o.rb=='none'){o.pc=null}const key=m+':'+(o.tol??25);if(o.pc&&o.pc.k==key)return o.pc.v;
   const w=iw(im),h=ih_(im),c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(im,0,0);
   try{const d=x.getImageData(0,0,w,h);rmBg(d,m,(o.tol??25)/100);x.putImageData(d,0,0)}catch(e){return im}
   o.pc={k:key,v:c};return c;
@@ -621,29 +638,35 @@ function draw(t){
 
 /* audio, playback, recording */
 let ac,dest,gn,musName='';const aud=new Audio();aud.loop=true;
-$('mus').onchange=e=>{const f=e.target.files[0];if(!f)return;aud.src=URL.createObjectURL(f);musName=f.name;musFile=f;
+let musURL='';
+function setMusic(f,say){
+  if(musURL)URL.revokeObjectURL(musURL);musURL=URL.createObjectURL(f);aud.src=musURL;musName=f.name;musFile=f;
   if(!ac){ac=new AudioContext();const src=ac.createMediaElementSource(aud);dest=ac.createMediaStreamDestination();gn=ac.createGain();src.connect(dest);src.connect(gn);gn.connect(ac.destination)}
-  $('st').textContent='Music added: '+f.name;renderTL()};
+  if(say)$('st').textContent='Music added: '+f.name;renderTL()}
+function clearMusic(){aud.pause();if(musURL)URL.revokeObjectURL(musURL);musURL='';aud.removeAttribute('src');musName='';musFile=null;renderTL()}
+$('mus').onchange=e=>{const f=e.target.files[0];if(f)setMusic(f,true)};
 const hasAud=()=>ac&&aud.src;
 function play(done,mute){
   cancelAnimationFrame(raf);playing=true;from=cur>=total-.3?0:cur;if(done)from=0;
   if(hasAud()){ac.resume();gn.gain.value=mute?0:1;aud.currentTime=from%(aud.duration||1e9);aud.play()}
   t0=performance.now();
-  const f=now=>{cur=from+(now-t0)/1000;draw(cur);head();
+  const f=now=>{cur=from+(now-t0)/1000;if(!(MOB&&now-lastD<30)){lastD=now;draw(cur);head()}
     if(cur<total+.3)raf=requestAnimationFrame(f);else{cur=total;pause();done&&done()}};
   raf=requestAnimationFrame(f);
 }
 function pause(){cancelAnimationFrame(raf);playing=false;if(hasAud())aud.pause();$('bp').textContent='Play';$('br').disabled=$('sur').disabled=false;draw(cur);head()}
 const toggle=()=>{if(playing)pause();else{$('bp').textContent='Pause';play()}};
 $('bp').onclick=toggle;
+const exportScale=()=>$('xres').value=='1080'?1.5:1;
 function recordLive(){
   if(!window.MediaRecorder){$('st').textContent='This browser cannot record. Use Chrome or Edge.';return}
+  const keepRS2=RS,xs2=exportScale();if(RS!=xs2){RS=xs2;setFmt();layout()}
   const au=hasAud(),types=au?['video/mp4;codecs=avc1,mp4a.40.2','video/webm;codecs=vp9,opus','video/webm']:['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'];
   const mime=types.find(m=>MediaRecorder.isTypeSupported(m))||'',stream=cv.captureStream(30);
   if(au)dest.stream.getAudioTracks().forEach(tr=>stream.addTrack(tr));
   const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5e6}),chunks=[];
   rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
-  rec.onstop=()=>{const ext=mime.includes('mp4')?'mp4':'webm',a=document.createElement('a');
+  rec.onstop=()=>{if(RS!=keepRS2){RS=keepRS2;setFmt();layout();draw(cur)}const ext=mime.includes('mp4')?'mp4':'webm',a=document.createElement('a');
     a.href=URL.createObjectURL(new Blob(chunks,{type:mime||'video/webm'}));a.download='video.'+ext;a.click();$('st').textContent='Saved as video.'+ext};
   $('br').disabled=$('sur').disabled=true;$('bp').textContent='Pause';$('st').textContent='Recording... keep this tab open and visible.';
   rec.start();play(()=>rec.stop(),true);
@@ -655,9 +678,9 @@ async function exportDirect(){
   if(!window.VideoEncoder||!window.VideoFrame||!window.Mp4Muxer){$('st').textContent='Direct export is not supported in this browser, using live recording instead.';recordLive();return}
   if(playing)pause();
   const ai=[...clips,...WMS].filter(o=>o.rb=='ai'&&o.img);if(ai.length){await Promise.all(ai.map(runAI))}
-  const brb=$('br'),fps=30,vcfg={codec:'avc1.640028',width:W,height:H,bitrate:6e6,framerate:fps};
+  const brb=$('br'),fps=30,xs=exportScale(),TW=Math.round(FMT[S.fmt][1]*xs),TH=Math.round(FMT[S.fmt][2]*xs),vcfg={codec:'avc1.640028',width:TW,height:TH,bitrate:xs>1?8e6:4.5e6,framerate:fps},keepRS=RS;
   try{const s=await VideoEncoder.isConfigSupported(vcfg);if(!s.supported)throw 0}catch(e){$('st').textContent='This browser cannot encode this video size directly, using live recording instead.';recordLive();return}
-  layout();exporting=true;cancelExp=false;brb.textContent='Cancel export';$('sur').disabled=$('bp').disabled=true;
+  if(RS!=xs){RS=xs;setFmt()}layout();exporting=true;cancelExp=false;brb.textContent='Cancel export';$('sur').disabled=$('bp').disabled=true;
   const keep=cur;let enc=null,aenc=null,failed=null;
   try{
     let acod=null,abuf=null;
@@ -694,15 +717,15 @@ async function exportDirect(){
     $('st').textContent=e==='cancel'?'Export cancelled.':'Direct export failed ('+((e&&e.message)||e)+'). Try again, or the live recording fallback.';
   }
   try{if(enc&&enc.state!='closed')enc.close()}catch(e){}try{if(aenc&&aenc.state!='closed')aenc.close()}catch(e){}
-  exporting=false;brb.textContent='Download video';$('sur').disabled=$('bp').disabled=false;cur=keep;draw(cur);head();
+  if(RS!=keepRS){RS=keepRS;setFmt();layout()}exporting=false;brb.textContent='Download video';$('sur').disabled=$('bp').disabled=false;cur=keep;draw(cur);head();
 }
 $('br').onclick=exportDirect;
 
 $('sur').onclick=()=>{
   applyTpl(TPL[Math.floor(Math.random()*TPL.length)]);seed=Math.floor(Math.random()*1e9);seedP();randFx();refresh();renderEd();
 };
-function setFmt(){const f=FMT[S.fmt];W=f[1];H=f[2];cv.width=W;cv.height=H;U=Math.sqrt(W*H/(720*1280));$('prev').style.width=W>H?'460px':'320px'}
-function refresh(){layout();renderTL();if(!playing)draw(cur);head()}
+function setFmt(){const f=FMT[S.fmt];W=Math.round(f[1]*RS);H=Math.round(f[2]*RS);cv.width=W;cv.height=H;U=Math.sqrt(W*H/(720*1280));$('prev').style.width=W>H?'460px':'320px'}
+function refresh(){layout();if(rfq)return;rfq=requestAnimationFrame(()=>{rfq=0;if(exporting)return;renderTL();if(!playing)draw(cur);head()})}
 
 /* automatic slides: Enter 3 times = new slide, ## title, # subtitle */
 function randFx(){let last='';slides.forEach(s=>{const o=S.ans.split('').map(c=>AN[c]).filter(a=>a!=last);s.an=o[Math.floor(Math.random()*o.length)]||'';last=s.an})}
@@ -797,24 +820,32 @@ function pick(i){sel=i;selT='s';layout();cur=clamp(slides[sel].s+slides[sel].d-1
 /* pictures (read as data URLs so they work in any browser view) */
 /* Every picture is decoded once, normalised to a bitmap (max 2048px, so huge photos stay fast), and a small thumbnail is made for the list. */
 function readImg(f,ok,bad){
-  const r=new FileReader();r.onerror=()=>bad&&bad();
-  r.onload=()=>{const im=new Image();
-    im.onload=()=>{
-      const w0=im.naturalWidth||im.width||512,h0=im.naturalHeight||im.height||512,k=Math.min(1,2048/Math.max(w0,h0));
-      const bm=document.createElement('canvas');bm.width=Math.max(1,Math.round(w0*k));bm.height=Math.max(1,Math.round(h0*k));
-      const x=bm.getContext('2d');x.imageSmoothingQuality='high';
-      try{x.drawImage(im,0,0,bm.width,bm.height)}catch(e){return bad&&bad()}
-      const tk=Math.min(1,120/Math.max(bm.width,bm.height)),th=document.createElement('canvas');th.width=Math.max(1,Math.round(bm.width*tk));th.height=Math.max(1,Math.round(bm.height*tk));
-      th.getContext('2d').drawImage(bm,0,0,th.width,th.height);
-      ok(bm,th.toDataURL('image/png'),w0,h0)};
-    im.onerror=()=>bad&&bad();im.src=r.result};
-  r.readAsDataURL(f);
+  const cap=MOB?1280:1600;
+  const fin=(src,w0,h0)=>{
+    const k=Math.min(1,cap/Math.max(w0,h0)),bm=document.createElement('canvas');bm.width=Math.max(1,Math.round(w0*k));bm.height=Math.max(1,Math.round(h0*k));
+    const x=bm.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(src,0,0,bm.width,bm.height);
+    const tk=Math.min(1,120/Math.max(bm.width,bm.height)),th=document.createElement('canvas');th.width=Math.max(1,Math.round(bm.width*tk));th.height=Math.max(1,Math.round(bm.height*tk));
+    th.getContext('2d').drawImage(bm,0,0,th.width,th.height);
+    return[bm,th.toDataURL('image/png'),w0,h0]};
+  const viaImg=u=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('decode'));im.src=u});
+  /* several ways to read the file, because phones and browsers differ */
+  const tries=[
+    async()=>{const b=await createImageBitmap(f);return[b,b.width,b.height,()=>b.close&&b.close()]},
+    async()=>{const u=URL.createObjectURL(f);try{const im=await viaImg(u);return[im,im.naturalWidth||512,im.naturalHeight||512,()=>URL.revokeObjectURL(u)]}catch(e){URL.revokeObjectURL(u);throw e}},
+    async()=>{const im=await viaImg(await blobToURL(f));return[im,im.naturalWidth||512,im.naturalHeight||512,()=>{}]}];
+  (async()=>{
+    for(const t of tries){
+      let r,out;
+      try{r=await t();out=fin(r[0],r[1],r[2]);r[3]()}catch(e){try{r&&r[3]()}catch(_){}continue}
+      ok(...out);return}
+    bad&&bad();
+  })();
 }
 $('im').onchange=e=>{
   const fs=[...e.target.files];e.target.value='';let at=Math.round(cur*10)/10;
   fs.forEach(f=>{
     const c={img:null,src:'',name:f.name,pos:'bottom',size:70,start:at,dur:4,fx:'fade',shape:'round',rb:'none',tol:25,cx:null,cy:null,pc:null};at+=4.2;
-    readImg(f,(im,src,w0,h0)=>{c.img=im;c.src=src;c.ow=w0;c.oh=h0;clips.push(c);selC=clips.indexOf(c);selT='c';cur=c.start+1.2;layout();renderCl();refresh();
+    readImg(f,(im,src,w0,h0)=>{c.img=im;c.src=src;c.fid=uid();c.ow=w0;c.oh=h0;clips.push(c);selC=clips.indexOf(c);selT='c';cur=c.start+1.2;layout();renderCl();refresh();
       $('st').textContent='Picture added: '+f.name+' ('+w0+' x '+h0+'). Drag it on the timeline.'},
       ()=>{$('st').textContent='Could not read this picture: '+f.name+'. Use PNG, JPG, WebP, GIF or SVG (HEIC is not supported by browsers).'});
   });
@@ -829,7 +860,7 @@ function renderCl(){
   <label>Length</label><input type="number" data-k="dur" min="0.5" step="0.1" value="${c.dur}"><button data-rp>Reset position</button><button data-x>Remove</button></div>`).join('');
   $('cl').querySelectorAll('.cr').forEach(r=>{const c=clips[r.dataset.c];
     r.onclick=()=>{selC=+r.dataset.c;selT='c';showClip(c);renderTL()};
-    r.querySelectorAll('[data-k]').forEach(el=>el.oninput=()=>{const k=el.dataset.k;c[k]=el.tagName=='SELECT'?el.value:Math.max(k=='dur'?.5:0,+el.value||0);if(k=='pos'){c.cx=c.cy=null}if(k=='tol'){clearTimeout(window._tt);window._tt=setTimeout(refresh,150)}else refresh()});
+    r.querySelectorAll('[data-k]').forEach(el=>el.oninput=()=>{const k=el.dataset.k;if(k=='rb'&&el.value=='ai'&&!okAI()){el.value=c.rb||'none';return}c[k]=el.tagName=='SELECT'?el.value:Math.max(k=='dur'?.5:0,+el.value||0);if(k=='pos'){c.cx=c.cy=null}if(k=='tol'){clearTimeout(window._tt);window._tt=setTimeout(refresh,150)}else refresh()});
     r.querySelector('[data-rp]').onclick=ev=>{ev.stopPropagation();c.cx=c.cy=null;refresh()};
     r.querySelector('[data-x]').onclick=()=>{clips.splice(+r.dataset.c,1);selC=-1;renderCl();refresh()}});
 }
@@ -886,6 +917,7 @@ const zoom=f=>{$('zm').value=clamp($('zm').value*f,6,140);refresh()};
 $('t_zo').onclick=()=>zoom(.8);$('t_zi').onclick=()=>zoom(1.25);$('t_fit').onclick=()=>{$('zm').value=clamp(($('tl').clientWidth-40)/total,6,140);refresh()};
 $('tl').addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault();zoom(e.deltaY<0?1.15:.87)}},{passive:false});
 document.addEventListener('keydown',e=>{
+  if($('home').classList.contains('on'))return;
   if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
   if(inShow()){if(e.key=='ArrowRight'||e.key=='PageDown'){e.preventDefault();go(slideAt(cur)+1);showBar();return}
     if(e.key=='ArrowLeft'||e.key=='PageUp'){e.preventDefault();go(slideAt(cur)-1);showBar();return}
@@ -936,12 +968,6 @@ stage.onmousemove=()=>{if(inShow())showBar()};
   if(document.fullscreenElement===stage||document.webkitFullscreenElement===stage)startShow();
   else{stage.style.cursor='';if(playing)pause()}}));
 stage.onclick=()=>{if(inShow()){toggle();showBar()}};
-$('hnew').onclick=()=>{
-  if(($('raw').value.trim()||clips.length)&&!confirm('Start fresh? This clears the text, slides and pictures. Your look, watermarks and music stay.'))return;
-  if(playing)pause();
-  $('raw').value='';slides=[mk('','','')];clips=[];sel=0;selC=-1;selT='s';cur=0;
-  layout();renderCl();renderEd();refresh();tab('auto');$('raw').focus();$('st').textContent='Ready for new text. Write it, then press Make slides.';
-};
 
 /* drag and resize pictures directly in the preview */
 const cpt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height]};
@@ -976,7 +1002,175 @@ cv.addEventListener('wheel',e=>{
   const [x,y]=cpt(e);if(!inB(c.box,x,y,SELH*U))return;
   e.preventDefault();toCustom(c);c.size=Math.round(clamp(c.size*(e.deltaY<0?1.06:.94),5,300)*10)/10;draw(cur);renderCl();
 },{passive:false});
+
+/* ===================== projects: saved inside this browser (IndexedDB) ===================== */
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const CTRL=['hsz','bsz','lh','pace','pg','ts','tc','fw','fi','kb','ls','ta','fx','wm','xres'];
+const getC=id=>{const e=$(id);return e.type=='checkbox'?e.checked:e.value},setC=(id,v)=>{const e=$(id);if(e.type=='checkbox')e.checked=!!v;else e.value=v};
+let curTab='auto',PID=null,PMETA=null,savedF=new Set(),lastSig='',saving=false,DEFAULT_ST=null,noDB='';
+const rq=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+let dbp=null;
+const db=()=>dbp||(dbp=new Promise((res,rej)=>{
+  if(!window.indexedDB){rej(new Error('IndexedDB not available'));return}
+  const r=indexedDB.open('shivaram-editor',1);
+  r.onupgradeneeded=()=>{r.result.createObjectStore('projects',{keyPath:'id'});r.result.createObjectStore('files')};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error('blocked'))}));
+const os=async(n,m='readonly')=>(await db()).transaction(n,m).objectStore(n);
+const listP=async()=>rq((await os('projects')).getAll()),getP=async id=>rq((await os('projects')).get(id)),putP=async r=>rq((await os('projects','readwrite')).put(r));
+const putF=async(k,v)=>rq((await os('files','readwrite')).put(v,k)),getF=async k=>rq((await os('files')).get(k)),delF=async k=>rq((await os('files','readwrite')).delete(k));
+const fKeys=async id=>rq((await os('files')).getAllKeys(IDBKeyRange.bound(id+'|',id+'|￿')));
+const delP=async id=>{await rq((await os('projects','readwrite')).delete(id));for(const k of await fKeys(id))await delF(k)};
+const canvasBlob=c=>new Promise(res=>c.toBlob(b=>{if(b&&b.type=='image/webp')res(b);else c.toBlob(r=>res(r),'image/png')},'image/webp',.92));
+async function blobToCanvas(b){
+  let bm;try{bm=await createImageBitmap(b)}catch(e){bm=await new Promise((res,rej)=>{const u=URL.createObjectURL(b),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=rej;im.src=u})}
+  const c=document.createElement('canvas');c.width=bm.width||bm.naturalWidth;c.height=bm.height||bm.naturalHeight;c.getContext('2d').drawImage(bm,0,0);if(bm.close)bm.close();return c}
+const blobToURL=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(b)});
+const dl=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),6e4)};
+const stamp=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())};
+const when=u=>new Date(u).toLocaleString([],{dateStyle:'medium',timeStyle:'short'});
+
+function capture(){
+  const ctl={};CTRL.forEach(id=>ctl[id]=getC(id));
+  return{v:1,raw:$('raw').value,S:{...S},cat,seed,ctl,zm:$('zm').value,tab:curTab,sel,selC,selT,cur:Math.round(cur*100)/100,
+    slides:slides.map(x=>({...x})),
+    clips:clips.map(c=>{const{img,pc,ai,box,lane,...r}=c;return r}),
+    wms:WMS.map(w=>{const{img,pc,ai,...r}=w;return r}),mus:musName}
+}
+const sigOf=st=>JSON.stringify({...st,cur:0});
+const isBlank=st=>!st.raw.trim()&&!st.clips.length&&!st.wms.some(w=>w.text||w.fid)&&st.slides.every(x=>!x.title&&!x.sub&&!x.body);
+function autoName(st){
+  const t=st.slides.map(x=>(x.title||'').split('\n')[0].trim()).find(Boolean)||(st.raw||'').split('\n').map(l=>l.replace(/^[#\s]+/,'').trim()).find(Boolean)||'';
+  return t?t.slice(0,40):'नयाँ प्रोजेक्ट '+new Date().toLocaleDateString()}
+function applyState(st,imgs,mus){
+  if(playing)pause();cdrag=null;
+  Object.assign(S,st.S);for(const k in OPT)$(k).value=S[k];
+  cat=st.cat||'j';seed=st.seed||7;seedP();
+  CTRL.forEach(id=>{if(st.ctl&&id in st.ctl)setC(id,st.ctl[id])});
+  $('raw').value=st.raw||'';$('zm').value=st.zm||36;setFmt();
+  slides=(st.slides&&st.slides.length?st.slides:[mk('','','')]).map(x=>({...mk(),...x}));
+  const wire=o=>{o.img=(o.fid&&imgs[o.fid])||null;const a=o.fid&&imgs[o.fid+'.ai'];o.ai=a?{src:o.img,v:a,p:Promise.resolve()}:null;o.pc=null;if(o.rb=='ai'&&!o.ai&&MOB)o.rb='auto';return o};
+  clips=(st.clips||[]).map(c=>wire({box:null,...c}));
+  WMS.length=0;(st.wms&&st.wms.length?st.wms:[newWm()]).forEach(w=>WMS.push(wire({...newWm(),...w})));
+  if(mus)setMusic(mus,false);else clearMusic();
+  sel=clamp(st.sel||0,0,slides.length-1);selC=st.selC>=0&&st.selC<clips.length?st.selC:-1;selT=st.selT=='c'&&selC>=0?'c':'s';
+  renderTpl();layout();renderCl();renderWm();renderEd();tab(st.tab||'auto');
+  cur=clamp(st.cur||0,0,total);draw(cur);renderTL();head();updNav();
+  $('tl').scrollLeft=Math.max(0,cur*pps()-120);
+}
+function blankState(){
+  const d=DEFAULT_ST;return{...d,raw:'',tab:'auto',sel:0,selC:-1,selT:'s',cur:0,slides:[mk('','','')],clips:[],wms:[newWm()],mus:''}}
+function newProject(){
+  hideHome();PID=uid();PMETA={id:PID,created:Date.now(),custom:false,name:'',persisted:false};savedF=new Set();
+  applyState(blankState(),{},null);lastSig=sigOf(capture());$('sv').textContent='';$('sv').className='';
+  tab('auto');$('raw').focus();$('st').textContent='New project. Write your text, then press Make slides. It saves by itself.';
+}
+async function saveNow(force){
+  if(!PID||saving||exporting||noDB)return;
+  const st=capture(),sig=sigOf(st);
+  if(!force&&sig===lastSig)return;
+  if(isBlank(st)&&!PMETA.persisted)return;
+  saving=true;
+  try{
+    const fids=[];let mk_='';
+    for(const o of[...clips,...WMS]){
+      if(!o.img||!o.fid||fids.includes(o.fid))continue;fids.push(o.fid);
+      if(!savedF.has(o.fid)){await putF(PID+'|'+o.fid,{blob:await canvasBlob(o.img)});savedF.add(o.fid)}
+      if(o.rb=='ai'&&o.ai&&o.ai.v&&o.ai.src===o.img){const k=o.fid+'.ai';fids.push(k);if(!savedF.has(k)){await putF(PID+'|'+k,{blob:await canvasBlob(o.ai.v)});savedF.add(k)}}}
+    if(musFile){fids.push('music');mk_='m:'+musName+':'+musFile.size;if(!savedF.has(mk_)){await putF(PID+'|music',{blob:musFile,name:musName});savedF.add(mk_)}}
+    for(const k of await fKeys(PID)){if(!fids.includes(k.slice(PID.length+1)))await delF(k)}
+    let old=null;try{old=await getP(PID)}catch(e){}
+    let thumb=old&&old.thumb||'';
+    if(!playing&&!exporting&&cv.width){try{const t=document.createElement('canvas');t.width=90;t.height=Math.max(1,Math.round(90*H/W));t.getContext('2d').drawImage(cv,0,0,t.width,t.height);thumb=t.toDataURL('image/jpeg',.6)}catch(e){}}
+    const name=PMETA.custom?PMETA.name:autoName(st);PMETA.name=name;
+    await putP({id:PID,name,custom:PMETA.custom,created:PMETA.created,updated:Date.now(),thumb,n:st.slides.length,fids,mk:mk_,state:st});
+    PMETA.persisted=true;lastSig=sig;
+    $('sv').className='';$('sv').textContent='✓ सुरक्षित भयो (auto-save) · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  }catch(e){
+    $('sv').className='err';$('sv').textContent='Save भएन: '+((e&&e.name=='QuotaExceededError')?'storage भरियो. Backup लिनुहोस् र पुराना project मेट्नुहोस्.':((e&&e.message)||e));
+  }
+  saving=false;
+}
+async function openProject(id){
+  document.body.style.cursor='progress';
+  try{
+    const rec=await getP(id);if(!rec)return;
+    const imgs={};let mus=null;
+    for(const k of await fKeys(id)){const fid=k.slice(id.length+1),f=await getF(k);if(!f)continue;
+      try{if(fid=='music')mus=new File([f.blob],f.name||'music');else imgs[fid]=await blobToCanvas(f.blob)}catch(e){}}
+    PID=id;PMETA={id,created:rec.created,custom:!!rec.custom,name:rec.name,persisted:true};savedF=new Set([...(rec.fids||[]),...(rec.mk?[rec.mk]:[])]);
+    hideHome();applyState(rec.state,imgs,mus);lastSig=sigOf(capture());
+    $('sv').className='';$('sv').textContent='';$('st').textContent='Opened: '+rec.name+'. Continue from where you stopped.';
+  }catch(e){$('h_msg')&&($('h_msg').textContent='खोल्न सकिएन: '+((e&&e.message)||e))}
+  document.body.style.cursor='';
+}
+const pend=new Map();
+const homeOpen=()=>$('home').classList.contains('on');
+function hideHome(){$('home').classList.remove('on');document.body.style.overflow=''}
+async function showHome(){
+  await saveNow(true);if(playing)pause();
+  $('home').classList.add('on');document.body.style.overflow='hidden';await renderHome();
+}
+async function renderHome(msg){
+  let list=[];try{list=(await listP()).filter(r=>!pend.has(r.id)).sort((a,b)=>b.updated-a.updated)}catch(e){noDB=(e&&e.message)||'not available'}
+  $('home').innerHTML=`<div class="hw"><h1>शिवराम गोबिन्द टेक्स्ट इडिटर प्रो</h1>
+    <button id="h_new" class="p big">+ नयाँ प्रोजेक्ट</button>
+    ${PID?'<div class="row" style="margin-top:8px"><button id="h_back">← चलिरहेको काममा फर्कनुहोस्</button></div>':''}
+    ${noDB?`<div class="hint" style="color:#c0392b;margin-top:12px">यो ब्राउजरमा काम save गर्ने सुविधा चलेन (${esc(noDB)}). Private/incognito window वा storage बन्द हुन सक्छ. काम गर्न मिल्छ तर बन्द गर्दा हराउँछ.</div>`:''}
+    <h2>तपाईंका प्रोजेक्टहरू ${list.length?'('+list.length+')':''}</h2>
+    ${list.length?list.map((r,i)=>`<div class="pc${i==0?' last':''}" data-id="${r.id}">${r.thumb?`<img src="${r.thumb}" alt="">`:'<div class="ph0"></div>'}
+      <div class="pi">${i==0?'<span class="badge">अन्तिम काम</span>':''}<b>${esc(r.name||'नाम छैन')}</b><small>${r.n||1} स्लाइड · ${when(r.updated)}</small>
+      <div class="pa"><button class="p" data-a="open">${i==0?'जारी राख्नुहोस्':'खोल्नुहोस्'}</button><button data-a="ren">नाम</button><button data-a="dup">नक्कल</button><button data-a="del">मेट्नुहोस्</button></div></div></div>`).join(''):'<div class="hint">अहिले कुनै प्रोजेक्ट छैन। माथिको “नयाँ प्रोजेक्ट” थिच्नुहोस्। तपाईंले गरेको काम यही डिभाइसमा आफैं save हुन्छ।</div>'}
+    <h2>ब्याकअप (Backup)</h2>
+    <div class="row"><button id="h_bk" ${list.length?'':'disabled'}>सबै प्रोजेक्टको Backup फाइल</button><button id="h_rs">Backup फाइलबाट खोल्नुहोस्</button><input id="h_f" type="file" accept=".json,application/json" hidden></div>
+    <div class="hint">Backup फाइलमा text, स्लाइड, तस्बिर र संगीत सबै हुन्छ। यसले मोबाइलको काम कम्प्युटरमा लैजान पनि मिल्छ। ब्राउजरको data मेटियो भने project पनि मेटिन्छ, त्यसैले बेला बेला Backup लिनुहोस्।</div>
+    <div id="h_msg">${msg?esc(msg):''}</div></div>`;
+  const H_=$('home'),msgs=t=>$('h_msg').textContent=t;
+  if(!msg&&pend.size){const[pid,o]=[...pend].pop();$('h_msg').innerHTML='“'+esc(o.name)+'” मेटियो। <button id="h_undo">फिर्ता ल्याउनुहोस्</button>';$('h_undo').onclick=()=>{clearTimeout(o.t);pend.delete(pid);renderHome()}}
+  $('h_new').onclick=newProject;if($('h_back'))$('h_back').onclick=hideHome;
+  H_.querySelectorAll('.pc').forEach(c=>{const id=c.dataset.id,r=list.find(x=>x.id==id);
+    c.onclick=()=>openProject(id);
+    c.querySelectorAll('[data-a]').forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const a=b.dataset.a;
+      try{
+        if(a=='open')openProject(id);
+        else if(a=='ren'){const n=prompt('प्रोजेक्टको नाम',r.name);if(n&&n.trim()){r.name=n.trim().slice(0,80);r.custom=true;await putP(r);if(id==PID){PMETA.name=r.name;PMETA.custom=true}renderHome()}}
+        else if(a=='dup'){const nid=uid();for(const k of await fKeys(id)){const f=await getF(k);await putF(nid+'|'+k.slice(id.length+1),f)}
+          await putP({...r,id:nid,name:r.name+' (copy)',custom:true,created:Date.now(),updated:Date.now()});renderHome('नक्कल बन्यो।')}
+        else if(a=='del'){const t=setTimeout(async()=>{pend.delete(id);try{await delP(id)}catch(e){}if(id==PID){PID=null;PMETA=null}},8000);pend.set(id,{t,name:r.name});renderHome()}
+      }catch(e){msgs('गल्ती: '+((e&&e.message)||e))}})});
+  if($('h_bk'))$('h_bk').onclick=async()=>{msgs('Backup बन्दैछ...');try{dl(await buildBackup(list),'shivaram-backup-'+stamp()+'.json');msgs('Backup फाइल डाउनलोड भयो।')}catch(e){msgs('Backup बनेन: '+((e&&e.message)||e))}};
+  $('h_rs').onclick=()=>$('h_f').click();
+  $('h_f').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;msgs('खोल्दैछ...');try{const n=await restoreBackup(f);await renderHome(n+' प्रोजेक्ट फिर्ता आयो।')}catch(er){msgs('Backup फाइल खोल्न सकिएन: '+((er&&er.message)||er))}};
+}
+async function buildBackup(recs){
+  const parts=['{"app":"shivaram-text-editor","v":1,"projects":['];
+  for(let i=0;i<recs.length;i++){const r=recs[i];parts.push((i?',':'')+'{"rec":'+JSON.stringify(r)+',"files":{');let first=true;
+    for(const k of await fKeys(r.id)){const f=await getF(k);if(!f)continue;
+      parts.push((first?'':',')+JSON.stringify(k.slice(r.id.length+1))+':{"name":'+JSON.stringify(f.name||'')+',"data":'+JSON.stringify(await blobToURL(f.blob))+'}');first=false}
+    parts.push('}}')}
+  parts.push(']}');return new Blob(parts,{type:'application/json'});
+}
+async function restoreBackup(file){
+  const j=JSON.parse(await file.text());if(!j||j.app!='shivaram-text-editor'||!Array.isArray(j.projects))throw new Error('यो यो app को Backup फाइल होइन');
+  let n=0;
+  for(const p of j.projects){const r=p.rec;let id=r.id,name=r.name;
+    if(await getP(id)){id=uid();name=name+' (restored)'}
+    for(const fid in p.files){const o=p.files[fid],blob=await(await fetch(o.data)).blob();await putF(id+'|'+fid,o.name?{blob,name:o.name}:{blob})}
+    await putP({...r,id,name});n++}
+  return n;
+}
+$('hhome').onclick=showHome;
+$('hnew').onclick=async()=>{await saveNow(true);newProject()};
+$('bk').onclick=async()=>{
+  await saveNow(true);if(!PID||!PMETA.persisted){$('st').textContent='Nothing to back up yet. Add some text first.';return}
+  $('st').textContent='Making backup...';try{dl(await buildBackup([await getP(PID)]),'shivaram-'+stamp()+'.json');$('st').textContent='Backup file downloaded.'}catch(e){$('st').textContent='Backup failed: '+((e&&e.message)||e)}
+};
+$('xres').onchange=()=>{if(MOB&&$('xres').value=='1080')$('st').textContent='1080p uses much more memory. If the phone gets slow or the page crashes, use 720p.'};
+setInterval(()=>{if(!homeOpen())saveNow()},3000);
+addEventListener('pagehide',()=>{pend.forEach((o,id)=>{delP(id)});if(!homeOpen())saveNow(true)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&!homeOpen())saveNow(true)});
 WMS.push(newWm());renderWm();seedP();setFmt();renderTpl();tab('auto');autoGen();
+DEFAULT_ST=capture();showHome();
 Promise.all(Object.keys(OPT.font).map(f=>document.fonts.load(`700 40px "${f}"`))).then(()=>{if(!playing)draw(cur)}).catch(()=>{});
 </script>
 </body>

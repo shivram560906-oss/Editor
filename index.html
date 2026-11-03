@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>शिवराम गोबिन्द टेक्स्ट इडिटर प्रो</title>
-  <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5/build/mp4-muxer.js"></script>
+  <script src="/mp4-muxer.js"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Hind:wght@500;700&family=Kalam:wght@400;700&family=Laila:wght@500;700&family=Mukta:wght@500;700&family=Noto+Sans+Devanagari:wght@500;700&family=Rozha+One&family=Tiro+Devanagari+Hindi&family=Yatra+One&display=swap"
     rel="stylesheet">
@@ -1347,6 +1347,10 @@
         <details class="sec" open>
           <summary>Format and colors</summary>
           <div class="g" id="grid"></div>
+          <div><label for="sfxv">Sound volume</label><input id="sfxv" type="range" min="0" max="100" value="72"></div>
+          <div class="row"><button id="sfxprev">Hear sound</button></div>
+          <div class="hint" id="sfxh">Match the animation: typewriter uses keyboard clicks, word pop uses a pop, bounce
+            uses bubbles. Pick any sound, or No sound. Each slide can use its own sound in Edit slides.</div>
           <label class="ck" style="margin-top:12px"><input id="pg" type="checkbox"> Progress bar</label>
           <div><label for="pace">Reading pace (slower to faster)</label><input id="pace" type="range" min="0.6"
               max="1.8" step="0.1" value="1"></div>
@@ -1473,12 +1477,13 @@
       bg: { glow: 'Glow and lights', diya: 'Diya flames', om: 'Om glow', mandala: 'Mandala', rays: 'Divine rays', cosmos: 'Zodiac cosmos', aurora: 'Aurora', bokeh: 'Bokeh circles', grid: 'Neon horizon', waves: 'Waves', stars: 'Stars and meteor', minimal: 'Minimal frame', lotus: 'Lotus pond', silk: 'Flowing silk', nebula: 'Nebula', dust: 'Golden dust', temple: 'Temple dusk', petals: 'Falling petals' },
       pal: Object.fromEntries(Object.entries(PAL).map(([k, v]) => [k, v.n])),
       an: { fade: 'Fade up', rise: 'Soft rise', pop: 'Word pop', type: 'Typewriter', slide: 'Slide in', zoom: 'Zoom in', blur: 'Blur reveal', drop: 'Drop bounce', flip: 'Flip in', swing: 'Swing in', bounce: 'Elastic bounce', wipe: 'Wipe reveal', cascade: 'Cascade fall', split: 'Split in', glowin: 'Glow bloom' },
+      sfx: { auto: 'Match the animation', none: 'No sound', keys: 'Keyboard typing', bubble: 'Bubble pop', pop: 'Soft pop', whoosh: 'Whoosh', swoosh: 'Swoosh', chime: 'Soft chime', bell: 'Temple bell', sparkle: 'Sparkle', drop: 'Water drop', thud: 'Soft thud', magic: 'Magic shimmer', ding: 'Ding', tick: 'Clock tick', paper: 'Page turn', click: 'Click', rise: 'Rising tone', coin: 'Coin', heart: 'Heartbeat' },
       font: { 'Noto Sans Devanagari': 'Noto Sans', 'Mukta': 'Mukta', 'Hind': 'Hind', 'Baloo 2': 'Baloo (rounded)', 'Tiro Devanagari Hindi': 'Tiro (serif)', 'Rozha One': 'Rozha (bold serif)', 'Yatra One': 'Yatra One (display)', 'Kalam': 'Kalam (handwritten)', 'Laila': 'Laila (calligraphy)' },
       panel: { none: 'No panel', card: 'Glass card', frame: 'Gold frame', bar: 'Side bar', spot: 'Soft spotlight', band: 'Full-width band' },
       al: { center: 'Center', left: 'Left', right: 'Right' },
       te: { none: 'None', shadow: 'Soft shadow', hard: 'Hard shadow', long: 'Long shadow', '3d': '3D extrude', deep: 'Deep 3D (shaded depth)', '3do': '3D + outline', outline: 'Outline', neon: 'Neon glow', gold: 'Gold metal' }
     };
-    const LBL = { te: 'Text effect', fmt: 'Format', bg: 'Background', pal: 'Colors', an: 'Default animation', font: 'Font', panel: 'Text panel', al: 'Alignment' };
+    const LBL = { te: 'Text effect', fmt: 'Format', bg: 'Background', pal: 'Colors', an: 'Default animation', sfx: 'Sound effect', font: 'Font', panel: 'Text panel', al: 'Alignment' };
     const TPL = `j|Rashifal Cosmos|cosmos|cosmic|R|g|none|center|gbrz|gold
 j|Graha Gochar|nebula|indigo|M|r|card|center|rfsl|shadow
 j|Kundali Gold|mandala|goldblack|R|z|frame|center|zrgb|gold
@@ -1534,7 +1539,7 @@ g|Midnight Quote|nebula|slate|T|r|spot|center|rgbf|shadow
 g|Lavender Soft|silk|lavender|M|l|card|center|lrfv|none
 g|Ember Impact|rays|ember|Y|a|none|center|adcz|3do
 g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.split('|'));
-    const S = { fmt: '916', bg: 'glow', pal: 'tihar', font: 'Noto Sans Devanagari', an: 'fade', panel: 'none', al: 'center', ans: 'fbz', te: 'shadow' };
+    const S = { fmt: '916', bg: 'glow', pal: 'tihar', font: 'Noto Sans Devanagari', an: 'fade', panel: 'none', al: 'center', ans: 'fbz', te: 'shadow', sfx: 'auto' };
     const MOB = matchMedia('(pointer:coarse)').matches || Math.min(screen.width, innerWidth) < 700; let RS = MOB ? .75 : 1, lastD = 0, aiAsked = false, rfq = 0, tbox = null;
     let W = 720, H = 1280, U = 1, seed = 7, P = [], total = 1, cur = 0, sel = 0, selC = -1, selT = 's', raf = 0, playing = false, t0 = 0, from = 0, snapOn = true, cat = 'j';
     let _sn = 0, picJob = 0; const nid = () => 's' + (++_sn) + Date.now().toString(36);
@@ -1546,7 +1551,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     function tab(k) { curTab = k; document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t == k)); document.querySelectorAll('.pn').forEach(p => p.classList.toggle('on', p.id == 'p_' + k)) }
     for (const k in OPT) {
       const d = document.createElement('div'); d.innerHTML = `<label for="${k}">${LBL[k]}</label><select id="${k}">` + Object.entries(OPT[k]).map(([v, n]) => `<option value="${v}">${n}</option>`).join('') + '</select>'; $(k == 'font' || k == 'te' ? 'gridT' : 'grid').appendChild(d);
-      d.lastChild.onchange = e => { S[k] = e.target.value; if (k == 'fmt') setFmt(); refresh() }
+      d.lastChild.onchange = e => { S[k] = e.target.value; if (k == 'fmt') setFmt(); if (k == 'sfx' || k == 'an') { const h = $('sfxh'); if (h) h.textContent = sfxHint({ an: '', sfx: '' }); if (k == 'sfx') hearResolved({ an: S.an, sfx: S.sfx, title: 'शीर्षक', sub: '', body: 'एक दुई तीन चार' }); } refresh() }
     }
     [['j', 'Jyotish'], ['d', 'Dharmik'], ['g', 'General']].forEach(([k, n]) => { const b = document.createElement('button'); b.textContent = n; b.dataset.c = k; b.onclick = () => { cat = k; renderTpl() }; $('cats').appendChild(b) });
     function renderTpl() {
@@ -1557,7 +1562,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       const v = { bg: t[2], pal: t[3], font: FN[t[4]], an: AN[t[5]], panel: t[6], al: t[7], te: t[9] || 'shadow' }; Object.assign(S, v, { ans: t[8] }); for (const k in v) $(k).value = v[k];
       if ($('fx').value == 'mix') randFx(); else slides.forEach(s => s.an = ''); refresh(); renderEd(); $('st').textContent = 'Template: ' + t[1]
     }
-    ['hsz', 'bsz', 'lh', 'pace', 'pg', 'ts', 'tc', 'fw', 'fi', 'kb', 'ls', 'ta'].forEach(k => $(k).oninput = () => refresh());
+    ['hsz', 'bsz', 'lh', 'pace', 'pg', 'ts', 'tc', 'fw', 'fi', 'kb', 'ls', 'ta', 'sfxv'].forEach(k => $(k).oninput = () => { if (k == 'sfxv' && sfxOut) sfxOut.gain.value = Math.max(0, Math.min(1, (+$('sfxv').value || 0) / 100)); refresh() });
     /* watermarks: any number, each with its own settings */
     const WMS = [], newWm = () => ({ text: '', img: null, thumb: '', rb: 'none', tol: 25, mask: 'none', pc: null, pos: 'br', mv: 'still', col: '#ffffff', size: 18, op: 55 });
     const WPOS = { tl: 'Top left', tc: 'Top center', tr: 'Top right', ml: 'Middle left', mc: 'Center', mr: 'Middle right', bl: 'Bottom left', bc: 'Bottom center', br: 'Bottom right' }, WMV = { still: 'Still', float: 'Gentle float', bounce: 'Move around the screen' }, WBG = { none: 'Keep as is', ai: 'Remove background (AI, best)', auto: 'Remove background (offline)', white: 'Remove white', black: 'Remove black' };
@@ -1565,7 +1570,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     function renderWm() {
       const op = (o, v) => Object.entries(o).map(([k, n]) => `<option value="${k}"${k == v ? ' selected' : ''}>${n}</option>`).join('');
       $('wml').innerHTML = WMS.map((w, i) => `<div class="wc" data-i="${i}"><div class="wch"><b>Watermark ${i + 1}</b><button data-x>Remove</button></div><div class="g">
-    <div><label>Text</label><textarea data-k="text" rows="2" style="min-height:54px" placeholder="@yourname">${esc(w.text)}</textarea></div>
+    <div><label>Text</label><textarea data-k="text" rows="2" style="min-height:54px" placeholder="@yourname "value="ज्यो. पं. शिवराम पराजली\n९८४७४५२९०६">${esc(w.text)}</textarea></div>
     <div><label>Logo picture (optional)</label><input type="file" accept="image/*" data-f></div>
     <div><label>Remove background</label><select data-k="rb">${op(WBG, w.rb)}</select></div><div><label>Remove strength (offline mode)</label><input type="range" data-k="tol" min="2" max="80" value="${w.tol}"></div><div><label>Mask shape (logo)</label><select data-k="mask">${op(MASKS, w.mask)}</select></div>
     <div><label>Position</label><select data-k="pos">${op(WPOS, w.pos)}</select></div>
@@ -2012,12 +2017,160 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       if (!playing && !exporting) safe(drawSel);
     }
 
-    /* audio, playback, recording */
-    let ac, dest, gn, musName = ''; const aud = new Audio(); aud.loop = true;
+    /* audio, playback, recording + slide sound effects */
+    let ac, dest, gn, sfxOut = null, musSrc = null, musName = ''; const aud = new Audio(); aud.loop = true;
     let musURL = '';
+    const SR = 48000;
+    const AUTO_SFX = { type: 'keys', pop: 'pop', bounce: 'bubble', fade: 'chime', rise: 'rise', slide: 'swoosh', zoom: 'whoosh', blur: 'magic', drop: 'drop', flip: 'paper', swing: 'whoosh', wipe: 'swoosh', cascade: 'sparkle', split: 'thud', glowin: 'magic' };
+    const SFX_AT = { fade: .32, rise: .18, pop: .28, type: .3, slide: .22, zoom: .2, blur: .28, drop: .18, flip: .22, swing: .22, bounce: .22, wipe: .22, cascade: .18, split: .22, glowin: .24 };
+    const LETTER_SFX = new Set(['keys', 'tick', 'click', 'bubble']);
+    const POP_AN = { pop: 1, bounce: 1, drop: 1, cascade: 1, swing: 1, split: 1 };
+    const POP_SFX = new Set(['pop', 'bubble', 'click', 'thud', 'drop', 'sparkle', 'keys', 'tick']);
+    function rng(seed) { let s = seed >>> 0; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296 } }
+    const SYNTH = {
+      keys(rnd) { const n = (SR * .042) | 0, a = new Float32Array(n), f = 150 + rnd() * 80, f2 = 1600 + rnd() * 1600; for (let i = 0; i < n; i++) { const t = i / SR; a[i] = (rnd() * 2 - 1) * Math.exp(-t * 280) * .75 + Math.sin(2 * Math.PI * f * t) * Math.exp(-t * 95) * .5 + Math.sin(2 * Math.PI * f2 * t) * Math.exp(-t * 420) * .22 } return a },
+      tick(rnd) { const n = (SR * .028) | 0, a = new Float32Array(n), f = 1700 + rnd() * 1400; for (let i = 0; i < n; i++) { const t = i / SR; a[i] = (rnd() * 2 - 1) * Math.exp(-t * 340) * .45 + Math.sin(2 * Math.PI * f * t) * Math.exp(-t * 300) * .55 } return a },
+      click(rnd) { const n = (SR * .032) | 0, a = new Float32Array(n); for (let i = 0; i < n; i++) { const t = i / SR; a[i] = (rnd() * 2 - 1) * Math.exp(-t * 210) * .9 + Math.sin(2 * Math.PI * (700 + rnd() * 200) * t) * Math.exp(-t * 140) * .25 } return a },
+      bubble(rnd) { const n = (SR * .15) | 0, a = new Float32Array(n); let ph = 0; const f0 = 480 + rnd() * 320; for (let i = 0; i < n; i++) { const t = i / SR; ph += 2 * Math.PI * (f0 * Math.exp(-t * 11) + 80) / SR; const e = Math.sin(Math.min(1, t / .01) * 1.5708) * Math.exp(-t * 16); a[i] = Math.sin(ph) * e; if (t < .008) a[i] += (rnd() * 2 - 1) * (1 - t / .008) * .28 } return a },
+      pop(rnd) { const n = (SR * .08) | 0, a = new Float32Array(n); let ph = 0; const f0 = 380 + rnd() * 180; for (let i = 0; i < n; i++) { const t = i / SR; ph += 2 * Math.PI * (f0 * Math.exp(-t * 20) + 70) / SR; a[i] = Math.sin(ph) * Math.exp(-t * 30); if (t < .007) a[i] += (rnd() * 2 - 1) * (1 - t / .007) * .4 } return a },
+      whoosh(rnd) { const n = (SR * .42) | 0, a = new Float32Array(n); let bp = 0; for (let i = 0; i < n; i++) { const u = i / n, white = rnd() * 2 - 1; bp = bp * .86 + white * .14; a[i] = (white - bp) * Math.sin(Math.PI * u) ** 1.3 } return a },
+      swoosh(rnd) { const n = (SR * .26) | 0, a = new Float32Array(n); let bp = 0; for (let i = 0; i < n; i++) { const u = i / n, white = rnd() * 2 - 1; bp = bp * (.62 + u * .3) + white * .2; a[i] = (white - bp) * Math.sin(Math.PI * u) * (1.15 - u) } return a },
+      chime(rnd) { const n = (SR * .7) | 0, a = new Float32Array(n), f = rnd() < .5 ? 880 : 1174; for (let i = 0; i < n; i++) { const t = i / SR, e = Math.exp(-t * 4.2); a[i] = (Math.sin(2 * Math.PI * f * t) * .62 + Math.sin(2 * Math.PI * f * 2.01 * t) * .22 + Math.sin(2 * Math.PI * f * 2.99 * t) * .1) * e } return a },
+      bell() { const n = (SR * 1.3) | 0, a = new Float32Array(n), parts = [1, 2.01, 2.76, 3.98, 5.15], amps = [.52, .28, .16, .09, .05]; for (let i = 0; i < n; i++) { const t = i / SR; let s = 0; for (let k = 0; k < parts.length; k++) s += Math.sin(2 * Math.PI * 196 * parts[k] * t) * amps[k] * Math.exp(-t * (1.5 + k * 1.25)); a[i] = s } return a },
+      sparkle(rnd) { const n = (SR * .55) | 0, a = new Float32Array(n); for (let k = 0; k < 6; k++) { const st = (rnd() * .26 * SR) | 0, f = 1500 + rnd() * 2600, len = ((.08 + rnd() * .08) * SR) | 0; for (let i = 0; i < len; i++) { const idx = st + i; if (idx >= n) break; const t = i / SR; a[idx] += Math.sin(2 * Math.PI * f * t) * Math.exp(-t * 30) * .75 } } return a },
+      drop(rnd) { const n = (SR * .26) | 0, a = new Float32Array(n); let ph = 0; const f0 = 900 + rnd() * 220; for (let i = 0; i < n; i++) { const t = i / SR; ph += 2 * Math.PI * (f0 * Math.exp(-t * 9) + 150) / SR; a[i] = Math.sin(ph) * Math.exp(-t * 8) * Math.min(1, t * 90) } return a },
+      thud(rnd) { const n = (SR * .2) | 0, a = new Float32Array(n), f = 80 + rnd() * 40; for (let i = 0; i < n; i++) { const t = i / SR; a[i] = Math.sin(2 * Math.PI * f * t) * Math.exp(-t * 14) * .95 + (rnd() * 2 - 1) * Math.exp(-t * 36) * .3 } return a },
+      magic(rnd) { const n = (SR * .58) | 0, a = new Float32Array(n); for (let i = 0; i < n; i++) { const t = i / SR, f = 480 + t * 980, e = Math.sin(Math.min(1, t / .58) * Math.PI); a[i] = Math.sin(2 * Math.PI * f * t) * .4 * e + Math.sin(2 * Math.PI * f * 1.5 * t) * .18 * e + Math.sin(2 * Math.PI * (1900 + Math.sin(t * 28) * 380) * t) * .12 * e } return a },
+      ding() { const n = (SR * .42) | 0, a = new Float32Array(n), f = 1046; for (let i = 0; i < n; i++) { const t = i / SR; a[i] = Math.sin(2 * Math.PI * f * t) * Math.exp(-t * 6.2) * .72 + Math.sin(2 * Math.PI * f * 2 * t) * Math.exp(-t * 8) * .18 } return a },
+      paper(rnd) { const n = (SR * .32) | 0, a = new Float32Array(n); let b = 0; for (let i = 0; i < n; i++) { const u = i / n, white = rnd() * 2 - 1; b = b * .9 + white * .1; const crack = Math.abs(white) > .87 ? white : 0; a[i] = (b * .5 + crack) * Math.sin(Math.PI * u) } return a },
+      rise() { const n = (SR * .38) | 0, a = new Float32Array(n); let ph = 0; for (let i = 0; i < n; i++) { const t = i / SR, f = 230 * Math.pow(3.2, t / .38); ph += 2 * Math.PI * f / SR; a[i] = Math.sin(ph) * Math.sin(Math.PI * Math.min(1, t / .38)) * .6 } return a },
+      coin() { const n = (SR * .34) | 0, a = new Float32Array(n); for (let i = 0; i < n; i++) { const t = i / SR; const e1 = t < .12 ? Math.exp(-t * 12) : 0, e2 = t > .08 ? Math.exp(-(t - .08) * 8) : 0; a[i] = Math.sin(2 * Math.PI * 988 * t) * e1 * .55 + Math.sin(2 * Math.PI * 1319 * t) * e2 * .62 } return a },
+      heart(rnd) { const n = (SR * .62) | 0, a = new Float32Array(n); const thump = t0 => { for (let i = 0; i < SR * .15; i++) { const idx = (t0 * SR + i) | 0; if (idx >= n) break; const t = i / SR; a[idx] += Math.sin(2 * Math.PI * 62 * t) * Math.exp(-t * 16) + (rnd() * 2 - 1) * Math.exp(-t * 48) * .12 } }; thump(0); thump(.2); return a }
+    };
+    const pcmCache = new Map(), abCache = new Map(), timeCache = new WeakMap();
+    function variantCount(id) { return (id == 'keys' || id == 'tick' || id == 'click' || id == 'bubble' || id == 'pop' || id == 'drop') ? 4 : 1 }
+    function pcmOf(id, v) { const k = id + ':' + v; let a = pcmCache.get(k); if (a) return a; a = SYNTH[id](rng((id.charCodeAt(0) * 131 + v * 997 + id.length * 17) >>> 0)); let p = 1e-6; for (let i = 0; i < a.length; i++) p = Math.max(p, Math.abs(a[i])); const g = .9 / p; for (let i = 0; i < a.length; i++) a[i] *= g; pcmCache.set(k, a); return a }
+    function audioBuf(id, v) { const k = id + ':' + v; let b = abCache.get(k); if (b) return b; const pcm = pcmOf(id, v); b = ac.createBuffer(1, pcm.length, SR); b.copyToChannel(pcm, 0); abCache.set(k, b); return b }
+    function resolveSfx(s) {
+      const an = (s && s.an) || S.an || 'fade';
+      let id = (s && s.sfx) ? s.sfx : (S.sfx || 'auto');
+      if (id == 'auto') id = AUTO_SFX[an] || 'chime';
+      if (!id || id == 'none' || !SYNTH[id]) return { id: 'none', an, mode: 'off' };
+      let mode = 'once';
+      if (an == 'type' && LETTER_SFX.has(id)) mode = 'letter';
+      else if (an == 'type' && id == 'pop') mode = 'word';
+      else if (POP_AN[an] && POP_SFX.has(id)) mode = 'wordpop';
+      else if ((id == 'keys' || id == 'tick' || id == 'click') && an != 'type') mode = 'burst';
+      return { id, an, mode }
+    }
+    function sfxHint(s) {
+      const r = resolveSfx(s || { an: '', sfx: '' });
+      if (r.mode == 'off') return 'Silent. Choose a sound, or Match the animation.';
+      const how = r.mode == 'letter' ? 'on each letter' : (r.mode == 'word' || r.mode == 'wordpop') ? 'on each word' : r.mode == 'burst' ? 'as a short typing burst' : 'once, when the text appears';
+      return 'Plays "' + (OPT.sfx[r.id] || r.id) + '" ' + how + '.'
+    }
+    function wordsOf(s) {
+      const list = [];
+      const add = (txt, mkr) => { let first = true; String(txt || '').split('\n').forEach(sg => { const ws = sg.split(/\s+/).filter(Boolean); if (first && mkr) list.push(mkr); first = false; ws.forEach(w => list.push(w)) }) };
+      if (s.title) add(s.title, ''); if (s.sub) add(s.sub, ''); paras(s.body || '').forEach(p => add(p.t, p.list ? p.mk : '')); return list
+    }
+    function slideTimes(s) {
+      const an = s.an || S.an || 'fade', sig = an + '\0' + (s.title || '') + '\0' + (s.sub || '') + '\0' + (s.body || '');
+      const hit = timeCache.get(s); if (hit && hit.sig == sig) return hit;
+      const words = wordsOf(s), times = [], starts = []; let c0 = 0;
+      words.forEach(w => { const g = gcs(w); g.forEach((_, k) => { times.push(.3 + (c0 + 1) / 28); starts.push(k == 0); c0++ }) });
+      const spec = { pop: [.3, .07], bounce: [.25, .06], drop: [.2, .06], cascade: [.2, .05], swing: [.25, .06], split: [.25, .05] }[an] || [.25, .06];
+      const tokens = words.map((_, n) => spec[0] + n * spec[1]);
+      const rec = { sig, letters: { times, starts }, tokens }; timeCache.set(s, rec); return rec
+    }
+    function countDue(s, r, lt) {
+      const tm = slideTimes(s);
+      if (r.mode == 'letter' || r.mode == 'word') { const arr = tm.letters.times; let c = 0; while (c < arr.length && arr[c] <= lt + .012) c++; return c }
+      if (r.mode == 'wordpop') { const arr = tm.tokens; let c = 0; while (c < arr.length && arr[c] <= lt + .012) c++; return c }
+      if (r.mode == 'burst') { const start = SFX_AT[r.an] || .2; if (lt + .012 < start) return 0; return Math.min(8, Math.floor((lt - start) / .055) + 1) }
+      return 0
+    }
+    let sfxNodes = [], hearT = [], sfxState = { sid: null, n: 0, t: -1, once: false };
+    function stopSfx() { hearT.forEach(clearTimeout); hearT = []; sfxNodes.forEach(n => { try { n.stop() } catch (e) { } }); sfxNodes = []; sfxState.sid = null }
+    function ensureAC() {
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+      if (!ac) { ac = new AC(); dest = ac.createMediaStreamDestination(); gn = ac.createGain(); sfxOut = ac.createGain(); sfxOut.connect(dest); sfxOut.connect(gn); gn.connect(ac.destination) }
+      if (sfxOut) sfxOut.gain.value = Math.max(0, Math.min(1, (+$('sfxv').value || 0) / 100));
+      if (ac.state == 'suspended') ac.resume(); return ac
+    }
+    function playOne(id, i, gain) {
+      try {
+        if (!SYNTH[id] || !ensureAC()) return;
+        const v = Math.abs(i | 0) % variantCount(id), src = ac.createBufferSource(); src.buffer = audioBuf(id, v);
+        if (id == 'keys' || id == 'tick' || id == 'click' || id == 'bubble' || id == 'pop') src.playbackRate.value = .9 + (Math.abs(i) % 7) * .04;
+        const g = ac.createGain(); g.gain.value = gain == null ? .8 : gain; src.connect(g); g.connect(sfxOut); src.start(); sfxNodes.push(src);
+        src.onended = () => { const k = sfxNodes.indexOf(src); if (k >= 0) sfxNodes.splice(k, 1) }
+      } catch (e) { }
+    }
+    function anySfx() { if ((+$('sfxv').value || 0) <= 0) return false; return slides.some(s => resolveSfx(s).mode != 'off') }
+    function sfxSync(t) {
+      if (!playing || exporting) return;
+      if ((+$('sfxv').value || 0) <= 0) { sfxState.sid = null; return }
+      const s = slides.find(x => t >= x.s - .001 && t < x.s + x.d);
+      if (!s) { sfxState.sid = null; return }
+      const r = resolveSfx(s); if (r.mode == 'off') { sfxState.sid = null; return }
+      const lt = t - s.s;
+      if (sfxState.sid !== s.id || t + .05 < sfxState.t) { sfxState = { sid: s.id, n: countDue(s, r, lt), t, once: lt + .02 >= (SFX_AT[r.an] || .2) }; return }
+      sfxState.t = t;
+      if (r.mode == 'once') { if (!sfxState.once && lt >= (SFX_AT[r.an] || .2)) { sfxState.once = true; playOne(r.id, 0, .9) } return }
+      const due = countDue(s, r, lt); let fired = 0;
+      while (sfxState.n < due && fired < 5) {
+        const i = sfxState.n;
+        if (r.mode == 'word') { if (slideTimes(s).letters.starts[i]) playOne(r.id, i, .72) }
+        else playOne(r.id, i, r.mode == 'letter' ? .62 : .78);
+        sfxState.n++; fired++
+      }
+      if (due - sfxState.n > 8) sfxState.n = due
+    }
+    function hearResolved(s) {
+      if (playing || exporting) return;
+      stopSfx();
+      const srcS = s || { an: S.an, sfx: S.sfx, title: 'शीर्षक', sub: '', body: 'एक दुई तीन चार' };
+      const r = resolveSfx(srcS);
+      if (s && s.id) { const h = $('e_sfxh'); if (h) h.textContent = sfxHint(s) } else { const h = $('sfxh'); if (h) h.textContent = sfxHint({ an: '', sfx: '' }) }
+      if (r.mode == 'off') { $('st').textContent = 'Sound is off.'; return }
+      if (!ensureAC()) { $('st').textContent = 'This browser cannot play sounds.'; return }
+      const n = (r.mode == 'letter' || r.mode == 'burst') ? 8 : (r.mode == 'word' || r.mode == 'wordpop') ? 4 : 1;
+      const gap = (r.id == 'bubble' || r.id == 'pop') ? 120 : 58;
+      playOne(r.id, 0, n == 1 ? .95 : .7);
+      for (let i = 1; i < n; i++) hearT.push(setTimeout(() => playOne(r.id, i, .7), i * (n == 1 ? 0 : gap)));
+      $('st').textContent = 'Sound: ' + (OPT.sfx[r.id] || r.id)
+    }
+    function bakeSfx(seconds) {
+      const vol = Math.max(0, Math.min(1, (+$('sfxv').value || 0) / 100)); if (vol <= 0) return null;
+      const N = Math.ceil(Math.max(.2, seconds) * SR), L = new Float32Array(N), R = new Float32Array(N); let any = false;
+      const mix = (id, time, vari, gain) => {
+        const pcm = pcmOf(id, Math.abs(vari) % variantCount(id)), start = Math.floor(time * SR), g = vol * gain;
+        for (let i = 0; i < pcm.length; i++) { const di = start + i; if (di < 0 || di >= N) continue; const v = pcm[i] * g; L[di] += v * (vari % 2 ? .82 : 1); R[di] += v * (vari % 2 ? 1 : .82) } any = true
+      };
+      slides.forEach(s => {
+        const r = resolveSfx(s); if (r.mode == 'off') return; const tm = slideTimes(s), end = s.s + s.d;
+        if (r.mode == 'once') { const tt = s.s + (SFX_AT[r.an] || .2); if (tt < end) mix(r.id, tt, 0, .9) }
+        else if (r.mode == 'letter') tm.letters.times.forEach((lt, i) => { const tt = s.s + lt; if (tt < end) mix(r.id, tt, i, .62) });
+        else if (r.mode == 'word') tm.letters.times.forEach((lt, i) => { if (!tm.letters.starts[i]) return; const tt = s.s + lt; if (tt < end) mix(r.id, tt, i, .75) });
+        else if (r.mode == 'wordpop') tm.tokens.forEach((lt, i) => { const tt = s.s + lt; if (tt < end) mix(r.id, tt, i, .8) });
+        else if (r.mode == 'burst') { const start = SFX_AT[r.an] || .2; for (let i = 0; i < 8; i++) { const tt = s.s + start + i * .055; if (tt < end) mix(r.id, tt, i, .6) } }
+      });
+      if (!any) return null;
+      for (let i = 0; i < N; i++) { if (L[i] > 1) L[i] = 1; else if (L[i] < -1) L[i] = -1; if (R[i] > 1) R[i] = 1; else if (R[i] < -1) R[i] = -1 }
+      return { L, R }
+    }
+    function mixSfx(abuf, pcm) {
+      if (!pcm) return abuf;
+      if (!abuf) { const off = new OfflineAudioContext(2, pcm.L.length, SR), buf = off.createBuffer(2, pcm.L.length, SR); buf.copyToChannel(pcm.L, 0); buf.copyToChannel(pcm.R, 1); return buf }
+      const L = abuf.getChannelData(0), R = abuf.getChannelData(1), n = Math.min(L.length, pcm.L.length);
+      for (let i = 0; i < n; i++) { let l = L[i] + pcm.L[i], r = R[i] + pcm.R[i]; L[i] = l < -1 ? -1 : l > 1 ? 1 : l; R[i] = r < -1 ? -1 : r > 1 ? 1 : r }
+      return abuf
+    }
+    $('sfxprev').onclick = () => hearResolved(slides[sel]);
     function setMusic(f, say) {
       if (musURL) URL.revokeObjectURL(musURL); musURL = URL.createObjectURL(f); aud.src = musURL; musName = f.name; musFile = f;
-      if (!ac) { ac = new AudioContext(); const src = ac.createMediaElementSource(aud); dest = ac.createMediaStreamDestination(); gn = ac.createGain(); src.connect(dest); src.connect(gn); gn.connect(ac.destination) }
+      ensureAC(); if (ac && !musSrc) { musSrc = ac.createMediaElementSource(aud); musSrc.connect(dest); musSrc.connect(gn) }
       if (say) $('st').textContent = 'Music added: ' + f.name; renderTL()
     }
     function clearMusic() { aud.pause(); if (musURL) URL.revokeObjectURL(musURL); musURL = ''; aud.removeAttribute('src'); musName = ''; musFile = null; renderTL() }
@@ -2025,22 +2178,24 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     const hasAud = () => ac && aud.src;
     function play(done, mute) {
       cancelAnimationFrame(raf); playing = true; from = cur >= total - .3 ? 0 : cur; if (done) from = 0;
-      if (hasAud()) { ac.resume(); gn.gain.value = mute ? 0 : 1; aud.currentTime = from % (aud.duration || 1e9); aud.play() }
+      if (musFile || anySfx()) { ensureAC(); if (gn) gn.gain.value = mute ? 0 : 1 }
+      if (hasAud()) { ac.resume(); aud.currentTime = from % (aud.duration || 1e9); aud.play() }
       t0 = performance.now();
       const f = now => {
-        cur = from + (now - t0) / 1000; if (!(MOB && now - lastD < 30)) { lastD = now; draw(cur); head() }
+        cur = from + (now - t0) / 1000; sfxSync(cur); if (!(MOB && now - lastD < 30)) { lastD = now; draw(cur); head() }
         if (cur < total + .3) raf = requestAnimationFrame(f); else { cur = total; pause(); done && done() }
       };
       raf = requestAnimationFrame(f);
     }
-    function pause() { cancelAnimationFrame(raf); playing = false; if (hasAud()) aud.pause(); $('bp').textContent = 'Play'; $('br').disabled = $('sur').disabled = false; draw(cur); head() }
+    function pause() { cancelAnimationFrame(raf); playing = false; if (hasAud()) aud.pause(); stopSfx(); $('bp').textContent = 'Play'; $('br').disabled = $('sur').disabled = false; draw(cur); head() }
     const toggle = () => { if (playing) pause(); else { $('bp').textContent = 'Pause'; play() } };
     $('bp').onclick = toggle;
     const exportScale = () => $('xres').value == '1080' ? 1.5 : 1;
     function recordLive() {
       if (!window.MediaRecorder) { $('st').textContent = 'This browser cannot record. Use Chrome or Edge.'; return }
       const keepRS2 = RS, xs2 = exportScale(); if (RS != xs2) { RS = xs2; setFmt(); layout() }
-      const au = hasAud(), types = au ? ['video/mp4;codecs=avc1,mp4a.40.2', 'video/webm;codecs=vp9,opus', 'video/webm'] : ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+      const au = !!(musFile || anySfx()); if (au) ensureAC();
+      const types = au ? ['video/mp4;codecs=avc1,mp4a.40.2', 'video/webm;codecs=vp9,opus', 'video/webm'] : ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
       const mime = types.find(m => MediaRecorder.isTypeSupported(m)) || '', stream = cv.captureStream(30);
       if (au) dest.stream.getAudioTracks().forEach(tr => stream.addTrack(tr));
       const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 5e6 }), chunks = [];
@@ -2064,10 +2219,11 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       if (RS != xs) { RS = xs; setFmt() } layout(); exporting = true; cancelExp = false; brb.textContent = 'Cancel export'; $('sur').disabled = $('bp').disabled = true;
       const keep = cur; let enc = null, aenc = null, failed = null;
       try {
+        const pcm = bakeSfx(total);
         let acod = null, abuf = null;
-        if (musFile && window.AudioEncoder && window.AudioData) {
+        if ((musFile || pcm) && window.AudioEncoder && window.AudioData) {
           for (const [c, m] of [['mp4a.40.2', 'aac'], ['opus', 'opus']]) { try { const s = await AudioEncoder.isConfigSupported({ codec: c, sampleRate: 48000, numberOfChannels: 2, bitrate: 128000 }); if (s.supported) { acod = [c, m]; break } } catch (e) { } }
-          if (acod) {
+          if (acod && musFile) {
             try {
               $('st').textContent = 'Preparing music...';
               const off = new OfflineAudioContext(2, Math.ceil(total * 48000), 48000), dec = await off.decodeAudioData(await musFile.arrayBuffer());
@@ -2075,6 +2231,8 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
               g.gain.setValueAtTime(1, Math.max(0, total - 1)); g.gain.linearRampToValueAtTime(0, total); src.start(); abuf = await off.startRendering()
             } catch (e) { abuf = null }
           }
+          if (acod && pcm) abuf = mixSfx(abuf, pcm);
+          if (!abuf) acod = null;
         }
         const muxer = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), video: { codec: 'avc', width: W, height: H }, ...(abuf ? { audio: { codec: acod[1], numberOfChannels: 2, sampleRate: 48000 } } : {}), fastStart: 'in-memory' });
         enc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => { failed = e } }); enc.configure(vcfg);
@@ -2098,7 +2256,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
         if (failed) throw failed;
         muxer.finalize();
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([muxer.target.buffer], { type: 'video/mp4' })); a.download = 'video.mp4'; a.click();
-        $('st').textContent = 'Saved as video.mp4' + (musFile && !abuf ? ' (music could not be added in this browser)' : '');
+        $('st').textContent = 'Saved as video.mp4' + (musFile && !abuf ? ' (music could not be added in this browser)' : '') + (!musFile && pcm && !abuf ? ' (sound effects could not be added in this browser)' : '');
       } catch (e) {
         $('st').textContent = e === 'cancel' ? 'Export cancelled.' : 'Direct export failed (' + ((e && e.message) || e) + '). Try again, or the live recording fallback.';
       }
@@ -2224,27 +2382,31 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
 
     /* manual slide editor */
     function renderEd() {
-      const s = slides[sel], ao = Object.entries(OPT.an).map(([v, n]) => `<option value="${v}">${n}</option>`).join(''), fo = Object.entries(OPT.font).map(([v, n]) => `<option value="${v}">${n}</option>`).join(''), eo2 = Object.entries(OPT.te).map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
+      const s = slides[sel], ao = Object.entries(OPT.an).map(([v, n]) => `<option value="${v}">${n}</option>`).join(''), fo = Object.entries(OPT.font).map(([v, n]) => `<option value="${v}">${n}</option>`).join(''), eo2 = Object.entries(OPT.te).map(([v, n]) => `<option value="${v}">${n}</option>`).join(''), so = Object.entries(OPT.sfx).map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
       $('ed').innerHTML = `<div class="chips">` + slides.map((x, i) => `<button data-i="${i}" class="${i == sel && selT == 's' ? 'on' : ''}">${i + 1}</button>`).join('') + `<button id="a1">+ Add</button><button id="e_x">Delete</button></div>
   <label>Title (## big text)</label><textarea id="e_t" rows="2" style="min-height:54px"></textarea><label>Subtitle (# smaller heading)</label><textarea id="e_s" rows="2" style="min-height:54px"></textarea>
   <label>Text</label>${tbar('e_b', 0)}<textarea id="e_b" style="min-height:130px"></textarea>
   <div class="g"><div><label>Animation</label><select id="e_a"><option value="">Template default</option>${ao}</select></div>
+  <div><label>Sound</label><select id="e_sf"><option value="">Look tab default</option>${so}</select></div>
   <div><label>Font</label><select id="e_f"><option value="">Template font</option>${fo}</select></div>
   <div><label>Text effect</label><select id="e_e"><option value="">Look tab default</option>${eo2}</select></div>
   <div><label>Seconds (0 = auto)</label><input type="number" id="e_d" min="0" step="0.5"></div>
   <div><label>Text size</label><input type="range" id="e_z" min="0.6" max="1.6" step="0.05"></div>
   <div><label>Move text up or down</label><input type="range" id="e_o" min="-600" max="600"></div>
   <div><label>Move text left or right</label><input type="range" id="e_ox" min="-600" max="600"></div></div>
+  <div class="hint" id="e_sfxh" style="margin:2px 0 6px"></div>
   <div class="hint" style="margin:2px 0 6px">You can also drag the text directly in the preview.</div>
   <div class="row"><label style="margin:0">Heading color</label><input type="color" id="e_hc"><button id="e_hr">Auto</button>
   <label style="margin:0 0 0 10px">Text color</label><input type="color" id="e_bc"><button id="e_br">Auto</button></div>
   <div class="row"><button id="e_rp">Reset text position</button><button id="e_all">Copy this look to all slides</button><button id="e_rf">Shuffle animations</button></div>`;
       const th = PAL[S.pal], v = (id, val) => $(id).value = val;
-      v('e_t', s.title); v('e_s', s.sub); v('e_b', s.body); v('e_a', s.an); v('e_f', s.font); v('e_e', s.te); v('e_d', s.dur); v('e_z', s.sz); v('e_o', s.oy); v('e_ox', s.ox || 0); v('e_hc', s.hc || th.h); v('e_bc', s.bc || th.b);
+      v('e_t', s.title); v('e_s', s.sub); v('e_b', s.body); v('e_a', s.an); v('e_sf', s.sfx || ''); v('e_f', s.font); v('e_e', s.te); v('e_d', s.dur); v('e_z', s.sz); v('e_o', s.oy); v('e_ox', s.ox || 0); v('e_hc', s.hc || th.h); v('e_bc', s.bc || th.b);
       const bind = (id, key, f = x => x) => $(id).oninput = e => { s[key] = f(e.target.value); refresh() };
-      bind('e_t', 'title'); bind('e_s', 'sub'); bind('e_b', 'body'); bind('e_a', 'an'); bind('e_f', 'font'); bind('e_e', 'te'); bind('e_d', 'dur', x => +x || 0); bind('e_z', 'sz', x => +x); bind('e_o', 'oy', x => +x); bind('e_ox', 'ox', x => +x); $('e_rp').onclick = () => { s.ox = 0; s.oy = 0; renderEd(); refresh() }; bind('e_hc', 'hc'); bind('e_bc', 'bc');
+      bind('e_t', 'title'); bind('e_s', 'sub'); bind('e_b', 'body'); bind('e_a', 'an'); bind('e_sf', 'sfx'); bind('e_f', 'font'); bind('e_e', 'te'); bind('e_d', 'dur', x => +x || 0); bind('e_z', 'sz', x => +x); bind('e_o', 'oy', x => +x); bind('e_ox', 'ox', x => +x); $('e_rp').onclick = () => { s.ox = 0; s.oy = 0; renderEd(); refresh() }; bind('e_hc', 'hc'); bind('e_bc', 'bc');
+      const updSfxH = () => { const h = $('e_sfxh'); if (h) h.textContent = sfxHint(s) }; updSfxH();
+      ['e_a', 'e_sf'].forEach(id => { const fn = $(id).oninput; $(id).oninput = e => { fn(e); updSfxH(); if (id == 'e_sf') hearResolved(s) } });
       $('e_hr').onclick = () => { s.hc = ''; renderEd(); refresh() }; $('e_br').onclick = () => { s.bc = ''; renderEd(); refresh() };
-      $('e_all').onclick = () => { slides.forEach(x => { x.an = s.an; x.font = s.font; x.te = s.te; x.hc = s.hc; x.bc = s.bc; x.sz = s.sz }); refresh(); $('st').textContent = 'Copied to all slides.' };
+      $('e_all').onclick = () => { slides.forEach(x => { x.an = s.an; x.font = s.font; x.te = s.te; x.hc = s.hc; x.bc = s.bc; x.sz = s.sz; x.sfx = s.sfx }); refresh(); $('st').textContent = 'Copied to all slides.' };
       $('e_rf').onclick = () => { randFx(); refresh(); renderEd() }; $('e_x').onclick = del;
       $('ed').querySelectorAll('[data-i]').forEach(b => b.onclick = () => { selT = 's'; pick(+b.dataset.i) });
       $('a1').onclick = () => { slides.splice(sel + 1, 0, mk('', '', 'यहाँ आफ्नो पाठ लेख्नुहोस्।')); pick(sel + 1) };
@@ -2466,7 +2628,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
 
     /* ===================== projects: saved inside this browser (IndexedDB) ===================== */
     const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-    const CTRL = ['hsz', 'bsz', 'lh', 'pace', 'pg', 'ts', 'tc', 'fw', 'fi', 'kb', 'ls', 'ta', 'fx', 'wm', 'xres'];
+    const CTRL = ['hsz', 'bsz', 'lh', 'pace', 'pg', 'ts', 'tc', 'fw', 'fi', 'kb', 'ls', 'ta', 'fx', 'wm', 'xres', 'sfxv'];
     const getC = id => { const e = $(id); return e.type == 'checkbox' ? e.checked : e.value }, setC = (id, v) => { const e = $(id); if (e.type == 'checkbox') e.checked = !!v; else e.value = v };
     let curTab = 'auto', PID = null, PMETA = null, savedF = new Set(), lastSig = '', saving = false, DEFAULT_ST = null, noDB = '';
     const rq = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error) });

@@ -1258,8 +1258,9 @@
           title="Settings">⚙</button><button id="ch_clr" class="ghost" title="Clear chat">Clear</button><button
           id="ch_x" class="ghost" title="Close">✕</button></div>
       <div id="ch_set" hidden>
-        <label for="ch_url">Ollama URL</label><input type="text" id="ch_url" value="http://localhost:11434">
-        <label for="ch_mod">Model</label><input type="text" id="ch_mod" value="gemma4-long:latest">
+        <label for="ch_key">Gemini API key</label><input type="password" id="ch_key" value="" placeholder="AIza..."
+          autocomplete="off">
+        <label for="ch_gm">Model</label><input type="text" id="ch_gm" value="gemini-3.8-flash">
         <label for="ch_tmp">Creativity (low = safer format)</label><input type="range" id="ch_tmp" min="0" max="1.2"
           step="0.1" value="0.6">
       </div>
@@ -2628,7 +2629,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     DEFAULT_ST = capture(); showHome();
     Promise.all(Object.keys(OPT.font).map(f => document.fonts.load(`700 40px "${f}"`))).then(() => { if (!playing) draw(cur) }).catch(() => { });
 
-    /* ===================== AI chat (local Ollama) ===================== */
+    /* ===================== AI chat (Gemini API) ===================== */
     const SYS = `You write content for a vertical short-video text editor. Reply in the language the user writes in (Nepali in Devanagari by default).
 Put ALL slide content inside ONE code block that starts with \`\`\`slides and ends with \`\`\`. Outside the block write at most one short sentence.
 
@@ -2661,7 +2662,7 @@ EXAMPLE:
     const CHIPS = ['आजको राशिफल (१२ राशि)', '५ वटा प्रेरक विचार', 'आरती / मन्त्र स्लाइड', 'Make it shorter', 'Add bullet points', 'Fix the format'];
     const chatH = []; let chatAC = null;
     const cfg = (k, d) => { try { return localStorage.getItem('ch_' + k) || d } catch (e) { return d } };
-    ['url', 'mod', 'tmp'].forEach(k => { const e = $('ch_' + k); e.value = cfg(k, e.value); e.oninput = () => { try { localStorage.setItem('ch_' + k, e.value) } catch (_) { } } });
+    ['key', 'gm', 'tmp'].forEach(k => { const e = $('ch_' + k); e.value = cfg(k, e.value); e.oninput = () => { try { localStorage.setItem('ch_' + k, e.value) } catch (_) { } } });
 
     /* turn the AI answer into text your slide parser understands */
     function toRaw(t) {
@@ -2694,30 +2695,35 @@ EXAMPLE:
       text = (text || '').trim(); if (!text) return;
       if (chatAC) { chatAC.abort(); return }
       addMsg('user', text); chatH.push({ role: 'user', content: text }); $('ch_in').value = '';
-      const bub = addMsg('a', '…'), url = $('ch_url').value.replace(/\/+$/, ''), ctxTxt = $('ch_ctx').checked ? $('raw').value.trim() : '';
-      const msgs = [{ role: 'system', content: SYS + (ctxTxt ? '\n\nCURRENT EDITOR TEXT (edit or extend this when asked):\n' + ctxTxt : '') }, ...chatH.slice(-10)];
+      const bub = addMsg('a', '…'), key = $('ch_key').value.trim(), ctxTxt = $('ch_ctx').checked ? $('raw').value.trim() : '';
+      const sysTxt = SYS + (ctxTxt ? '\n\nCURRENT EDITOR TEXT (edit or extend this when asked):\n' + ctxTxt : '');
+      const contents = chatH.slice(-10).map(m => ({ role: m.role == 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
       chatAC = new AbortController(); $('ch_send').textContent = 'Stop'; $('ch_stat').textContent = 'thinking…';
       let full = '';
       try {
-        const r = await fetch(url + '/api/chat', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: chatAC.signal,
-          body: JSON.stringify({ model: $('ch_mod').value.trim(), messages: msgs, stream: true, options: { temperature: +$('ch_tmp').value, num_ctx: 8192, num_predict: 8192, top_p: 0.9, repeat_penalty: 1.1 } })
+        if (!key) throw new Error('No API key. Click the ⚙ button and paste your Gemini API key.');
+        const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent($('ch_gm').value.trim()) + ':streamGenerateContent?alt=sse', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, signal: chatAC.signal,
+          body: JSON.stringify({ systemInstruction: { parts: [{ text: sysTxt }] }, contents, generationConfig: { temperature: +$('ch_tmp').value, topP: 0.9, maxOutputTokens: 8192 } })
         });
         if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + (await r.text()).slice(0, 200));
         const rd = r.body.getReader(), dec = new TextDecoder(); let buf = '';
         for (; ;) {
           const { done, value } = await rd.read(); if (done) break; buf += dec.decode(value, { stream: true }); let i;
           while ((i = buf.indexOf('\n')) >= 0) {
-            const ln = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (!ln) continue;
-            const j = JSON.parse(ln); if (j.error) throw new Error(j.error);
-            if (j.message && j.message.content) { full += j.message.content; bub.textContent = full; $('ch_log').scrollTop = 1e9; $('ch_stat').textContent = 'writing…' }
+            let ln = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (!ln.startsWith('data:')) continue;
+            ln = ln.slice(5).trim(); if (!ln || ln == '[DONE]') continue;
+            const j = JSON.parse(ln); if (j.error) throw new Error(j.error.message || JSON.stringify(j.error));
+            const ps = j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts;
+            const tx = ps ? ps.map(p => p.text || '').join('') : '';
+            if (tx) { full += tx; bub.textContent = full; $('ch_log').scrollTop = 1e9; $('ch_stat').textContent = 'writing…' }
           }
         }
         chatH.push({ role: 'assistant', content: full });
         if (full.trim()) { addActions(bub, full); if ($('ch_auto').checked) applyAI(full, false) } else bub.textContent = '(empty answer)';
       } catch (e) {
         if (e.name == 'AbortError') { bub.textContent = (full || '') + ' [stopped]'; if (full) chatH.push({ role: 'assistant', content: full }) }
-        else { bub.className = 'm a err'; bub.textContent = 'Could not reach Ollama: ' + e.message + '\n\nCheck that Ollama is running, the model name is right, and OLLAMA_ORIGINS="*" is set.' }
+        else { bub.className = 'm a err'; bub.textContent = 'Gemini error: ' + e.message + '\n\nCheck your API key (⚙ settings), the model name, and your internet connection.' }
       }
       chatAC = null; $('ch_send').textContent = 'Send'; $('ch_stat').textContent = ''; $('ch_log').scrollTop = 1e9;
     }

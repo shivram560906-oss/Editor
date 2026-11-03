@@ -1084,54 +1084,195 @@
       margin-top: 10px;
       min-height: 18px
     }
-  
-/* ---- AI chat ---- */
-.wrap{max-width:1680px}
-#chat{flex:0 0 330px;position:sticky;top:10px;display:flex;flex-direction:column;height:calc(100vh - 84px);min-height:440px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-#chat.off{display:none}
-.ch-h{display:flex;gap:6px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
-.ch-h b{flex:1}.ch-h button{padding:3px 9px;min-height:0}
-#ch_stat{font-size:11px;color:var(--mut)}
-#ch_set{padding:10px 12px;border-bottom:1px solid var(--line);background:var(--sub)}
-#ch_log{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
-.m{max-width:94%;padding:8px 11px;border-radius:12px;white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.5}
-.m.u{align-self:flex-end;background:var(--ac);color:var(--acfg)}
-.m.a{align-self:flex-start;background:var(--sub);border:1px solid var(--line)}
-.m.a.err{border-color:#c0392b;color:#c0392b}
-.m .ma{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.m .ma button{padding:4px 9px;font-size:12px;min-height:30px}
-.ch-chips{display:flex;gap:6px;overflow-x:auto;padding:6px 12px}.ch-chips button{flex:0 0 auto;padding:4px 10px;font-size:12px;border-color:var(--line);color:var(--fg)}
-.ch-o{padding:0 12px 4px;display:flex;flex-direction:column;gap:2px}.ch-o label{display:flex;gap:6px;align-items:center;font-weight:400;margin:0}
-.ch-in{display:flex;gap:6px;padding:8px 12px 12px;align-items:flex-end}.ch-in textarea{min-height:46px;max-height:140px}
-@media(max-width:760px){
-  #chat{position:fixed;inset:0;z-index:2000;height:100dvh;border-radius:0;border:0;display:none;flex:none}
-  #chat.open{display:flex}
-}
-</style>
+
+    /* ---- AI chat ---- */
+    .wrap {
+      max-width: 1680px
+    }
+
+    #chat {
+      flex: 0 0 330px;
+      position: sticky;
+      top: 10px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 84px);
+      min-height: 440px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      overflow: hidden
+    }
+
+    #chat.off {
+      display: none
+    }
+
+    .ch-h {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .ch-h b {
+      flex: 1
+    }
+
+    .ch-h button {
+      padding: 3px 9px;
+      min-height: 0
+    }
+
+    #ch_stat {
+      font-size: 11px;
+      color: var(--mut)
+    }
+
+    #ch_set {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--sub)
+    }
+
+    #ch_log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .m {
+      max-width: 94%;
+      padding: 8px 11px;
+      border-radius: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.5
+    }
+
+    .m.u {
+      align-self: flex-end;
+      background: var(--ac);
+      color: var(--acfg)
+    }
+
+    .m.a {
+      align-self: flex-start;
+      background: var(--sub);
+      border: 1px solid var(--line)
+    }
+
+    .m.a.err {
+      border-color: #c0392b;
+      color: #c0392b
+    }
+
+    .m .ma {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px
+    }
+
+    .m .ma button {
+      padding: 4px 9px;
+      font-size: 12px;
+      min-height: 30px
+    }
+
+    .ch-chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 6px 12px
+    }
+
+    .ch-chips button {
+      flex: 0 0 auto;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-color: var(--line);
+      color: var(--fg)
+    }
+
+    .ch-o {
+      padding: 0 12px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px
+    }
+
+    .ch-o label {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      font-weight: 400;
+      margin: 0
+    }
+
+    .ch-in {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px 12px;
+      align-items: flex-end
+    }
+
+    .ch-in textarea {
+      min-height: 46px;
+      max-height: 140px
+    }
+
+    @media(max-width:760px) {
+      #chat {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        height: 100dvh;
+        border-radius: 0;
+        border: 0;
+        display: none;
+        flex: none
+      }
+
+      #chat.open {
+        display: flex
+      }
+    }
+  </style>
 </head>
 
 <body>
   <header>
-    <h1>शिवराम गोबिन्द टेक्स्ट इडिटर प्रो</h1><button id="hhome" class="ghost">Projects</button><button id="hchat" class="ghost">AI Chat</button><button id="hnew"
-      class="p">New +</button>
+    <h1>शिवराम गोबिन्द टेक्स्ट इडिटर प्रो</h1><button id="hhome" class="ghost">Projects</button><button id="hchat"
+      class="ghost">AI Chat</button><button id="hnew" class="p">New +</button>
   </header>
   <div id="home"></div>
   <div class="wrap">
-<aside id="chat">
-  <div class="ch-h"><b>AI Writer</b><span id="ch_stat"></span><button id="ch_cfg" class="ghost" title="Settings">⚙</button><button id="ch_clr" class="ghost" title="Clear chat">Clear</button><button id="ch_x" class="ghost" title="Close">✕</button></div>
-  <div id="ch_set" hidden>
-    <label for="ch_key">Gemini API key</label><input type="password" id="ch_key" placeholder="AIza..." autocomplete="off">
-    <div class="hint" style="margin:2px 0 4px">Saved only in this browser. Get a key at aistudio.google.com/apikey</div>
-    <label for="ch_mod">Model</label><input type="text" id="ch_mod" value="gemini-3.6-flash">
-    <label for="ch_tmp">Creativity (low = safer format)</label><input type="range" id="ch_tmp" min="0" max="1.2" step="0.1" value="0.6">
-  </div>
-  <div id="ch_log"></div>
-  <div class="ch-chips" id="ch_chips"></div>
-  <div class="ch-o">
-    <label><input type="checkbox" id="ch_ctx"> Use current editor text as context</label>
-    <label><input type="checkbox" id="ch_auto"> Auto-apply to editor when finished</label>
-  </div>
-  <div class="ch-in"><textarea id="ch_in" rows="2" placeholder="जस्तै: मेष देखि मीन सम्मको आजको राशिफल बनाऊ"></textarea><button id="ch_send" class="p">Send</button></div>
-</aside>
+    <aside id="chat">
+      <div class="ch-h"><b>AI Writer</b><span id="ch_stat"></span><button id="ch_cfg" class="ghost"
+          title="Settings">⚙</button><button id="ch_clr" class="ghost" title="Clear chat">Clear</button><button
+          id="ch_x" class="ghost" title="Close">✕</button></div>
+      <div id="ch_set" hidden>
+        <label for="ch_url">Ollama URL</label><input type="text" id="ch_url" value="http://localhost:11434">
+        <label for="ch_mod">Model</label><input type="text" id="ch_mod" value="gemma4-long:latest">
+        <label for="ch_tmp">Creativity (low = safer format)</label><input type="range" id="ch_tmp" min="0" max="1.2"
+          step="0.1" value="0.6">
+      </div>
+      <div id="ch_log"></div>
+      <div class="ch-chips" id="ch_chips"></div>
+      <div class="ch-o">
+        <label><input type="checkbox" id="ch_ctx"> Use current editor text as context</label>
+        <label><input type="checkbox" id="ch_auto"> Auto-apply to editor when finished</label>
+      </div>
+      <div class="ch-in"><textarea id="ch_in" rows="2"
+          placeholder="जस्तै: मेष देखि मीन सम्मको आजको राशिफल बनाऊ"></textarea><button id="ch_send"
+          class="p">Send</button></div>
+    </aside>
 
     <aside id="prev">
       <div id="stage"><canvas id="cv" width="720" height="1280"></canvas>
@@ -1169,7 +1310,7 @@
               a row make a <b>multi-line</b> title (or subtitle).</li>
             <li>Anything without <code>##</code> or <code>#</code> is plain <b>body text</b>. No line is ever guessed to
               be a heading.</li>
-            <li>Press Enter <b>once or twice</b>: nothing special. The text stays in the same block.</li>
+            <li>Press Enter <b>once</b>: the next text goes on a <b>new line</b> in the video (same slide).</li>
             <li>Press Enter <b>three times</b>: a <b>new slide</b>. Nothing else starts a new slide.</li>
             <li>A full stop <code>.</code> or Nepali full stop <code>&#2404;</code> never creates a slide or a break.
             </li>
@@ -1218,7 +1359,7 @@
                 <option value="700">Bold</option>
               </select></div>
             <label class="ck"><input id="fi" type="checkbox"> Italic</label>
-            <label class="ck"><input id="kb" type="checkbox"> Keep line breaks in body text</label>
+            <input id="kb" type="checkbox" checked hidden>
           </div>
         </details>
         <details class="sec" open>
@@ -1587,7 +1728,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     const slen = s => s.title.length + s.sub.length + s.body.length;
     function layout() {
       const pc = +$('pace').value; let t = 0;
-      slides.forEach(s => { let d = s.dur || Math.max(2, 2.2 + slen(s) / 25) / pc; if (!s.dur && (s.an || S.an) == 'type') d = Math.max(d, .2 + slen(s) / 40 + .8); s.d = d; s.s = t; t += d });
+      slides.forEach(s => { let d = s.dur || Math.max(3.5, 2.2 + slen(s) / 12) / pc; if (!s.dur && (s.an || S.an) == 'type') d = Math.max(d, .3 + slen(s) / 28 + 1.6); s.d = d; s.s = t; t += d });
       const ordered = clips.map((c, i) => i).sort((a, b) => clips[a].start - clips[b].start), ends = [];
       ordered.forEach(i => { const c = clips[i]; let l = 0; while (ends[l] !== undefined && ends[l] > c.start + .001) l++; ends[l] = c.start + c.dur; c.lane = l });
       total = Math.max(t, ...clips.map(c => c.start + c.dur), 1);
@@ -1626,12 +1767,12 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     const shade = (h, m) => { const n = parseInt(h.slice(1), 16), c = v => Math.round(v * (1 - m) + 255 * m); return `rgb(${c(n >> 16 & 255)},${c(n >> 8 & 255)},${c(n & 255)})` };
     const ROM = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x'];
     function paras(txt) {
-      /* Rules: a blank line does nothing; plain lines flow into one text block; only list items (-, *, bullet, 1.) start separate rows. */
+      /* Rules: every line you type (Enter) is shown on its own line in the video; blank lines are skipped; list items get markers. */
       const out = []; let cn = [], last = null;
       txt.replace(/\r/g, '').split('\n').forEach(l => {
         if (!l.trim()) return;
         const m = /^([ \t]*)([-*•]|\d+[.)])\s+(.*)$/.exec(l);
-        if (!m) { const t = l.trim(); if (last && !last.list && !$('kb').checked) last.t += ' ' + t; else { last = { t, lv: 0, mk: '' }; out.push(last) } return }
+        if (!m) { const t = l.trim(); last = { t, lv: 0, mk: '' }; out.push(last); return }
         const lv = Math.min(3, Math.floor(m[1].replace(/\t/g, '  ').length / 2)); let mk;
         if (/\d/.test(m[2])) { cn[lv] = (cn[lv] || 0) + 1; cn.length = lv + 1; const n = cn[lv]; mk = lv == 0 ? n + '.' : lv == 1 ? String.fromCharCode(96 + Math.min(n, 26)) + '.' : (ROM[n - 1] || n) + '.' }
         else { cn.length = Math.min(cn.length, lv + 1); mk = ['•', '◦', '▪', '–'][lv] }
@@ -2486,9 +2627,9 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     WMS.push(newWm()); renderWm(); seedP(); setFmt(); renderTpl(); tab('auto'); autoGen();
     DEFAULT_ST = capture(); showHome();
     Promise.all(Object.keys(OPT.font).map(f => document.fonts.load(`700 40px "${f}"`))).then(() => { if (!playing) draw(cur) }).catch(() => { });
-  
-/* ===================== AI chat (Gemini API) ===================== */
-const SYS=`You write content for a vertical short-video text editor. Reply in the language the user writes in (Nepali in Devanagari by default).
+
+    /* ===================== AI chat (local Ollama) ===================== */
+    const SYS = `You write content for a vertical short-video text editor. Reply in the language the user writes in (Nepali in Devanagari by default).
 Put ALL slide content inside ONE code block that starts with \`\`\`slides and ends with \`\`\`. Outside the block write at most one short sentence.
 
 FORMAT RULES (follow exactly):
@@ -2517,83 +2658,83 @@ EXAMPLE:
 1. पूजा गर्नुहोस्
 2. दान दिनुहोस्
 \`\`\``;
-const CHIPS=['आजको राशिफल (१२ राशि)','५ वटा प्रेरक विचार','आरती / मन्त्र स्लाइड','Make it shorter','Add bullet points','Fix the format'];
-const chatH=[];let chatAC=null;
-const cfg=(k,d)=>{try{return localStorage.getItem('ch_'+k)||d}catch(e){return d}};
-['key','mod','tmp'].forEach(k=>{const e=$('ch_'+k);e.value=cfg(k,e.value);e.oninput=()=>{try{localStorage.setItem('ch_'+k,e.value)}catch(_){}}});
+    const CHIPS = ['आजको राशिफल (१२ राशि)', '५ वटा प्रेरक विचार', 'आरती / मन्त्र स्लाइड', 'Make it shorter', 'Add bullet points', 'Fix the format'];
+    const chatH = []; let chatAC = null;
+    const cfg = (k, d) => { try { return localStorage.getItem('ch_' + k) || d } catch (e) { return d } };
+    ['url', 'mod', 'tmp'].forEach(k => { const e = $('ch_' + k); e.value = cfg(k, e.value); e.oninput = () => { try { localStorage.setItem('ch_' + k, e.value) } catch (_) { } } });
 
-/* turn the AI answer into text your slide parser understands */
-function toRaw(t){
-  const m=/```[a-z]*[ \t]*\n([\s\S]*?)(```|$)/i.exec(t);let s=m?m[1]:t;
-  s=s.replace(/\r/g,'').replace(/\*\*|__/g,'')
-     .replace(/^[ \t]*#{3,}[ \t]*/gm,'## ')
-     .replace(/^([ \t]*)\*[ \t]+/gm,'$1- ')
-     .replace(/^[ \t]*(-{3,}|\*{3,}|_{3,})[ \t]*$/gm,'\n\n')
-     .replace(/[ \t]+$/gm,'').replace(/\n{4,}/g,'\n\n\n');
-  return s.trim();
-}
-function applyAI(txt,append){
-  const t=toRaw(txt);if(!t){$('st').textContent='Nothing to apply.';return}
-  $('raw').value=append&&$('raw').value.trim()?$('raw').value.replace(/\s+$/,'')+'\n\n\n'+t:t;
-  autoGen();
-}
-function addMsg(role,text){
-  const d=document.createElement('div');d.className='m '+(role=='user'?'u':'a');d.textContent=text;
-  $('ch_log').appendChild(d);$('ch_log').scrollTop=1e9;return d;
-}
-function addActions(bub,full){
-  const a=document.createElement('div');a.className='ma';
-  a.innerHTML='<button class="p" data-a="r">Replace editor + make slides</button><button data-a="p">Add as new slides</button><button data-a="c">Copy</button>';
-  a.querySelector('[data-a=r]').onclick=()=>applyAI(full,false);
-  a.querySelector('[data-a=p]').onclick=()=>applyAI(full,true);
-  a.querySelector('[data-a=c]').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(toRaw(full));
-  bub.appendChild(a);
-}
-async function chatSend(text){
-  text=(text||'').trim();if(!text)return;
-  if(chatAC){chatAC.abort();return}
-  const key=$('ch_key').value.trim();
-  if(!key){addMsg('a','पहिले ⚙ मा Gemini API key राख्नुहोस्। (Add your Gemini API key in ⚙ settings first.)');$('ch_set').hidden=false;$('ch_key').focus();return}
-  addMsg('user',text);chatH.push({role:'user',content:text});$('ch_in').value='';
-  const bub=addMsg('a','…'),ctxTxt=$('ch_ctx').checked?$('raw').value.trim():'';
-  const sys=SYS+(ctxTxt?'\n\nCURRENT EDITOR TEXT (edit or extend this when asked):\n'+ctxTxt:'');
-  const contents=chatH.slice(-10).map(m=>({role:m.role=='assistant'?'model':'user',parts:[{text:m.content}]}));
-  chatAC=new AbortController();$('ch_send').textContent='Stop';$('ch_stat').textContent='thinking…';
-  let full='';
-  try{
-    const model=encodeURIComponent($('ch_mod').value.trim()||'gemini-3.6-flash');
-    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':streamGenerateContent?alt=sse',{method:'POST',
-      headers:{'Content-Type':'application/json','x-goog-api-key':key},signal:chatAC.signal,
-      body:JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents,generationConfig:{temperature:+$('ch_tmp').value}})});
-    if(!r.ok){let m=await r.text();try{m=JSON.parse(m).error.message}catch(_){}throw new Error('HTTP '+r.status+' '+String(m).slice(0,300))}
-    const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
-    for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
-      while((i=buf.indexOf('\n'))>=0){const ln=buf.slice(0,i).trim();buf=buf.slice(i+1);
-        if(!ln.startsWith('data:'))continue;const d=ln.slice(5).trim();if(!d||d=='[DONE]')continue;
-        let j;try{j=JSON.parse(d)}catch(_){continue}
-        if(j.error)throw new Error(j.error.message||'API error');
-        const parts=j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts;
-        if(parts){const t=parts.map(x=>x.text||'').join('');if(t){full+=t;bub.textContent=full;$('ch_log').scrollTop=1e9;$('ch_stat').textContent='writing…'}}}}
-    chatH.push({role:'assistant',content:full});
-    if(full.trim()){addActions(bub,full);if($('ch_auto').checked)applyAI(full,false)}else bub.textContent='(empty answer)';
-  }catch(e){
-    if(e.name=='AbortError'){bub.textContent=(full||'')+' [stopped]';if(full)chatH.push({role:'assistant',content:full})}
-    else{bub.className='m a err';bub.textContent='Gemini request failed: '+e.message+'\n\nCheck the API key, the model name, and your internet connection.'}
-  }
-  chatAC=null;$('ch_send').textContent='Send';$('ch_stat').textContent='';$('ch_log').scrollTop=1e9;
-}
-$('ch_send').onclick=()=>chatSend($('ch_in').value);
-$('ch_in').onkeydown=e=>{if(e.key=='Enter'&&!e.shiftKey){e.preventDefault();chatSend($('ch_in').value)}};
-$('ch_cfg').onclick=()=>{$('ch_set').hidden=!$('ch_set').hidden};
-$('ch_clr').onclick=()=>{chatH.length=0;$('ch_log').innerHTML='';addMsg('a','नमस्ते! म तपाईंको स्लाइडका लागि सामग्री लेख्न सक्छु। कुनै विषय भन्नुहोस्।')};
-$('ch_x').onclick=$('hchat').onclick=()=>{
-  const mob=matchMedia('(max-width:760px)').matches;
-  $('chat').classList.toggle(mob?'open':'off');
-};
-CHIPS.forEach(c=>{const b=document.createElement('button');b.textContent=c;
-  b.onclick=()=>{if(/shorter|bullet|format/i.test(c))$('ch_ctx').checked=true;chatSend(c)};$('ch_chips').appendChild(b)});
-addMsg('a','नमस्ते! म तपाईंको स्लाइडका लागि सामग्री लेख्न सक्छु। कुनै विषय भन्नुहोस्।');
-</script>
+    /* turn the AI answer into text your slide parser understands */
+    function toRaw(t) {
+      const m = /```[a-z]*[ \t]*\n([\s\S]*?)(```|$)/i.exec(t); let s = m ? m[1] : t;
+      s = s.replace(/\r/g, '').replace(/\*\*|__/g, '')
+        .replace(/^[ \t]*#{3,}[ \t]*/gm, '## ')
+        .replace(/^([ \t]*)\*[ \t]+/gm, '$1- ')
+        .replace(/^[ \t]*(-{3,}|\*{3,}|_{3,})[ \t]*$/gm, '\n\n')
+        .replace(/[ \t]+$/gm, '').replace(/\n{4,}/g, '\n\n\n');
+      return s.trim();
+    }
+    function applyAI(txt, append) {
+      const t = toRaw(txt); if (!t) { $('st').textContent = 'Nothing to apply.'; return }
+      $('raw').value = append && $('raw').value.trim() ? $('raw').value.replace(/\s+$/, '') + '\n\n\n' + t : t;
+      autoGen();
+    }
+    function addMsg(role, text) {
+      const d = document.createElement('div'); d.className = 'm ' + (role == 'user' ? 'u' : 'a'); d.textContent = text;
+      $('ch_log').appendChild(d); $('ch_log').scrollTop = 1e9; return d;
+    }
+    function addActions(bub, full) {
+      const a = document.createElement('div'); a.className = 'ma';
+      a.innerHTML = '<button class="p" data-a="r">Replace editor + make slides</button><button data-a="p">Add as new slides</button><button data-a="c">Copy</button>';
+      a.querySelector('[data-a=r]').onclick = () => applyAI(full, false);
+      a.querySelector('[data-a=p]').onclick = () => applyAI(full, true);
+      a.querySelector('[data-a=c]').onclick = () => navigator.clipboard && navigator.clipboard.writeText(toRaw(full));
+      bub.appendChild(a);
+    }
+    async function chatSend(text) {
+      text = (text || '').trim(); if (!text) return;
+      if (chatAC) { chatAC.abort(); return }
+      addMsg('user', text); chatH.push({ role: 'user', content: text }); $('ch_in').value = '';
+      const bub = addMsg('a', '…'), url = $('ch_url').value.replace(/\/+$/, ''), ctxTxt = $('ch_ctx').checked ? $('raw').value.trim() : '';
+      const msgs = [{ role: 'system', content: SYS + (ctxTxt ? '\n\nCURRENT EDITOR TEXT (edit or extend this when asked):\n' + ctxTxt : '') }, ...chatH.slice(-10)];
+      chatAC = new AbortController(); $('ch_send').textContent = 'Stop'; $('ch_stat').textContent = 'thinking…';
+      let full = '';
+      try {
+        const r = await fetch(url + '/api/chat', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: chatAC.signal,
+          body: JSON.stringify({ model: $('ch_mod').value.trim(), messages: msgs, stream: true, options: { temperature: +$('ch_tmp').value, num_ctx: 8192, num_predict: 8192, top_p: 0.9, repeat_penalty: 1.1 } })
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + (await r.text()).slice(0, 200));
+        const rd = r.body.getReader(), dec = new TextDecoder(); let buf = '';
+        for (; ;) {
+          const { done, value } = await rd.read(); if (done) break; buf += dec.decode(value, { stream: true }); let i;
+          while ((i = buf.indexOf('\n')) >= 0) {
+            const ln = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (!ln) continue;
+            const j = JSON.parse(ln); if (j.error) throw new Error(j.error);
+            if (j.message && j.message.content) { full += j.message.content; bub.textContent = full; $('ch_log').scrollTop = 1e9; $('ch_stat').textContent = 'writing…' }
+          }
+        }
+        chatH.push({ role: 'assistant', content: full });
+        if (full.trim()) { addActions(bub, full); if ($('ch_auto').checked) applyAI(full, false) } else bub.textContent = '(empty answer)';
+      } catch (e) {
+        if (e.name == 'AbortError') { bub.textContent = (full || '') + ' [stopped]'; if (full) chatH.push({ role: 'assistant', content: full }) }
+        else { bub.className = 'm a err'; bub.textContent = 'Could not reach Ollama: ' + e.message + '\n\nCheck that Ollama is running, the model name is right, and OLLAMA_ORIGINS="*" is set.' }
+      }
+      chatAC = null; $('ch_send').textContent = 'Send'; $('ch_stat').textContent = ''; $('ch_log').scrollTop = 1e9;
+    }
+    $('ch_send').onclick = () => chatSend($('ch_in').value);
+    $('ch_in').onkeydown = e => { if (e.key == 'Enter' && !e.shiftKey) { e.preventDefault(); chatSend($('ch_in').value) } };
+    $('ch_cfg').onclick = () => { $('ch_set').hidden = !$('ch_set').hidden };
+    $('ch_clr').onclick = () => { chatH.length = 0; $('ch_log').innerHTML = ''; addMsg('a', 'नमस्ते! म तपाईंको स्लाइडका लागि सामग्री लेख्न सक्छु। कुनै विषय भन्नुहोस्।') };
+    $('ch_x').onclick = $('hchat').onclick = () => {
+      const mob = matchMedia('(max-width:760px)').matches;
+      $('chat').classList.toggle(mob ? 'open' : 'off');
+    };
+    CHIPS.forEach(c => {
+      const b = document.createElement('button'); b.textContent = c;
+      b.onclick = () => { if (/shorter|bullet|format/i.test(c)) $('ch_ctx').checked = true; chatSend(c) }; $('ch_chips').appendChild(b)
+    });
+    addMsg('a', 'नमस्ते! म तपाईंको स्लाइडका लागि सामग्री लेख्न सक्छु। कुनै विषय भन्नुहोस्।');
+  </script>
 </body>
 
 </html>

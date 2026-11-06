@@ -26,6 +26,49 @@ const IMAGE_MODEL = process.env.CLOUDFLARE_IMAGE_MODEL || "@cf/black-forest-labs
 const IMAGE_STEPS = Math.min(8, Math.max(1, parseInt(process.env.CLOUDFLARE_IMAGE_STEPS || "4", 10) || 4));
 const CF_BASE = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/`;
 
+/* The editor is used for religious and cultural videos, so every picture must
+   stay respectful and family-friendly. The summary prompt below is instructed
+   to produce safe scenes, explicit "@img" prompts are screened, and every
+   final prompt gets positive safety wording. */
+const SAFE_FALLBACK =
+  "A peaceful Nepali temple courtyard at sunrise with modestly dressed people in traditional attire, warm golden light, respectful and family-friendly, no text";
+
+const IMAGE_SAFETY =
+  ", respectful family-friendly scene, modest traditional clothing, serene and dignified atmosphere, high quality";
+
+const UNSAFE_PATTERNS = [
+  /\bnude\b/i, /\bnudity\b/i, /\bnaked\b/i, /\btopless\b/i, /\bbottomless\b/i,
+  /\blingerie\b/i, /\bunderwear\b/i, /\bunderpants\b/i, /\bpanties\b/i, /\bbra\b/i,
+  /\bbikini\b/i, /\bswimsuit\b/i, /\bswimwear\b/i, /\bcleavage\b/i, /\bbreasts?\b/i,
+  /\bhalf[- ]?naked\b/i, /\bundress(?:ed|ing)?\b/i, /\bsexual\w*\b/i, /\bsex\b/i,
+  /\berotic\w*\b/i, /\bporn\w*\b/i, /\bseductive\b/i, /\bsensual\b/i,
+  /\bkiss(?:es|ing)?\b/i, /\bromantic\b/i,
+  /\bblood\w*\b/i, /\bgore\b/i, /\bviolence\b/i, /\bviolent\b/i, /\bweapons?\b/i,
+  /\bguns?\b/i, /\bknife\b/i, /\bknives\b/i, /\bswords?\b/i, /\bkill\w*\b/i,
+  /\bmurder\w*\b/i, /\bcorpse\b/i, /\btorture\w*\b/i, /\bterroris\w*\b/i,
+  /\bdrugs?\b/i, /\bcocaine\b/i, /\bheroin\b/i, /\balcohol\b/i, /\bbeers?\b/i,
+  /\bwine\w*\b/i, /\bwhiskey\b/i, /\bcigarette\w*\b/i, /\bsmoking\b/i,
+  /\bgambling\b/i, /\bcasino\b/i, /\bhorror\b/i, /\bdemons?\b/i, /\bdevils?\b/i,
+];
+
+/* Common Nepali/Devanagari words for the same unsafe topics. */
+const UNSAFE_NEPALI = [
+  "नग्न", "निर्वस्त्र", "अर्धनग्न", "सेक्स", "यौन", "कामुक", "अश्लील", "पोर्न",
+  "बलात्कार", "रक्त", "हिंसा", "हत्या", "हतियार", "आतंक", "मदिरा", "रक्सी",
+  "धूम्रपान", "जुवा", "डरलाग्दो",
+];
+
+function unsafePrompt(text) {
+  const value = String(text || "");
+  if (UNSAFE_NEPALI.some((word) => value.includes(word))) return true;
+  return UNSAFE_PATTERNS.some((re) => re.test(value));
+}
+
+function safeImagePrompt(prompt) {
+  const base = String(prompt || "").replace(/[.\s]+$/, "").trim();
+  return `${base}${IMAGE_SAFETY}`.slice(0, 2000);
+}
+
 const MAX_BODY = 100 * 1024;
 const RATE_WINDOW = 10 * 60 * 1000;
 const RATE_LIMIT = 80;
@@ -122,7 +165,13 @@ async function cloudflare(model, input, timeoutMs) {
       throw new HttpError(502, "Cloudflare rejected the API credentials. Check the server settings.");
     }
     if (r.status === 429) {
-      throw new HttpError(429, "AI rate limit reached. Please wait a minute and try again.");
+      const daily = /daily free allocation|neurons/i.test(detail);
+      throw new HttpError(
+        429,
+        daily
+          ? "The daily free AI limit is used up. Please try again tomorrow or upgrade the Cloudflare Workers plan."
+          : "AI rate limit reached. Please wait a minute and try again."
+      );
     }
     throw new HttpError(502, `AI service error: ${String(detail).slice(0, 180)}`);
   }
@@ -134,6 +183,14 @@ Read the slide text below. It may be written in Nepali or another language.
 Reply with ONE English image prompt of at most 35 words that captures the main idea.
 Describe a concrete scene: the setting, people or objects, and the lighting.
 Do not include any text, captions, letters, logos or watermarks in the image.
+
+Safety rules that must always be followed:
+- The picture will be used in religious and cultural videos, so it must be respectful and suitable for all ages.
+- Every person must be fully clothed in modest traditional attire. Never show nudity, underwear, swimwear, revealing or tight clothing, bare chests, or sexual or romantic poses.
+- No violence, blood, weapons, drugs, alcohol, smoking, gambling, horror or disturbing imagery.
+- Never mock or disrespect any religion, deity, temple, holy place, flag or community.
+- If the slide text suggests anything unsafe, choose a calm, respectful and symbolic alternative instead.
+
 Return only the prompt. No quotes, labels, or explanation.`;
 
 async function summarize(text) {
@@ -157,13 +214,14 @@ async function summarize(text) {
     .replace(/\s+/g, " ")
     .trim();
   if (!prompt) throw new HttpError(502, "The AI could not write an image prompt for this slide.");
+  if (unsafePrompt(prompt)) return SAFE_FALLBACK;
   return prompt.slice(0, 600);
 }
 
 async function generateImage(prompt) {
   const result = await cloudflare(
     IMAGE_MODEL,
-    { prompt: prompt.slice(0, 2000), steps: IMAGE_STEPS },
+    { prompt: safeImagePrompt(prompt), steps: IMAGE_STEPS },
     60000
   );
   if (!result.image) throw new HttpError(502, "The AI did not return an image.");
@@ -196,7 +254,12 @@ async function slideImage(req, res) {
     if (!text && !explicit) throw new HttpError(400, "Slide text or an image prompt is required.");
 
     const started = Date.now();
-    const prompt = explicit || (await summarize(text));
+    let prompt;
+    if (explicit && !unsafePrompt(explicit)) prompt = explicit;
+    else if (text) prompt = await summarize(text);
+    else prompt = SAFE_FALLBACK;
+    if (unsafePrompt(prompt)) prompt = SAFE_FALLBACK;
+    if (explicit && prompt !== explicit) console.warn("Unsafe @img prompt was replaced with a safe scene.");
     const image = await generateImage(prompt);
     console.log(`AI picture ${Date.now() - started}ms | ${prompt.slice(0, 100)}`);
     sendJSON(res, 200, { success: true, prompt, image });
@@ -243,9 +306,13 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-  if (!ACCOUNT_ID || !API_TOKEN) {
-    console.warn("Cloudflare credentials are missing. Add them to .env or the host environment.");
-  }
-});
+if (require.main === module) {
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+    if (!ACCOUNT_ID || !API_TOKEN) {
+      console.warn("Cloudflare credentials are missing. Add them to .env or the host environment.");
+    }
+  });
+}
+
+module.exports = { unsafePrompt, safeImagePrompt, SAFE_FALLBACK };

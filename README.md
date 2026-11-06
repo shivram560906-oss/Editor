@@ -20,6 +20,18 @@ Every slide gets a picture automatically when you press **Make slides**.
 - Otherwise the server summarizes the slide text in English with a Workers AI text model, then generates the picture with `@cf/black-forest-labs/flux-1-schnell`.
 - The browser only talks to `/api/slide-image`; the Cloudflare token stays on the server.
 
+### Safety
+
+Pictures are constrained for religious and cultural use:
+
+- The summary prompt requires respectful, family-friendly scenes, fully clothed people in modest attire, and no violence or disturbing imagery.
+- Explicit `@img` prompts are screened. If one contains unsafe wording, the server ignores it and summarizes the slide instead.
+- Every final image prompt adds positive safety wording (modest clothing, respectful, serene).
+
+This is a prompt-level safeguard, not a guarantee from the image model. Review generated pictures before publishing.
+
+If the free daily Cloudflare AI allocation runs out, the app says so; wait for the reset or upgrade the Workers plan.
+
 ### Credentials
 
 Copy `.env.example` to `.env` and fill in:

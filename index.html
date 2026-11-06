@@ -1672,8 +1672,8 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
         <section id="tlw" aria-label="Timeline">
           <div class="tb">
             <b class="tb-title">Timeline</b>
-            <button id="t_l" class="tb-btn" title="Back 0.1s" aria-label="Back 0.1 seconds"><svg class="ic"><use href="#i-chev-left"></use></svg></button>
-            <button id="t_r" class="tb-btn" title="Forward 0.1s" aria-label="Forward 0.1 seconds"><svg class="ic"><use href="#i-chev-right"></use></svg></button>
+            <button id="t_undo" class="tb-btn" title="Undo" aria-label="Undo" disabled><svg class="ic"><use href="#i-undo"></use></svg></button>
+            <button id="t_redo" class="tb-btn" title="Redo" aria-label="Redo" disabled><svg class="ic"><use href="#i-redo"></use></svg></button>
             <span class="tb-sep"></span>
             <button id="t_sp" class="tb-btn" title="Split at playhead"><svg class="ic"><use href="#i-scissors"></use></svg><span class="label">Split</span></button>
             <button id="t_dp" class="tb-btn" title="Duplicate"><svg class="ic"><use href="#i-copy"></use></svg><span class="label">Duplicate</span></button>
@@ -1695,7 +1695,7 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
             </div>
           </div>
           <div id="tl"><div id="ti"></div></div>
-          <div class="tl-hint">Click the ruler to move the playhead. Drag slides to reorder, drag edges to trim. Space play · S split · Del remove.</div>
+          <div class="tl-hint">Click the ruler to move the playhead. Drag empty space to scroll, click it to clear the selection. Drag slides to reorder, drag edges to trim. Space play · S split · Del remove.</div>
         </section>
       </section>
 
@@ -2680,6 +2680,19 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
 
     /* manual slide editor */
     function renderEd() {
+      if (selT == 'none') {
+        $('ed').innerHTML = `
+<div class="slide-strip">
+  <div class="chips">${slides.map((x, i) => `<button type="button" data-i="${i}">${i + 1}</button>`).join('')}</div>
+  <div class="strip-actions">
+    <button type="button" id="a1" class="btn btn-sm"><svg class="ic"><use href="#i-plus"></use></svg> Add</button>
+  </div>
+</div>
+<div class="card"><div class="panel-head"><h2>Nothing selected</h2><p>Tap a slide or a picture to edit it.</p></div></div>`;
+        $('ed').querySelectorAll('[data-i]').forEach(b => b.onclick = () => { selT = 's'; pick(+b.dataset.i) });
+        $('a1').onclick = () => { slides.splice(sel + 1, 0, mk('', '', 'यहाँ आफ्नो पाठ लेख्नुहोस्।')); pick(sel + 1) };
+        return;
+      }
       const s = slides[sel], ao = Object.entries(OPT.an).map(([v, n]) => `<option value="${v}">${n}</option>`).join(''), fo = Object.entries(OPT.font).map(([v, n]) => `<option value="${v}">${n}</option>`).join(''), eo2 = Object.entries(OPT.te).map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
       $('ed').innerHTML = `
 <div class="slide-strip">
@@ -2848,7 +2861,13 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
         };
         run(mv, ev => {
           ti.classList.remove('panning');
-          if (ev.type == 'pointerup' && !moved && !cancelled) seek(e)
+          if (ev.type == 'pointerup' && !moved && !cancelled) {
+            seek(e);
+            /* tapping empty space clears the current selection */
+            selC = -1; selT = 'none';
+            $('st').textContent = 'Selection cleared.';
+            renderEd(); renderCl(); refresh();
+          }
         });
         return
       }
@@ -2866,7 +2885,13 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       };
       run(mv, () => { renderCl(); renderEd() }); refresh();
     };
+    function needSel() {
+      if (selT != 'none') return true;
+      $('st').textContent = 'Select a slide or picture first.';
+      return false;
+    }
     function split() {
+      if (!needSel()) return;
       if (selT == 'c' && clips[selC]) { const c = clips[selC]; if (cur > c.start + .3 && cur < c.start + c.dur - .3) { const n = { ...c, sid: null, auto: false, start: Math.round(cur * 10) / 10 }; n.dur = Math.round((c.start + c.dur - n.start) * 10) / 10; c.dur = Math.round((n.start - c.start) * 10) / 10; clips.splice(selC + 1, 0, n); selC++ } }
       else {
         const s = slides[sel], fr = clamp((cur - s.s) / s.d, .2, .8), at = Math.floor(s.body.length * fr); let i = s.body.indexOf('\n', at); if (i < 0) i = s.body.indexOf(' ', at);
@@ -2875,10 +2900,18 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       }
       layout(); renderCl(); renderEd(); refresh();
     }
-    function dup() { if (selT == 'c' && clips[selC]) { const c = clips[selC]; clips.splice(selC + 1, 0, { ...c, sid: null, auto: false, start: Math.round((c.start + c.dur) * 10) / 10 }); selC++ } else slides.splice(sel + 1, 0, { ...slides[sel], id: nid() }); layout(); renderCl(); renderEd(); refresh() }
-    function del() { if (selT == 'c' && clips[selC]) { clips.splice(selC, 1); selC = -1; selT = 's' } else if (slides.length > 1) { slides.splice(sel, 1); sel = Math.max(0, sel - 1) } layout(); renderCl(); renderEd(); refresh() }
+    function dup() {
+      if (!needSel()) return;
+      if (selT == 'c' && clips[selC]) { const c = clips[selC]; clips.splice(selC + 1, 0, { ...c, sid: null, auto: false, start: Math.round((c.start + c.dur) * 10) / 10 }); selC++ } else slides.splice(sel + 1, 0, { ...slides[sel], id: nid() });
+      layout(); renderCl(); renderEd(); refresh()
+    }
+    function del() {
+      if (!needSel()) return;
+      if (selT == 'c' && clips[selC]) { clips.splice(selC, 1); selC = -1; selT = 's' } else if (slides.length > 1) { slides.splice(sel, 1); sel = Math.max(0, sel - 1) }
+      layout(); renderCl(); renderEd(); refresh()
+    }
     const step = d => { if (playing) pause(); cur = clamp(cur + d, 0, total); draw(cur); head() };
-    $('t_sp').onclick = split; $('t_dp').onclick = dup; $('t_dl').onclick = del; $('t_l').onclick = () => step(-.1); $('t_r').onclick = () => step(.1);
+    $('t_sp').onclick = split; $('t_dp').onclick = dup; $('t_dl').onclick = del;
     $('t_sn').onclick = () => { snapOn = !snapOn; $('t_sn').classList.toggle('on', snapOn); $('t_sn').textContent = snapOn ? 'Snap on' : 'Snap off' };
     const zoom = f => { $('zm').value = clamp($('zm').value * f, 6, 140); refresh() };
     $('t_zo').onclick = () => zoom(.8); $('t_zi').onclick = () => zoom(1.25); $('t_fit').onclick = () => { $('zm').value = clamp(($('tl').clientWidth - 40) / total, 6, 140); refresh() };
@@ -3043,7 +3076,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       clips = (st.clips || []).map(c => wire({ box: null, ...c }));
       WMS.length = 0; (st.wms && st.wms.length ? st.wms : [newWm()]).forEach(w => WMS.push(wire({ ...newWm(), ...w })));
       if (!keepMus) { if (mus) setMusic(mus, false); else clearMusic() }
-      sel = clamp(st.sel || 0, 0, slides.length - 1); selC = st.selC >= 0 && st.selC < clips.length ? st.selC : -1; selT = st.selT == 'c' && selC >= 0 ? 'c' : 's';
+      sel = clamp(st.sel || 0, 0, slides.length - 1); selC = st.selC >= 0 && st.selC < clips.length ? st.selC : -1; selT = st.selT == 'c' && selC >= 0 ? 'c' : st.selT == 'none' ? 'none' : 's';
       renderTpl(); layout(); renderCl(); renderWm(); renderEd(); tab(st.tab || 'auto');
       cur = clamp(st.cur || 0, 0, total); draw(cur); renderTL(); head(); updNav();
       $('tl').scrollLeft = Math.max(0, cur * pps() - 120);
@@ -3204,7 +3237,11 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     const usig = st => JSON.stringify({ ...st, cur: 0, tab: '', sel: 0, selC: 0, selT: '', zm: 0, cat: '', mus: '' });
     function regImgs() { [...clips, ...WMS].forEach(o => { if (o.fid && o.img) { imgReg.set(o.fid, o.img); if (o.ai && o.ai.v) imgReg.set(o.fid + '.ai', o.ai.v) } }) }
     function pruneReg() { if (imgReg.size < 30) return; const used = new Set();[...undoStack, ...redoStack, curSnap].forEach(st => { if (st) (st.clips || []).concat(st.wms || []).forEach(o => { if (o.fid) { used.add(o.fid); used.add(o.fid + '.ai') } }) });[...imgReg.keys()].forEach(k => { if (!used.has(k)) imgReg.delete(k) }) }
-    function updUR() { $('undo').disabled = !undoStack.length; $('redo').disabled = !redoStack.length }
+    function updUR() {
+      const noUndo = !undoStack.length, noRedo = !redoStack.length;
+      ['undo', 't_undo'].forEach(id => { const b = $(id); if (b) b.disabled = noUndo });
+      ['redo', 't_redo'].forEach(id => { const b = $(id); if (b) b.disabled = noRedo });
+    }
     function resetHistory() { undoStack.length = 0; redoStack.length = 0; regImgs(); curSnap = capture(); curSig = usig(curSnap); lastSeen = curSig; seenAt = 0; updUR() }
     function commitPending() {
       const st = capture(), sg = usig(st); if (sg === curSig || !curSnap) return;
@@ -3223,7 +3260,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     }
     function undo() { if (!PID || homeOpen() || exporting) return; commitPending(); if (!undoStack.length) return; redoStack.push(curSnap); applySnap(undoStack.pop()); $('st').textContent = 'Undone.' }
     function redo() { if (!PID || homeOpen() || exporting) return; commitPending(); if (!redoStack.length) return; undoStack.push(curSnap); applySnap(redoStack.pop()); $('st').textContent = 'Redone.' }
-    $('undo').onclick = undo; $('redo').onclick = redo;
+    $('undo').onclick = undo; $('redo').onclick = redo; $('t_undo').onclick = undo; $('t_redo').onclick = redo;
     setInterval(histTick, 400);
     $('hhome').onclick = showHome;
     $('hnew').onclick = async () => { await saveNow(true); newProject() };

@@ -383,7 +383,11 @@ img { max-width: 100%; }
   position: relative;
   touch-action: pan-y;
   min-height: 124px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
+#ti.panning { cursor: grabbing; }
 #ti::before {
   content: "";
   position: absolute;
@@ -443,6 +447,18 @@ img { max-width: 100%; }
   transform: translateX(-50%);
   background: var(--ac);
   box-shadow: 0 0 0 3px rgba(255, 59, 92, .22);
+}
+/* wider invisible grab area around the playhead handle */
+#phh {
+  position: absolute;
+  top: -3px;
+  width: 28px;
+  height: 28px;
+  transform: translateX(-50%);
+  z-index: 5;
+  cursor: ew-resize;
+  touch-action: none;
+  border-radius: 50%;
 }
 .tk {
   position: absolute;
@@ -2792,7 +2808,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     const pps = () => +$('zm').value;
     $('zm').oninput = () => refresh();
     function renderTL() {
-      const p = pps(), nl = Math.max(1, ...clips.map(c => (c.lane || 0) + 1)), h = 62 + nl * 28 + (hasAud() ? 28 : 0); let o = '<div id="ph"></div>';
+      const p = pps(), nl = Math.max(1, ...clips.map(c => (c.lane || 0) + 1)), h = 62 + nl * 28 + (hasAud() ? 28 : 0); let o = '<div id="ph"></div><div id="phh" title="Drag to seek"></div>';
       const step = p < 14 ? 10 : p < 30 ? 5 : 1;
       for (let i = 0; i <= Math.ceil(total) + 2; i++)if (i % step == 0) o += `<div class="tk" style="left:${i * p}px">${i % (step * (step == 1 ? 5 : 1)) ? '' : fmtT(i)}</div>`;
       slides.forEach((s, i) => o += `<div class="b sl${selT == 's' && i == sel ? ' on' : ''}" data-i="${i}" style="left:${s.s * p}px;width:${s.d * p}px;top:22px">${i + 1}. ${esc(s.title || s.sub || s.body.split('\n')[0])}<u></u></div>`);
@@ -2800,7 +2816,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       if (hasAud()) o += `<div class="b mu" style="left:0;width:${total * p}px;top:${54 + nl * 28}px">Music: ${esc(musName)}</div>`;
       $('ti').innerHTML = o; $('ti').style.width = (Math.ceil(total) + 4) * p + 'px'; $('ti').style.height = h + 'px'; $('tt').textContent = ' ' + fmtT(cur, 1) + ' / ' + fmtT(total, 1);
     }
-    function head() { const h = $('ph'); if (h) { h.style.left = cur * pps() + 'px'; if (playing) { const tl = $('tl'), x = cur * pps(); if (x > tl.scrollLeft + tl.clientWidth - 30 || x < tl.scrollLeft) tl.scrollLeft = x - 40 } } $('tt').textContent = ' ' + fmtT(cur, 1) + ' / ' + fmtT(total, 1); updNav() }
+    function head() { const h = $('ph'), hh = $('phh'), x = cur * pps(); if (h) h.style.left = x + 'px'; if (hh) hh.style.left = x + 'px'; if (playing) { const tl = $('tl'); if (x > tl.scrollLeft + tl.clientWidth - 30 || x < tl.scrollLeft) tl.scrollLeft = x - 40 } $('tt').textContent = ' ' + fmtT(cur, 1) + ' / ' + fmtT(total, 1); updNav() }
     function seek(e) { if (playing) pause(); cur = clamp((e.clientX - $('ti').getBoundingClientRect().left) / pps(), 0, total); draw(cur); head() }
     function sn(v, o) {
       if (!snapOn) return Math.round(v * 10) / 10;
@@ -2808,9 +2824,35 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       const th = 9 / pps(); let b = v, bd = th; c.forEach(x => { const d = Math.abs(x - v); if (d < bd) { bd = d; b = x } }); return bd < th ? b : Math.round(v * 10) / 10;
     }
     $('ti').onpointerdown = e => {
-      const b = e.target.closest('.b'), p = pps(), L = () => $('ti').getBoundingClientRect().left;
-      const run = (mv, up2) => { const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); up2 && up2() }; addEventListener('pointermove', mv); addEventListener('pointerup', up); addEventListener('pointercancel', up) };
-      if (!b) { seek(e); run(seek); return }
+      const ti = $('ti'), tl = $('tl'), b = e.target.closest('.b'), p = pps(), L = () => ti.getBoundingClientRect().left;
+      const run = (mv, up2) => { const up = ev => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); up2 && up2(ev) }; addEventListener('pointermove', mv); addEventListener('pointerup', up); addEventListener('pointercancel', up) };
+
+      /* the round handle at the top of the red line scrubs the playhead */
+      if (e.target.closest('#phh')) {
+        e.preventDefault();
+        if (playing) pause();
+        const x0 = e.clientX, c0 = cur;
+        const mv = ev => { cur = clamp(c0 + (ev.clientX - x0) / p, 0, total); draw(cur); head() };
+        run(mv); return
+      }
+
+      /* empty timeline: drag to pan, tap to seek */
+      if (!b) {
+        const x0 = e.clientX, y0 = e.clientY, s0 = tl.scrollLeft;
+        let moved = false, cancelled = false;
+        const mv = ev => {
+          const dx = ev.clientX - x0, dy = ev.clientY - y0;
+          if (!moved && Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) { cancelled = true; return }
+          if (!moved && Math.abs(dx) > 6) { moved = true; ti.classList.add('panning') }
+          if (moved) { tl.scrollLeft = s0 - dx; if (ev.cancelable) ev.preventDefault() }
+        };
+        run(mv, ev => {
+          ti.classList.remove('panning');
+          if (ev.type == 'pointerup' && !moved && !cancelled) seek(e)
+        });
+        return
+      }
+
       if (b.classList.contains('mu')) return;
       const isC = b.dataset.c !== undefined, o = isC ? clips[+b.dataset.c] : slides[+b.dataset.i], side = e.target.tagName == 'U' ? 'r' : e.target.tagName == 'I' ? 'l' : 'm';
       if (isC) { selC = +b.dataset.c; selT = 'c'; showClip(o) } else { sel = +b.dataset.i; selT = 's' }
@@ -2840,7 +2882,10 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     $('t_sn').onclick = () => { snapOn = !snapOn; $('t_sn').classList.toggle('on', snapOn); $('t_sn').textContent = snapOn ? 'Snap on' : 'Snap off' };
     const zoom = f => { $('zm').value = clamp($('zm').value * f, 6, 140); refresh() };
     $('t_zo').onclick = () => zoom(.8); $('t_zi').onclick = () => zoom(1.25); $('t_fit').onclick = () => { $('zm').value = clamp(($('tl').clientWidth - 40) / total, 6, 140); refresh() };
-    $('tl').addEventListener('wheel', e => { if (e.ctrlKey) { e.preventDefault(); zoom(e.deltaY < 0 ? 1.15 : .87) } }, { passive: false });
+    $('tl').addEventListener('wheel', e => {
+      if (e.ctrlKey) { e.preventDefault(); zoom(e.deltaY < 0 ? 1.15 : .87); return }
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); $('tl').scrollLeft += e.deltaY }
+    }, { passive: false });
     document.addEventListener('keydown', e => {
       if ($('home').classList.contains('on')) return;
       if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;

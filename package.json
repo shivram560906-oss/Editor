@@ -1,8 +1,12 @@
-
 {
   "name": "my-editor-website",
   "version": "1.0.0",
+  "description": "Nepali text-to-video editor with Cloudflare AI slide pictures",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

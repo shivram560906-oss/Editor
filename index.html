@@ -1072,6 +1072,7 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
 }
 #ch_set label { margin-top: 8px; }
 #ch_set label:first-child { margin-top: 0; }
+#ch_set .ch-note { margin: 10px 0 0; font-size: 11px; line-height: 1.45; color: var(--mut); }
 #ch_log {
   flex: 1 1 auto;
   min-height: 0;
@@ -1601,8 +1602,7 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
         <div id="ch_set" hidden>
           <label for="ch_key">Gemini API key</label>
           <input type="password" id="ch_key" value="" placeholder="AIza..." autocomplete="off">
-          <label for="ch_pk">Pixabay API key (slide pictures)</label>
-          <input type="password" id="ch_pk" value="" placeholder="Pixabay key" autocomplete="off">
+          <p class="ch-note">Slide pictures are generated automatically by Cloudflare AI.</p>
           <label for="ch_gm">Model</label>
           <select id="ch_gm">
             <option value="gemini-3.8-flash" selected>gemini-3.8-flash</option>
@@ -2563,7 +2563,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       return chunks.map(c => {
         const ti = [], su = [], bo = []; let m, q = '';
         c.split('\n').forEach(l => {
-          if (m = /^\s*@(?:img|image|pic):\s*(.+)$/i.exec(l)) { q = m[1].trim(); return }
+          if (m = /^\s*@(?:img|image|pic)\s*:\s*(.+)$/i.exec(l)) { q = m[1].trim(); return }
           if (m = /^\s*##\s*(.*)$/.exec(l)) { ti.push(m[1].trim()); if (l.trim()) firstLine = false }
           else if (m = /^\s*#\s*(.*)$/.exec(l)) { su.push(m[1].trim()); if (l.trim()) firstLine = false }
           else if (firstLine && l.trim()) { ti.push(l.trim()); firstLine = false }   /* the very first line is always the heading */
@@ -2579,47 +2579,46 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       sel = 0; if ($('fx').value == 'mix') randFx(); layout(); pick(0); $('st').textContent = slides.length + ' slide' + (slides.length > 1 ? 's' : '') + ' ready. Press Play.';
       autoPics();
     }
-    /* automatic pictures: slides with an "@img: keywords" line get a Pixabay photo below the text */
-    const fetchT = (u, ms) => fetch(u, { signal: AbortSignal.timeout(ms || 10000) });
-    async function pixSearch(q, key, ori) {
-      const r = await fetchT('https://pixabay.com/api/?key=' + encodeURIComponent(key) + '&q=' + encodeURIComponent(q.slice(0, 100)) + '&image_type=photo&safesearch=true&per_page=15&orientation=' + ori);
-      if (!r.ok) { const t = (await r.text().catch(() => '')).slice(0, 80); throw new Error(r.status == 429 ? 'Pixabay limit reached (wait a minute)' : 'Pixabay ' + r.status + ' ' + t) }
-      return (await r.json()).hits || [];
-    }
-    /* Pixabay's image server usually blocks canvas use, so: try direct, then a free CORS image proxy */
-    async function getBlob(url) {
-      const tries = [url, 'https://images.weserv.nl/?url=' + encodeURIComponent(url.replace(/^https?:\/\//, '')) + '&w=900&output=jpg'];
-      for (const u of tries) { try { const r = await fetchT(u, 12000); if (r.ok) { const b = await r.blob(); if (b.size > 500) return b } } catch (e) { } }
-      throw new Error('Could not download the picture (blocked by the browser)');
-    }
-    async function addPic(s, key, used, job) {
-      const fresh = a => a.filter(h => !used.has(h.id)), w = s.q.split(/\s+/);
-      let hits = fresh(await pixSearch(s.q, key, 'horizontal'));
-      if (!hits.length) hits = fresh(await pixSearch(s.q, key, 'all'));
-      if (!hits.length && w.length > 2) hits = fresh(await pixSearch(w.slice(0, 2).join(' '), key, 'all'));
-      if (!hits.length) throw new Error('No picture found for "' + s.q + '"');
-      const h = hits[0]; used.add(h.id);
-      const blob = await getBlob(h.webformatURL || h.largeImageURL);
-      const [im, src, w0, h0] = await new Promise((res, rej) => readImg(blob, (a, b, c, d) => res([a, b, c, d]), () => rej(new Error('Could not read picture'))));
+    /* automatic pictures: every slide gets a Cloudflare AI image below the text.
+       An "@img: description" line overrides the automatic English summary. */
+    function slideText(s) { return [s.title, s.sub, s.body].map(x => (x || '').trim()).filter(Boolean).join('\n').trim() }
+    async function addPic(s, job) {
+      let r;
+      try {
+        r = await fetch('/api/slide-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: slideText(s), prompt: (s.q || '').trim() }),
+          signal: AbortSignal.timeout(120000)
+        });
+      } catch (e) {
+        throw new Error('AI picture service is not reachable. Start the app with "npm start".');
+      }
+      let data = null; try { data = await r.json() } catch (e) { }
+      if (r.status === 404) throw new Error('AI picture service is not available. Start the app with "npm start".');
+      if (!r.ok || !data || !data.image) throw new Error((data && data.error) || ('AI picture failed (' + r.status + ')'));
+      const blob = await (await fetch(data.image)).blob();
+      const [im, src, w0, h0] = await new Promise((res, rej) => readImg(blob, (a, b, c, d) => res([a, b, c, d]), () => rej(new Error('Could not read the AI picture'))));
       if (job !== picJob || !slides.includes(s)) return;
-      clips.push({ img: im, src, name: 'Pixabay: ' + s.q, pos: 'bottom', size: 80, mh: .36, start: s.s + .3, dur: Math.max(1, s.d - .6), fx: 'fade', shape: 'round', rb: 'none', tol: 25, cx: null, cy: null, pc: null, fid: uid(), ow: w0, oh: h0, auto: true, sid: s.id });
+      const label = (data.prompt || s.q || s.title || 'AI image').replace(/\s+/g, ' ').trim().slice(0, 90);
+      clips.push({ img: im, src, name: 'AI: ' + label, pos: 'bottom', size: 80, mh: .36, start: s.s + .3, dur: Math.max(1, s.d - .6), fx: 'fade', shape: 'round', rb: 'none', tol: 25, cx: null, cy: null, pc: null, fid: uid(), ow: w0, oh: h0, auto: true, sid: s.id });
       layout(); renderCl(); refresh();
     }
     async function autoPics() {
-      const job = picJob, todo = slides.filter(s => s.q); if (!todo.length) return;
-      const key = ($('ch_pk').value || '').trim();
-      if (!key) { $('st').textContent = 'Slides ready. Add your Pixabay key (AI Writer, gear icon) to get pictures automatically.'; return }
-      const used = new Set(); let ok = 0, err = '', n = 0, next = 0, stop = false;
+      const job = picJob, todo = slides.filter(s => (s.q || '').trim() || slideText(s));
+      if (!todo.length) return;
+      if (location.protocol === 'file:') { $('st').textContent = 'Slides ready. AI pictures need the app server (npm start).'; return }
+      let ok = 0, err = '', next = 0, stop = false;
       const one = async () => {
         while (!stop && job === picJob && next < todo.length) {
           const s = todo[next++];
-          $('st').textContent = 'Finding pictures… ' + ok + ' / ' + todo.length + ' done';
-          try { await Promise.race([addPic(s, key, used, job), new Promise((_, rj) => setTimeout(() => rj(new Error('Timed out for "' + s.q + '"')), 40000))]); ok++ }
-          catch (e) { err = e.message || String(e); console.warn('pic', s.q, e); if (/limit|Pixabay 4/i.test(err)) stop = true }
+          $('st').textContent = 'Creating AI pictures… ' + ok + ' / ' + todo.length + ' done';
+          try { await addPic(s, job); ok++ }
+          catch (e) { err = e.message || String(e); console.warn('pic', s.q || s.title, e); if (/limit|credentials|not configured|not reachable/i.test(err)) stop = true }
         }
       };
       await Promise.all([one(), one(), one()]);
-      if (job === picJob) $('st').textContent = ok + ' of ' + todo.length + ' pictures added.' + (err ? ' ' + err : '')
+      if (job === picJob) $('st').textContent = ok + ' of ' + todo.length + ' AI pictures added.' + (err ? ' ' + err : '')
     }
     $('gen').onclick = autoGen; $('goman').onclick = () => { tab('man'); openSheet() };
     const SAMPLE = `आजको राशिफल
@@ -3208,7 +3207,7 @@ FORMAT RULES (follow exactly):
 - Bullets: "- text". Numbers: "1. text". Sub-level: indent 2 spaces (max 4 levels).
 - Never use ** bold, ### headings, tables, emojis, or HTML.
 - Keep each slide SHORT for a 9:16 video: title up to 6 words, body 15 to 35 words (or 3 to 5 short bullets).
-- PICTURE LINE: as the LAST line of EVERY slide (including the first) write "@img: " followed by 2 to 3 English words describing a real photo that fits that slide (concrete and visual, e.g. "@img: sunrise mountains"). Always English, even if the slide is Nepali. No punctuation. It is a search keyword and is not shown in the video.
+- PICTURE LINE: as the LAST line of EVERY slide (including the first) write "@img: " followed by 2 to 3 English words describing a real photo that fits that slide (concrete and visual, e.g. "@img: sunrise mountains"). Always English, even if the slide is Nepali. No punctuation. It is used as the AI image prompt and is not shown in the video.
 - Do not write any other notes or explanations inside the block.
 
 EXAMPLE:
@@ -3232,7 +3231,7 @@ EXAMPLE:
     const CHIPS = ['आजको राशिफल (१२ राशि)', '५ वटा प्रेरक विचार', 'आरती / मन्त्र स्लाइड', 'Make it shorter', 'Add bullet points', 'Fix the format'];
     const chatH = []; let chatAC = null;
     const cfg = (k, d) => { try { return localStorage.getItem('ch_' + k) || d } catch (e) { return d } };
-    ['key', 'pk', 'gm', 'tmp'].forEach(k => { const e = $('ch_' + k), d = e.value; e.value = cfg(k, d); if (e.value === '' && d) e.value = d; e.oninput = e.onchange = () => { try { localStorage.setItem('ch_' + k, e.value) } catch (_) { } } });
+    ['key', 'gm', 'tmp'].forEach(k => { const e = $('ch_' + k), d = e.value; e.value = cfg(k, d); if (e.value === '' && d) e.value = d; e.oninput = e.onchange = () => { try { localStorage.setItem('ch_' + k, e.value) } catch (_) { } } });
 
     /* turn the AI answer into text your slide parser understands */
     function toRaw(t) {

@@ -8,7 +8,7 @@ A single-page Nepali text-to-video editor. Write a script, generate slides, add 
 npm start
 ```
 
-Open <http://localhost:8765>.
+Open <http://localhost:8765> (the included `.env` sets `PORT=8765`; without a `.env` the server uses port 10000, or the `PORT` your host provides).
 
 No npm packages are required — the server uses Node's built-in `http` and `fetch`.
 

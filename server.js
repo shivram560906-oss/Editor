@@ -18,7 +18,7 @@ function loadEnv() {
 }
 loadEnv();
 
-const PORT = process.env.PORT || 8765;
+const PORT = process.env.PORT || 10000;
 const ACCOUNT_ID = (process.env.CLOUDFLARE_ACCOUNT_ID || "").trim();
 const API_TOKEN = (process.env.CLOUDFLARE_API_TOKEN || "").trim();
 const TEXT_MODEL = process.env.CLOUDFLARE_TEXT_MODEL || "@cf/meta/llama-3.1-8b-instruct-fp8";

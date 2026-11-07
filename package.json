@@ -8,8 +8,5 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {
-    "ws": "^8.22.1"
   }
 }

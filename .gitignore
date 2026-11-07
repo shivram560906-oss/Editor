@@ -12,3 +12,6 @@ pollinations-test.png
 
 # Synthesized narration cache
 .tts-cache/
+
+# Local API example with a live key; never commit it
+t.js

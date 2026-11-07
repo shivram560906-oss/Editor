@@ -5,13 +5,12 @@ A single-page Nepali text-to-video editor. Write a script, generate slides, add 
 ## Run locally
 
 ```bash
-npm install
 npm start
 ```
 
 Open <http://localhost:8765> (the included `.env` sets `PORT=8765`; without a `.env` the server uses port 10000, or the `PORT` your host provides).
 
-`npm install` is required once: narration uses the `ws` package to reach Microsoft Edge's speech service.
+No npm packages are required — the server uses Node's built-in `http` and `fetch`.
 
 ## Slide pictures (Cloudflare + Pollinations fallback)
 
@@ -56,12 +55,14 @@ Open **Media → Nepali narration** and press **Generate narration**. The editor
 - If a slide's text changes, its row shows **Text changed — regenerate**; the old clip stays until you regenerate it.
 - Each slide's narration text is limited to 2,000 characters.
 
-The server tries these providers in order:
+The server sends narration to **YourVoice** (`https://yourvoic.com`) with:
 
-1. **Azure Speech** when `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION` are set (default voice `ne-NP-HemkalaNeural`).
-2. **Microsoft Edge neural voice**, which is free and needs no API key (default `ne-NP-HemkalaNeural`; set `EDGE_TTS_VOICE=ne-NP-SagarNeural` for the male voice). This is the recommended default.
+- voice **Vijay** (male)
+- language **`ne`** (Nepali)
+- model **`aura-lite`**
+- WAV audio
 
-Synthesized MP3s are cached in `.tts-cache/`, keyed by provider, voice and text. The folder is ignored by Git.
+The YourVoice API key stays on the server and is never exposed to the browser. Each slide is one API request, and the returned WAV is cached in `.tts-cache/`, keyed by voice, language, model and text. The folder is ignored by Git. YourVoice charges credits per character; if the account runs out, the editor shows the API's error message instead of silently changing voices.
 
 ## Watermark
 
@@ -99,21 +100,21 @@ POLLINATIONS_API=...
 
 `POLLINATIONS_API` is optional but recommended. Without it there is no fallback when Cloudflare runs out. On a host such as Render, add all three variables in the service's environment settings. `.env` is ignored by Git and is never committed.
 
-Narration credentials are optional. The free Microsoft Edge neural voice works with no setup. If you want an official key, add Azure Speech (the free tier includes the same `ne-NP-HemkalaNeural` voice):
+Narration requires a YourVoice API key. Create one at <https://yourvoic.com> and add it to `.env` (or the host's environment settings):
 
 ```env
-AZURE_SPEECH_KEY=...
-AZURE_SPEECH_REGION=...
-AZURE_TTS_VOICE=ne-NP-HemkalaNeural
+YOURVOICE_API_KEY=...
+YOURVOICE_VOICE=Vijay
+YOURVOICE_LANGUAGE=ne
+YOURVOICE_MODEL=aura-lite
 ```
 
-Optional overrides: `CLOUDFLARE_TEXT_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `CLOUDFLARE_IMAGE_STEPS`, `POLLINATIONS_IMAGE_MODEL`, `POLLINATIONS_TEXT_MODEL`, `EDGE_TTS_VOICE`, `AZURE_TTS_VOICE`, `PORT`.
+Optional overrides: `CLOUDFLARE_TEXT_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `CLOUDFLARE_IMAGE_STEPS`, `POLLINATIONS_IMAGE_MODEL`, `POLLINATIONS_TEXT_MODEL`, `YOURVOICE_VOICE`, `YOURVOICE_LANGUAGE`, `YOURVOICE_MODEL`, `PORT`.
 
 ## Files
 
 - `index.html` — the whole editor (UI, timeline, canvas and export).
 - `server.js` — static server, `/ping` health check, `/Rashi/` pictures, the Cloudflare/Pollinations AI proxy, and the `/api/tts` narration proxy.
-- `edge-tts.js` — free Nepali narration through Microsoft Edge's neural voice (v2 token, chunking and MP3 assembly).
 - `Rashi/` — local rashi pictures used by `@imglink` (`0.png`, `1.png`–`12.png`).
-- `.tts-cache/` — generated narration MP3s (created automatically, ignored by Git).
+- `.tts-cache/` — generated narration WAV files (created automatically, ignored by Git).
 - `editor.original.html` — untouched backup of the original editor.

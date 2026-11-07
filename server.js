@@ -2,7 +2,6 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
-const { synthesizeEdge } = require("./edge-tts");
 
 /* Local development: load .env if it exists. On a host, set the variables in
    the dashboard instead. Never commit real credentials. */
@@ -38,15 +37,15 @@ const POLLINATIONS_TEXT_MODEL = (process.env.POLLINATIONS_TEXT_MODEL || "").trim
 const HAS_CLOUDFLARE = !!(ACCOUNT_ID && API_TOKEN);
 const HAS_POLLINATIONS = !!POLLINATIONS_API;
 
-/* Nepali narration. Azure Speech is used when its key is configured; without
-   a key the server uses Microsoft Edge's free Nepali neural voice. */
-const AZURE_TTS_KEY = (process.env.AZURE_SPEECH_KEY || "").trim();
-const AZURE_TTS_REGION = (process.env.AZURE_SPEECH_REGION || "").trim();
-const AZURE_TTS_VOICE = (process.env.AZURE_TTS_VOICE || "ne-NP-HemkalaNeural").trim();
-const EDGE_TTS_VOICE = (process.env.EDGE_TTS_VOICE || "ne-NP-HemkalaNeural").trim();
+/* Nepali narration through YourVoice (https://yourvoic.com). The API key stays
+   on the server and is never sent to the browser. Default voice: Vijay (male). */
+const YOURVOICE_API_KEY = (process.env.YOURVOICE_API_KEY || "").trim();
+const YOURVOICE_VOICE = (process.env.YOURVOICE_VOICE || "Vijay").trim();
+const YOURVOICE_LANGUAGE = (process.env.YOURVOICE_LANGUAGE || "ne").trim();
+const YOURVOICE_MODEL = (process.env.YOURVOICE_MODEL || "aura-lite").trim();
 const TTS_CACHE_DIR = path.join(__dirname, ".tts-cache");
 const TTS_MAX_CHARS = 2000;
-const HAS_AZURE_TTS = !!(AZURE_TTS_KEY && AZURE_TTS_REGION);
+const HAS_YOURVOICE = !!YOURVOICE_API_KEY;
 
 /* The editor is used for religious and cultural videos, so every picture must
    stay respectful and family-friendly. The summary prompt below is instructed
@@ -525,62 +524,68 @@ function serveRashi(req, res, pathname) {
 }
 
 /* ============================== Nepali TTS ============================== */
-function escapeXml(value) {
-  return String(value).replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" }[c]));
+function looksLikeWav(buf) {
+  return !!buf && buf.length > 12 && buf.toString("ascii", 0, 4) === "RIFF" && buf.toString("ascii", 8, 12) === "WAVE";
 }
 
-function looksLikeMp3(buf) {
-  return !!buf && buf.length > 2 && (buf[0] === 0xff || (buf[0] === 0x49 && buf[1] === 0x44 && buf[2] === 0x33));
-}
-
-async function ttsEdge(text) {
-  return synthesizeEdge(text, EDGE_TTS_VOICE);
-}
-
-async function ttsAzure(text) {
-  const ssml = `<speak version='1.0' xml:lang='ne-NP'><voice xml:lang='ne-NP' name='${AZURE_TTS_VOICE}'>${escapeXml(text)}</voice></speak>`;
-  const r = await fetch(`https://${AZURE_TTS_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+async function ttsYourVoice(text) {
+  const r = await fetch("https://yourvoic.com/api/v1/tts/stream", {
     method: "POST",
     headers: {
-      "Ocp-Apim-Subscription-Key": AZURE_TTS_KEY,
-      "Content-Type": "application/ssml+xml",
-      "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+      "X-API-Key": YOURVOICE_API_KEY,
+      "Content-Type": "application/json",
     },
-    signal: AbortSignal.timeout(30000),
-    body: ssml,
+    signal: AbortSignal.timeout(90000),
+    body: JSON.stringify({
+      text,
+      voice: YOURVOICE_VOICE,
+      language: YOURVOICE_LANGUAGE,
+      model: YOURVOICE_MODEL,
+      speed: 1,
+      pitch: 1,
+      response_format: "wav",
+    }),
   });
-  if (!r.ok) throw new Error("Azure TTS HTTP " + r.status + " " + (await r.text()).slice(0, 200));
-  return Buffer.from(await r.arrayBuffer());
+  if (!r.ok) {
+    let detail = "";
+    try {
+      const data = await r.json();
+      const err = data && data.error;
+      detail = typeof err === "string" ? err : (err && (err.message || err.details)) || "";
+    } catch (e) {
+      try { detail = (await r.text()).slice(0, 300); } catch (e2) { }
+    }
+    throw new Error("YourVoice HTTP " + r.status + (detail ? ": " + detail : ""));
+  }
+  const buf = Buffer.from(await r.arrayBuffer());
+  if (!looksLikeWav(buf)) {
+    let detail = "";
+    try {
+      const data = JSON.parse(buf.toString("utf8"));
+      const err = data && data.error;
+      detail = typeof err === "string" ? err : (err && (err.message || err.details)) || "";
+    } catch (e) { }
+    throw new Error(detail ? "YourVoice: " + detail : "YourVoice returned non-WAV audio");
+  }
+  return buf;
 }
 
-function ttsCacheFile(provider, text) {
-  const voice = provider === "azure" ? AZURE_TTS_VOICE : provider === "edge" ? EDGE_TTS_VOICE : "ne";
-  const hash = crypto.createHash("sha256").update(provider + "|" + voice + "|" + text).digest("hex");
-  return path.join(TTS_CACHE_DIR, hash + ".mp3");
+function ttsCacheFile(text) {
+  const voice = [YOURVOICE_VOICE, YOURVOICE_LANGUAGE, YOURVOICE_MODEL].join("|");
+  const hash = crypto.createHash("sha256").update("yourvoice|" + voice + "|" + text).digest("hex");
+  return path.join(TTS_CACHE_DIR, hash + ".wav");
 }
 
 async function synthesizeTts(text) {
   const clean = String(text || "").replace(/\s+/g, " ").trim().slice(0, TTS_MAX_CHARS);
   if (!clean) throw new Error("Empty text");
-  const providers = [];
-  if (HAS_AZURE_TTS) providers.push({ name: "azure", run: () => ttsAzure(clean) });
-  providers.push({ name: "edge", run: () => ttsEdge(clean) });
-  let lastError = null;
-  for (const provider of providers) {
-    try {
-      const file = ttsCacheFile(provider.name, clean);
-      if (fs.existsSync(file)) return { buf: fs.readFileSync(file), provider: provider.name, cached: true };
-      const buf = await provider.run();
-      if (!looksLikeMp3(buf)) throw new Error(provider.name + " returned non-MP3 data");
-      fs.mkdirSync(TTS_CACHE_DIR, { recursive: true });
-      fs.writeFileSync(file, buf);
-      return { buf, provider: provider.name, cached: false };
-    } catch (e) {
-      lastError = e;
-      console.warn("TTS " + provider.name + " failed:", (e && e.message) || e);
-    }
-  }
-  throw lastError || new Error("TTS failed");
+  if (!HAS_YOURVOICE) throw new Error("YourVoice is not configured. Add YOURVOICE_API_KEY to .env.");
+  const file = ttsCacheFile(clean);
+  if (fs.existsSync(file)) return { buf: fs.readFileSync(file), provider: "yourvoice", cached: true };
+  const buf = await ttsYourVoice(clean);
+  fs.mkdirSync(TTS_CACHE_DIR, { recursive: true });
+  fs.writeFileSync(file, buf);
+  return { buf, provider: "yourvoice", cached: false };
 }
 
 function serveTts(req, res) {
@@ -598,7 +603,7 @@ function serveTts(req, res) {
       const data = JSON.parse(body || "{}");
       const result = await synthesizeTts(data.text);
       res.writeHead(200, {
-        "Content-Type": "audio/mpeg",
+        "Content-Type": "audio/wav",
         "Content-Length": result.buf.length,
         "Cache-Control": "public, max-age=86400",
         "X-TTS-Provider": result.provider,
@@ -671,7 +676,8 @@ if (require.main === module) {
       if (!HAS_CLOUDFLARE) console.warn("Cloudflare is not configured; using Pollinations only.");
       if (!HAS_POLLINATIONS) console.warn("Pollinations fallback is not configured; using Cloudflare only.");
     }
-    console.log("Nepali TTS: " + (HAS_AZURE_TTS ? "Azure Speech" : "free Microsoft Edge neural voice"));
+    if (HAS_YOURVOICE) console.log("Nepali TTS: YourVoice (" + YOURVOICE_VOICE + ", " + YOURVOICE_LANGUAGE + ")");
+    else console.warn("Nepali TTS: YourVoice is not configured. Set YOURVOICE_API_KEY in .env.");
   });
 }
 

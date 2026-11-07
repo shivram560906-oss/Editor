@@ -1675,9 +1675,11 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
           <p class="ch-note">Slide pictures are generated automatically by Cloudflare AI.</p>
           <label for="ch_gm">Model</label>
           <select id="ch_gm">
-            <option value="gemini-3.8-flash" selected>gemini-3.8-flash</option>
+            <option value="gemini-2.5-flash" selected>gemini-2.5-flash</option>
             <option value="gemini-3.6-flash">gemini-3.6-flash</option>
+            <option value="gemini-3.8-flash">gemini-3.8-flash</option>
             <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
+            <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
           </select>
           <label for="ch_tmp">Creativity</label>
           <input type="range" id="ch_tmp" min="0" max="1.2" step="0.1" value="0.6">
@@ -2808,11 +2810,25 @@ ${dateLine}
       if (missing.length) throw new Error('Gemini ले सबै १२ राशिको ४/४ बुँदा दिएन (' + missing.join(', ') + ')।');
       return out;
     }
-    async function generateRashiPoints(bs, signal) {
+    const RASHI_MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest'];
+    function rashiAttempt(signal, ms) {
+      const ctl = new AbortController();
+      const onAbort = () => ctl.abort();
+      if (signal) {
+        if (signal.aborted) ctl.abort();
+        else signal.addEventListener('abort', onAbort, { once: true });
+      }
+      const timer = setTimeout(() => ctl.abort(), ms);
+      return {
+        signal: ctl.signal,
+        done() { clearTimeout(timer); if (signal) signal.removeEventListener('abort', onAbort) }
+      };
+    }
+    async function generateRashiPoints(bs, signal, onProgress) {
       const key = $('ch_key').value.trim();
       if (!key) throw new Error('Gemini API key छैन। AI settings (⚙) बाट key हाल्नुहोस्।');
-      const model = $('ch_gm').value.trim() || 'gemini-3.8-flash';
-      const ck = model + '|' + bs.y + '-' + bs.m + '-' + bs.d;
+      const selected = $('ch_gm').value.trim() || 'gemini-2.5-flash';
+      const ck = selected + '|' + bs.y + '-' + bs.m + '-' + bs.d;
       if (RASHI_CACHE.has(ck)) return RASHI_CACHE.get(ck);
       const ad = bsToAd(bs.y, bs.m, bs.d), adStr = ad.toISOString().slice(0, 10);
       const wd = BS_WEEK[bsWeekday(bs.y, bs.m, bs.d)];
@@ -2820,24 +2836,54 @@ ${dateLine}
       const bsStr = neNum(bs.y) + ' ' + BS_MONTHS[bs.m - 1] + ' ' + neNum(bs.d);
       const user = rashiPrompt(bs);
       const context = `Request context: Bikram Sambat date ${bsStr}; Gregorian date ${adStr}; weekday ${wd} (${wdEn}); location Nepal (Asia/Kathmandu). Use these exact values for the day's planetary positions and Moon transit.`;
-      const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, signal,
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: RASHI_SYS + '\n' + context }] },
-          contents: [{ role: 'user', parts: [{ text: user }] }],
-          generationConfig: { temperature: 0.85, topP: 0.9, maxOutputTokens: 8192, responseMimeType: 'application/json' }
-        })
-      });
-      let j = null; try { j = await r.json() } catch (e) { }
-      if (!r.ok) throw new Error('Gemini: ' + ((j && j.error && j.error.message) || ('HTTP ' + r.status)));
-      if (j && j.promptFeedback && j.promptFeedback.blockReason) throw new Error('Gemini ले यो अनुरोध अस्वीकार गर्यो: ' + j.promptFeedback.blockReason);
-      const parts = j && j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts;
-      const text = parts ? parts.map(p => p.text || '').join('') : '';
-      if (!text.trim()) throw new Error('Gemini ले खाली जवाफ फर्कायो।');
-      const data = parseRashiJson(text);
-      RASHI_CACHE.set(ck, data);
-      if (RASHI_CACHE.size > 30) RASHI_CACHE.delete(RASHI_CACHE.keys().next().value);
-      return data;
+      const models = [selected, ...RASHI_MODEL_FALLBACKS.filter(m => m !== selected)];
+      let lastErr = null;
+      for (let mi = 0; mi < models.length; mi++) {
+        const model = models[mi];
+        if (signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
+        if (onProgress) onProgress(mi === 0
+          ? 'Gemini ले ' + bsStr + ' का लागि १२ राशिको भविष्यफल लेख्दैछ…'
+          : 'पहिलो Gemini model व्यस्त छ — अर्को model बाट प्रयास गर्दै…');
+        const attempt = rashiAttempt(signal, mi === 0 ? 15000 : 35000);
+        try {
+          const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, signal: attempt.signal,
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: RASHI_SYS + '\n' + context }] },
+              contents: [{ role: 'user', parts: [{ text: user }] }],
+              generationConfig: {
+                temperature: 0.85, topP: 0.9, maxOutputTokens: 4096,
+                responseMimeType: 'application/json',
+                thinkingConfig: { thinkingBudget: 0 }
+              }
+            })
+          });
+          let j = null; try { j = await r.json() } catch (e) { }
+          if (!r.ok) {
+            const rawMsg = (j && j.error && j.error.message) || ('HTTP ' + r.status);
+            lastErr = new Error(/high demand|UNAVAILABLE|overloaded/i.test(rawMsg) ? 'Gemini model अहिले व्यस्त छ।' : rawMsg);
+            if ([404, 429, 500, 502, 503, 504].includes(r.status) || (r.status === 400 && /thinking/i.test(rawMsg))) continue;
+            throw lastErr;
+          }
+          if (j && j.promptFeedback && j.promptFeedback.blockReason) throw new Error('Gemini ले यो अनुरोध अस्वीकार गर्यो: ' + j.promptFeedback.blockReason);
+          const parts = j && j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts;
+          const text = parts ? parts.map(p => p.text || '').join('') : '';
+          if (!text.trim()) { lastErr = new Error('Gemini ले खाली जवाफ फर्कायो।'); continue; }
+          let data;
+          try { data = parseRashiJson(text) } catch (e) { lastErr = e; continue; }
+          RASHI_CACHE.set(ck, data);
+          if (RASHI_CACHE.size > 30) RASHI_CACHE.delete(RASHI_CACHE.keys().next().value);
+          return data;
+        } catch (e) {
+          if (signal && signal.aborted) throw e;
+          if (e && e.name === 'AbortError') { lastErr = new Error('Gemini ले समयमा जवाफ दिएन।'); continue; }
+          if (e === lastErr) throw e;
+          lastErr = e;
+        } finally {
+          attempt.done();
+        }
+      }
+      throw lastErr || new Error('Gemini बाट जवाफ आएन।');
     }
     function autoGen(aiPics) {
       const raw = $('raw').value; if (!raw.trim()) { $('st').textContent = 'Write or paste your text first.'; return }
@@ -3600,7 +3646,7 @@ EXAMPLE:
     /* Nepali (Bikram Sambat) date picker. The 12 rashi points are generated
        by Gemini for the chosen date; only the template structure is fixed. */
     const RCAL = { sel: null, view: null };
-    let rashiBusy = false, rashiAC = null, rashiSeq = 0, rashiBs = null;
+    let rashiBusy = false, rashiAC = null, rashiSeq = 0, rashiBs = null, rashiBub = null;
     function rcalSetMsg(msg, err) {
       const el = $('rcal_msg');
       el.textContent = msg || '';
@@ -3678,7 +3724,11 @@ EXAMPLE:
       rashiBusy = false;
       rashiBs = null;
       hideRashiCal();
-      if (wasBusy) $('st').textContent = 'राशिफल रद्द भयो।';
+      if (wasBusy) {
+        if (rashiBub) { rashiBub.className = 'm a'; rashiBub.textContent = 'राशिफल रद्द गरियो।'; rashiBub = null }
+        $('ch_stat').textContent = 'रद्द गरियो।';
+        $('st').textContent = 'राशिफल रद्द भयो।';
+      }
     }
     async function makeRashiSlides() {
       if (rashiBusy) return;
@@ -3691,13 +3741,23 @@ EXAMPLE:
       rashiBs = bs;
       rashiAC = new AbortController();
       const dateLabel = neNum(bs.d) + ' ' + BS_MONTHS[bs.m - 1] + ' ' + neNum(bs.y);
+      setChat(true);
+      addMsg('user', rashiPrompt(bs));
+      rashiBub = addMsg('a', '…');
+      const say = msg => {
+        $('st').textContent = msg;
+        $('ch_stat').textContent = msg;
+        if (rashiBub) rashiBub.textContent = msg;
+      };
       hideRashiCal();
-      $('st').textContent = 'Gemini ले ' + dateLabel + ' का लागि १२ राशिको भविष्यफल लेख्दैछ…';
+      say('Gemini ले ' + dateLabel + ' का लागि १२ राशिको भविष्यफल लेख्दैछ…');
       try {
-        const points = await generateRashiPoints(bs, rashiAC.signal);
+        const points = await generateRashiPoints(bs, rashiAC.signal, say);
         if (seq !== rashiSeq) return;
         const raw = rashiRaw(bs, points);
         rashiAC = null;
+        if (rashiBub) { rashiBub.className = 'm a'; rashiBub.textContent = 'राशिफल तयार भयो — १३ स्लाइड बनाइयो।'; rashiBub = null }
+        $('ch_stat').textContent = 'तयार भयो।';
         hideRashiCal();
         $('raw').value = raw;
         setChat(false); tab('auto');
@@ -3705,6 +3765,8 @@ EXAMPLE:
       } catch (e) {
         if (seq !== rashiSeq || e.name === 'AbortError') return;
         const msg = 'Gemini error: ' + (e.message || e);
+        if (rashiBub) { rashiBub.className = 'm a err'; rashiBub.textContent = msg + '\n\nफेरि प्रयास गर्न राशिफल बटन थिच्नुहोस्।'; rashiBub = null }
+        $('ch_stat').textContent = 'Gemini error';
         $('st').textContent = msg;
         if (!$('rcal').hidden) rcalSetMsg(msg, true);
       } finally {
@@ -3712,6 +3774,7 @@ EXAMPLE:
           rashiBusy = false;
           rashiBs = null;
           if (rashiAC) rashiAC = null;
+          rashiBub = null;
         }
       }
     }

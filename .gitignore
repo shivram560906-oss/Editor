@@ -9,3 +9,6 @@ Thumbs.db
 # Local AI test scratch files
 gen.js
 pollinations-test.png
+
+# Synthesized narration cache
+.tts-cache/

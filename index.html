@@ -980,6 +980,24 @@ input[type=checkbox] {
 }
 .music-row .ic { color: var(--green); }
 .music-row b { flex: 1; min-width: 0; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.voice-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-2);
+  margin-top: 8px;
+}
+.voice-row.stale { border-color: rgba(255, 193, 7, .42); }
+.voice-row .vi { width: 28px; height: 28px; min-width: 28px; border-radius: 9px; display: grid; place-items: center; background: var(--bg); color: var(--ac); }
+.voice-row .vi .ic { width: 14px; height: 14px; }
+.voice-row .vmeta { flex: 1 1 auto; min-width: 0; }
+.voice-row .vmeta b { display: block; font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.voice-row .vmeta small { display: block; margin-top: 2px; font-size: 10px; color: var(--mut); }
+.voice-row .btn-icon { width: 27px; min-width: 27px; min-height: 27px; border-radius: 7px; }
+.voice-row .btn-icon .ic { width: 13px; height: 13px; }
 
 /* ============================ watermark ============================ */
 .wc {
@@ -1617,6 +1635,7 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
     <symbol id="i-zoom-in" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/><path d="M11 8v6"/></symbol>
     <symbol id="i-fit" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M8 12h8"/></symbol>
     <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
     <symbol id="i-image-plus" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8"/><path d="M8 12h8"/></symbol>
@@ -1841,7 +1860,7 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
         <div class="pn" id="p_media">
           <div class="sheet-head"><span class="grip"></span><b>Media</b><button class="sheet-close" data-sheet-close title="Close" aria-label="Close panel"><svg class="ic"><use href="#i-x"></use></svg></button></div>
           <div class="panel-head">
-            <h2>Pictures &amp; music</h2>
+            <h2>Pictures, music &amp; narration</h2>
             <p>Pictures are added at the playhead. Drag them in the preview to move or resize.</p>
           </div>
           <div class="card">
@@ -1861,6 +1880,15 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
               <span>Add music</span>
               <input id="mus" type="file" accept="audio/*">
             </label>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Nepali narration</h3>
+            <p class="hint">One AI voice clip per slide. Each slide stays visible until its narration finishes, and music automatically softens under the voice.</p>
+            <div class="row">
+              <button id="vgen" class="btn btn-primary btn-sm"><svg class="ic"><use href="#i-mic"></use></svg> Generate narration</button>
+              <button id="vclr" class="btn btn-sm">Remove all</button>
+            </div>
+            <div id="vlist"></div>
           </div>
         </div>
 
@@ -2037,6 +2065,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     let _sn = 0, picJob = 0; const nid = () => 's' + (++_sn) + Date.now().toString(36);
     const mk = (title, sub, body) => ({ id: nid(), q: '', link: '', title: title || '', sub: sub || '', body: body || '', an: '', font: '', te: '', hc: '', bc: '', dur: 0, sz: 1, oy: 0, ox: 0 });
     let slides = [mk('x', '', 'y')], clips = [], exporting = false, cdrag = null, musFile = null, cancelExp = false;
+    const voices = new Map(); let voiceBusy = false, voiceJob = 0, voiceDecodeCtx = null;
 
     /* tabs and design controls */
     const TABS = [['auto', 'Write', 'i-pen'], ['man', 'Slides', 'i-layers'], ['look', 'Look', 'i-palette'], ['media', 'Media', 'i-image'], ['wm', 'Brand', 'i-badge']];
@@ -2051,7 +2080,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       };
       $('tabs').appendChild(b)
     });
-    function tab(k) { curTab = k; document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t == k)); document.querySelectorAll('.pn').forEach(p => p.classList.toggle('on', p.id == 'p_' + k)) }
+    function tab(k) { curTab = k; document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t == k)); document.querySelectorAll('.pn').forEach(p => p.classList.toggle('on', p.id == 'p_' + k)); if (k == 'media') renderVoices() }
     function openSheet() { document.body.classList.add('sheet-open'); const p = document.querySelector('.pn.on'); if (p) p.scrollTop = 0 }
     function closeSheet() { document.body.classList.remove('sheet-open') }
     document.querySelectorAll('[data-sheet-close]').forEach(b => b.onclick = closeSheet);
@@ -2259,7 +2288,13 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     const slen = s => s.title.length + s.sub.length + s.body.length;
     function layout() {
       const pc = +$('pace').value; let t = 0;
-      slides.forEach(s => { let d = s.dur || Math.max(3.5, 2.2 + slen(s) / 12) / pc; if (!s.dur && (s.an || S.an) == 'type') d = Math.max(d, .3 + slen(s) / 28 + 1.6); s.d = d; s.s = t; t += d });
+      slides.forEach(s => {
+        let d = s.dur || Math.max(3.5, 2.2 + slen(s) / 12) / pc;
+        if (!s.dur && (s.an || S.an) == 'type') d = Math.max(d, .3 + slen(s) / 28 + 1.6);
+        const v = voices.get(s.id);
+        if (v && v.dur) d = Math.max(d, v.dur + .35);
+        s.d = d; s.s = t; t += d
+      });
       clips.forEach(c => { if (!c.sid) return; const s = slides.find(x => x.id === c.sid); if (s) { c.start = Math.round((s.s + .3) * 10) / 10; c.dur = Math.max(1, Math.round((s.d - .6) * 10) / 10) } });
       const ordered = clips.map((c, i) => i).sort((a, b) => clips[a].start - clips[b].start), ends = [];
       ordered.forEach(i => { const c = clips[i]; let l = 0; while (ends[l] !== undefined && ends[l] > c.start + .001) l++; ends[l] = c.start + c.dur; c.lane = l });
@@ -2542,16 +2577,57 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     }
 
     /* audio, playback, recording */
-    let ac, dest, gn, musName = ''; const aud = new Audio(); aud.loop = true;
-    let musURL = '';
+    let ac, dest, musGain, monGain, voiceBus, voiceMon, musSrc, musName = ''; const aud = new Audio(); aud.loop = true;
+    let musURL = '', voiceSrcs = [];
+    function ensureAudio() {
+      if (ac) return ac;
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return null;
+      ac = new C();
+      dest = ac.createMediaStreamDestination();
+      musGain = ac.createGain(); monGain = ac.createGain();
+      voiceBus = ac.createGain(); voiceMon = ac.createGain();
+      musSrc = ac.createMediaElementSource(aud);
+      musSrc.connect(musGain); musGain.connect(dest); musGain.connect(monGain); monGain.connect(ac.destination);
+      voiceBus.connect(dest); voiceBus.connect(voiceMon); voiceMon.connect(ac.destination);
+      return ac;
+    }
     function setMusic(f, say) {
       if (musURL) URL.revokeObjectURL(musURL); musURL = URL.createObjectURL(f); aud.src = musURL; musName = f.name; musFile = f;
-      if (!ac) { ac = new AudioContext(); const src = ac.createMediaElementSource(aud); dest = ac.createMediaStreamDestination(); gn = ac.createGain(); src.connect(dest); src.connect(gn); gn.connect(ac.destination) }
+      ensureAudio();
       if (say) $('st').textContent = 'Music added: ' + f.name; renderTL()
     }
     function clearMusic() { aud.pause(); if (musURL) URL.revokeObjectURL(musURL); musURL = ''; aud.removeAttribute('src'); musName = ''; musFile = null; renderTL() }
     $('mus').onchange = e => { const f = e.target.files[0]; if (f) setMusic(f, true) };
-    const hasAud = () => ac && aud.src;
+    const hasAud = () => !!(ac && aud.src);
+    const hasNarr = () => voices.size > 0;
+    function stopVoices() {
+      voiceSrcs.forEach(s => { try { s.stop() } catch (e) { } });
+      voiceSrcs = [];
+      if (ac && musGain) { musGain.gain.cancelScheduledValues(ac.currentTime); musGain.gain.setValueAtTime(1, ac.currentTime) }
+    }
+    function scheduleVoices(from) {
+      stopVoices();
+      if (!ac || !voices.size) return;
+      const base = ac.currentTime + .04;
+      slides.forEach(s => {
+        const v = voices.get(s.id);
+        if (!v || !v.buf) return;
+        const start = s.s, end = start + v.dur;
+        if (end <= from + .02) return;
+        const offset = Math.max(0, from - start), playDur = v.dur - offset;
+        if (playDur <= .02) return;
+        const src = ac.createBufferSource(); src.buffer = v.buf; src.connect(voiceBus);
+        src.start(base + Math.max(0, start - from), offset, playDur); voiceSrcs.push(src);
+        const t0 = base + Math.max(0, start - from), t1 = base + Math.max(0, end - from);
+        if (t1 > base) {
+          musGain.gain.setValueAtTime(1, t0);
+          musGain.gain.linearRampToValueAtTime(.22, t0 + .06);
+          musGain.gain.setValueAtTime(.22, Math.max(t0 + .06, t1 - .02));
+          musGain.gain.linearRampToValueAtTime(1, t1 + .15);
+        }
+      });
+    }
     let _playUI = null;
     function setPlayUI() {
       if (_playUI === playing) return;
@@ -2564,7 +2640,16 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     }
     function play(done, mute) {
       cancelAnimationFrame(raf); playing = true; setPlayUI(); from = cur >= total - .3 ? 0 : cur; if (done) from = 0;
-      if (hasAud()) { ac.resume(); gn.gain.value = mute ? 0 : 1; aud.currentTime = from % (aud.duration || 1e9); aud.play() }
+      if (hasAud() || hasNarr()) {
+        ensureAudio();
+        if (ac) {
+          ac.resume().catch(() => { });
+          monGain.gain.value = mute ? 0 : 1;
+          voiceMon.gain.value = mute ? 0 : 1;
+          if (hasAud()) { aud.currentTime = from % (aud.duration || 1e9); aud.play().catch(() => { }) }
+          scheduleVoices(from);
+        }
+      }
       t0 = performance.now();
       const f = now => {
         cur = from + (now - t0) / 1000; if (!(MOB && now - lastD < 30)) { lastD = now; draw(cur); head() }
@@ -2572,16 +2657,17 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       };
       raf = requestAnimationFrame(f);
     }
-    function pause() { cancelAnimationFrame(raf); playing = false; setPlayUI(); if (hasAud()) aud.pause(); $('br').disabled = $('sur').disabled = false; draw(cur); head() }
+    function pause() { cancelAnimationFrame(raf); playing = false; setPlayUI(); stopVoices(); if (hasAud()) aud.pause(); $('br').disabled = $('sur').disabled = false; draw(cur); head() }
     const toggle = () => { if (playing) pause(); else play() };
     $('bp').onclick = toggle;
     const exportScale = () => $('xres').value == '1080' ? 1.5 : 1;
     function recordLive() {
       if (!window.MediaRecorder) { $('st').textContent = 'This browser cannot record. Use Chrome or Edge.'; return }
       const keepRS2 = RS, xs2 = exportScale(); if (RS != xs2) { RS = xs2; setFmt(); layout() }
-      const au = hasAud(), types = au ? ['video/mp4;codecs=avc1,mp4a.40.2', 'video/webm;codecs=vp9,opus', 'video/webm'] : ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+      const au = hasAud() || hasNarr(), types = au ? ['video/mp4;codecs=avc1,mp4a.40.2', 'video/webm;codecs=vp9,opus', 'video/webm'] : ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+      if (au) ensureAudio();
       const mime = types.find(m => MediaRecorder.isTypeSupported(m)) || '', stream = cv.captureStream(30);
-      if (au) dest.stream.getAudioTracks().forEach(tr => stream.addTrack(tr));
+      if (au && dest) dest.stream.getAudioTracks().forEach(tr => stream.addTrack(tr));
       const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 5e6 }), chunks = [];
       rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data) };
       rec.onstop = () => {
@@ -2599,6 +2685,44 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       b.classList.toggle('is-cancel', label == 'Cancel')
     }
 
+    /* Offline audio mix for direct export: music (ducked under each voice) plus
+       one narration clip at each slide start. Returns null when nothing to mix. */
+    async function renderExportAudio() {
+      if (!musFile && !hasNarr()) return null;
+      const off = new OfflineAudioContext(2, Math.ceil(total * 48000), 48000);
+      let musicGain = null;
+      if (musFile) {
+        try {
+          const dec = await off.decodeAudioData(await musFile.arrayBuffer());
+          const src = off.createBufferSource(), g = off.createGain(); src.buffer = dec; src.loop = true; src.connect(g); g.connect(off.destination);
+          musicGain = g; src.start()
+        } catch (e) { musicGain = null }
+      }
+      let lastVoiceEnd = 0;
+      for (const s of slides) {
+        const v = voices.get(s.id); if (!v) continue;
+        try {
+          let buf = v.buf;
+          if (!buf) { buf = await off.decodeAudioData(await v.blob.arrayBuffer()); v.buf = buf }
+          const src = off.createBufferSource(); src.buffer = buf; src.connect(off.destination); src.start(Math.max(0, s.s));
+          lastVoiceEnd = Math.max(lastVoiceEnd, s.s + v.dur);
+          if (musicGain) {
+            const t0 = Math.max(0, s.s), t1 = Math.max(t0, s.s + v.dur);
+            musicGain.gain.setValueAtTime(1, t0);
+            musicGain.gain.linearRampToValueAtTime(.22, t0 + .06);
+            musicGain.gain.setValueAtTime(.22, Math.max(t0 + .06, t1 - .02));
+            musicGain.gain.linearRampToValueAtTime(1, t1 + .15);
+          }
+        } catch (e) { }
+      }
+      if (musicGain) {
+        const fadeAt = Math.max(0, total - 1);
+        musicGain.gain.setValueAtTime(lastVoiceEnd > fadeAt ? .22 : 1, fadeAt);
+        musicGain.gain.linearRampToValueAtTime(0, total);
+      }
+      return await off.startRendering()
+    }
+
     /* direct export: every frame is drawn and encoded as fast as the computer can, no real-time recording */
     async function exportDirect() {
       if (exporting) { cancelExp = true; return }
@@ -2607,20 +2731,23 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       const ai = [...clips, ...WMS].filter(o => o.rb == 'ai' && o.img); if (ai.length) { await Promise.all(ai.map(runAI)) }
       const brb = $('br'), fps = 30, xs = exportScale(), TW = Math.round(FMT[S.fmt][1] * xs), TH = Math.round(FMT[S.fmt][2] * xs), vcfg = { codec: 'avc1.640028', width: TW, height: TH, bitrate: xs > 1 ? 8e6 : 4.5e6, framerate: fps }, keepRS = RS;
       try { const s = await VideoEncoder.isConfigSupported(vcfg); if (!s.supported) throw 0 } catch (e) { $('st').textContent = 'This browser cannot encode this video size directly, using live recording instead.'; recordLive(); return }
-      if (RS != xs) { RS = xs; setFmt() } layout(); exporting = true; cancelExp = false; setExportUI('Cancel'); $('sur').disabled = $('bp').disabled = true;
+      if (RS != xs) { RS = xs; setFmt() } layout();
+      const needAudio = !!(musFile || hasNarr());
+      let acod = null;
+      if (needAudio && window.AudioEncoder && window.AudioData) {
+        for (const [c, m] of [['mp4a.40.2', 'aac'], ['opus', 'opus']]) { try { const s = await AudioEncoder.isConfigSupported({ codec: c, sampleRate: 48000, numberOfChannels: 2, bitrate: 128000 }); if (s.supported) { acod = [c, m]; break } } catch (e) { } }
+      }
+      if (needAudio && hasNarr() && !acod) {
+        if (RS != keepRS) { RS = keepRS; setFmt(); layout() }
+        $('st').textContent = 'This browser cannot encode narration audio directly, using live recording instead.';
+        recordLive(); return;
+      }
+      exporting = true; cancelExp = false; setExportUI('Cancel'); $('sur').disabled = $('bp').disabled = true;
       const keep = cur; let enc = null, aenc = null, failed = null;
       try {
-        let acod = null, abuf = null;
-        if (musFile && window.AudioEncoder && window.AudioData) {
-          for (const [c, m] of [['mp4a.40.2', 'aac'], ['opus', 'opus']]) { try { const s = await AudioEncoder.isConfigSupported({ codec: c, sampleRate: 48000, numberOfChannels: 2, bitrate: 128000 }); if (s.supported) { acod = [c, m]; break } } catch (e) { } }
-          if (acod) {
-            try {
-              $('st').textContent = 'Preparing music...';
-              const off = new OfflineAudioContext(2, Math.ceil(total * 48000), 48000), dec = await off.decodeAudioData(await musFile.arrayBuffer());
-              const src = off.createBufferSource(), g = off.createGain(); src.buffer = dec; src.loop = true; src.connect(g); g.connect(off.destination);
-              g.gain.setValueAtTime(1, Math.max(0, total - 1)); g.gain.linearRampToValueAtTime(0, total); src.start(); abuf = await off.startRendering()
-            } catch (e) { abuf = null }
-          }
+        let abuf = null;
+        if (needAudio && acod) {
+          try { $('st').textContent = 'Preparing audio...'; abuf = await renderExportAudio() } catch (e) { abuf = null }
         }
         const muxer = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), video: { codec: 'avc', width: W, height: H }, ...(abuf ? { audio: { codec: acod[1], numberOfChannels: 2, sampleRate: 48000 } } : {}), fastStart: 'in-memory' });
         enc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => { failed = e } }); enc.configure(vcfg);
@@ -2644,7 +2771,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
         if (failed) throw failed;
         muxer.finalize();
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([muxer.target.buffer], { type: 'video/mp4' })); a.download = 'video.mp4'; a.click();
-        $('st').textContent = 'Saved as video.mp4' + (musFile && !abuf ? ' (music could not be added in this browser)' : '');
+        $('st').textContent = 'Saved as video.mp4' + (needAudio && !abuf ? (hasNarr() ? ' (narration could not be added in this browser)' : ' (music could not be added in this browser)') : '');
       } catch (e) {
         $('st').textContent = e === 'cancel' ? 'Export cancelled.' : 'Direct export failed (' + ((e && e.message) || e) + '). Try again, or the live recording fallback.';
       }
@@ -2890,6 +3017,8 @@ ${dateLine}
       const raw = $('raw').value; if (!raw.trim()) { $('st').textContent = 'Write or paste your text first.'; return }
       slides = mdParse(raw); if (!slides.length) slides = [mk('', '', raw)];
       clips = clips.filter(c => !c.auto); selC = -1; picJob++;
+      voiceJob++; voiceBusy = false;
+      pruneVoices(); renderVoices();
       sel = 0; if ($('fx').value == 'mix') randFx(); layout(); pick(0); $('st').textContent = slides.length + ' slide' + (slides.length > 1 ? 's' : '') + ' ready. Press Play.';
       autoPics(!!aiPics);
     }
@@ -2898,6 +3027,137 @@ ${dateLine}
        - AI Writer: every slide gets a picture, using @img when present and
          the slide text otherwise. @imglink always stays local. */
     function slideText(s) { return [s.title, s.sub, s.body].map(x => (x || '').trim()).filter(Boolean).join('\n').trim() }
+
+    /* Nepali narration: one voice clip per slide. The clip length is added to
+       the slide duration so a slide never changes before its narration ends. */
+    function narrationText(s) {
+      return slideText(s).split('\n').map(l => l.replace(/^\s*[-*•]\s*/, '').replace(/^\s*\d+[.)]\s*/, '').replace(/[*_`#]/g, '').trim()).filter(Boolean).map(l => /[।.!?]$/.test(l) ? l : l + '।').join(' ');
+    }
+    async function decodeVoice(blob) {
+      const ctx = voiceDecodeCtx || (voiceDecodeCtx = new OfflineAudioContext(1, 1, 48000));
+      return await ctx.decodeAudioData(await blob.arrayBuffer());
+    }
+    function voiceTitle(s, i) {
+      return (s.title || s.sub || s.body || ('Slide ' + (i + 1))).replace(/\s+/g, ' ').trim().slice(0, 70);
+    }
+    function renderVoices() {
+      const box = $('vlist'); if (!box) return;
+      const busy = voiceBusy;
+      box.innerHTML = slides.map((s, i) => {
+        const v = voices.get(s.id), text = narrationText(s), stale = !!(v && v.text !== text);
+        const label = voiceTitle(s, i);
+        const sub = v ? (stale ? 'Text changed — regenerate' : v.dur.toFixed(1) + 's voice') : (text ? 'No voice yet' : 'No text on this slide');
+        return `<div class="voice-row${stale ? ' stale' : ''}" data-vid="${esc(s.id)}">
+          <span class="vi"><svg class="ic"><use href="#i-${v ? 'check' : 'mic'}"></use></svg></span>
+          <div class="vmeta"><b>${esc(label)}</b><small>${esc(sub)}</small></div>
+          <button class="btn btn-icon" data-vact="gen" title="${v ? 'Regenerate' : 'Generate'} voice" ${busy || !text ? 'disabled' : ''}><svg class="ic"><use href="#i-${v ? 'redo' : 'mic'}"></use></svg></button>
+          ${v ? `<button class="btn btn-icon" data-vact="del" title="Remove voice" ${busy ? 'disabled' : ''}><svg class="ic"><use href="#i-trash"></use></svg></button>` : ''}
+        </div>`;
+      }).join('') || '<p class="hint">No slides yet.</p>';
+      box.querySelectorAll('[data-vact]').forEach(b => b.onclick = () => {
+        const id = b.closest('.voice-row').dataset.vid, s = slides.find(x => x.id === id);
+        if (!s) return;
+        if (b.dataset.vact === 'del') removeVoice(s); else genOneVoice(s)
+      });
+      if ($('vgen')) $('vgen').disabled = busy;
+      if ($('vclr')) $('vclr').disabled = busy || !voices.size;
+    }
+    async function genVoice(s) {
+      const pid = PID, job = voiceJob;
+      const text = narrationText(s);
+      if (!text) throw new Error('This slide has no text to narrate.');
+      if (text.length > 2000) throw new Error('This slide is too long for narration (max 2000 characters).');
+      let r;
+      try {
+        r = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+          signal: AbortSignal.timeout(120000)
+        });
+      } catch (e) {
+        throw new Error('Narration service is not reachable. Start the app with "npm start".');
+      }
+      const blob = await r.blob();
+      let data = null;
+      if (!r.ok) { try { data = JSON.parse(await blob.text()) } catch (e) { } }
+      if (!r.ok) throw new Error((data && data.error) || ('Narration failed (' + r.status + ')'));
+      if (!blob.size) throw new Error('Narration service returned no audio.');
+      let buf;
+      try { buf = await decodeVoice(blob) } catch (e) { throw new Error('Could not decode the narration audio.') }
+      if (PID !== pid || voiceJob !== job || !slides.includes(s)) return;
+      voices.set(s.id, { blob, buf, dur: buf.duration, text });
+      s.voiceDur = buf.duration; s.voiceText = text;
+      savedF.delete('voice-' + s.id);
+      layout(); renderVoices(); refresh();
+    }
+    async function saveVoiceNow() {
+      for (let i = 0; i < 20 && saving; i++) await new Promise(r => setTimeout(r, 150));
+      await saveNow(true)
+    }
+    async function genOneVoice(s) {
+      if (voiceBusy) return;
+      voiceBusy = true; const job = ++voiceJob; renderVoices();
+      try {
+        await genVoice(s);
+        if (job === voiceJob) { $('st').textContent = 'Narration ready for this slide.'; await saveVoiceNow() }
+      } catch (e) {
+        if (job === voiceJob) $('st').textContent = 'Narration failed: ' + ((e && e.message) || e)
+      } finally {
+        if (job === voiceJob) { voiceBusy = false; renderVoices() }
+      }
+    }
+    async function genAllVoices() {
+      if (voiceBusy) return;
+      const todo = slides.filter(s => { const t = narrationText(s), v = voices.get(s.id); return t && (!v || v.text !== t) });
+      if (!todo.length) { $('st').textContent = voices.size ? 'Narration is already up to date.' : 'Add text to a slide first.'; return }
+      voiceBusy = true; const job = ++voiceJob; renderVoices();
+      let ok = 0, failed = 0;
+      try {
+        for (let i = 0; i < todo.length; i++) {
+          if (job !== voiceJob) return;
+          $('st').textContent = 'Generating narration ' + (i + 1) + ' / ' + todo.length + '…';
+          try { await genVoice(todo[i]); ok++ } catch (e) { failed++; console.warn('Narration failed:', (e && e.message) || e) }
+          if (job === voiceJob) renderVoices();
+        }
+        if (job === voiceJob) {
+          $('st').textContent = failed ? ('Narration ready for ' + ok + ' slide' + (ok == 1 ? '' : 's') + '; ' + failed + ' failed.') : ('Narration ready for all ' + ok + ' slides.');
+          await saveVoiceNow()
+        }
+      } finally {
+        if (job === voiceJob) { voiceBusy = false; renderVoices() }
+      }
+    }
+    function removeVoice(s) {
+      if (voiceBusy || !voices.has(s.id)) return;
+      voices.delete(s.id); delete s.voiceDur; delete s.voiceText;
+      savedF.delete('voice-' + s.id);
+      if (PID) delF(PID + '|voice-' + s.id).catch(() => { });
+      layout(); renderVoices(); refresh(); saveVoiceNow();
+      $('st').textContent = 'Narration removed for this slide.';
+    }
+    function removeAllVoices() {
+      if (voiceBusy) { $('st').textContent = 'Wait for the narration to finish first.'; return }
+      if (!voices.size) { $('st').textContent = 'There is no narration to remove.'; return }
+      if (!confirm('Remove all Nepali narration from this project?')) return;
+      const ids = [...voices.keys()];
+      voices.clear();
+      slides.forEach(s => { delete s.voiceDur; delete s.voiceText });
+      ids.forEach(id => { savedF.delete('voice-' + id); if (PID) delF(PID + '|voice-' + id).catch(() => { }) });
+      layout(); renderVoices(); refresh(); saveVoiceNow();
+      $('st').textContent = 'All narration removed.';
+    }
+    function pruneVoices() {
+      const ids = new Set(slides.map(s => s.id));
+      for (const id of [...voices.keys()]) {
+        if (ids.has(id)) continue;
+        voices.delete(id); savedF.delete('voice-' + id);
+        if (PID) delF(PID + '|voice-' + id).catch(() => { });
+      }
+    }
+    $('vgen').onclick = genAllVoices;
+    $('vclr').onclick = removeAllVoices;
+
     async function addPic(s, job) {
       let r;
       try {
@@ -3409,7 +3669,7 @@ ${dateLine}
       });
       if (!keepMus) { if (mus) setMusic(mus, false); else clearMusic() }
       sel = clamp(st.sel || 0, 0, slides.length - 1); selC = st.selC >= 0 && st.selC < clips.length ? st.selC : -1; selT = st.selT == 'c' && selC >= 0 ? 'c' : st.selT == 'none' ? 'none' : 's';
-      renderTpl(); layout(); renderCl(); renderWm(); renderEd(); tab(st.tab || 'auto');
+      renderTpl(); layout(); renderCl(); renderWm(); renderEd(); renderVoices(); tab(st.tab || 'auto');
       cur = clamp(st.cur || 0, 0, total); draw(cur); renderTL(); head(); updNav();
       $('tl').scrollLeft = Math.max(0, cur * pps() - 120);
       if (!keepMus) resetHistory();
@@ -3419,6 +3679,7 @@ ${dateLine}
     }
     function newProject() {
       hideHome(); PID = uid(); PMETA = { id: PID, created: Date.now(), custom: false, name: '', persisted: false }; savedF = new Set();
+      voices.clear(); voiceBusy = false; voiceJob++;
       applyState(blankState(), {}, null); lastSig = sigOf(capture()); $('sv').textContent = ''; $('sv').className = '';
       tab('auto'); openSheet(); $('raw').focus(); $('st').textContent = 'New project. Write your text, then press Make slides. It saves by itself.';
     }
@@ -3436,6 +3697,12 @@ ${dateLine}
           if (o.rb == 'ai' && o.ai && o.ai.v && o.ai.src === o.img) { const k = o.fid + '.ai'; fids.push(k); if (!savedF.has(k)) { await putF(PID + '|' + k, { blob: await canvasBlob(o.ai.v) }); savedF.add(k) } }
         }
         if (musFile) { fids.push('music'); mk_ = 'm:' + musName + ':' + musFile.size; if (!savedF.has(mk_)) { await putF(PID + '|music', { blob: musFile, name: musName }); savedF.add(mk_) } }
+        for (const [id, v] of voices) {
+          const k = 'voice-' + id;
+          if (fids.includes(k)) continue;
+          fids.push(k);
+          if (!savedF.has(k)) { await putF(PID + '|' + k, { blob: v.blob, text: v.text, dur: v.dur }); savedF.add(k) }
+        }
         for (const k of await fKeys(PID)) { if (!fids.includes(k.slice(PID.length + 1))) await delF(k) }
         let old = null; try { old = await getP(PID) } catch (e) { }
         let thumb = old && old.thumb || '';
@@ -3454,12 +3721,17 @@ ${dateLine}
       document.body.style.cursor = 'progress';
       try {
         const rec = await getP(id); if (!rec) return;
-        const imgs = {}; let mus = null;
+        const imgs = {}; let mus = null; const vfiles = new Map();
         for (const k of await fKeys(id)) {
           const fid = k.slice(id.length + 1), f = await getF(k); if (!f) continue;
-          try { if (fid == 'music') mus = new File([f.blob], f.name || 'music'); else imgs[fid] = await blobToCanvas(f.blob) } catch (e) { }
+          try {
+            if (fid == 'music') mus = new File([f.blob], f.name || 'music');
+            else if (/^voice-/.test(fid)) { const sid = fid.slice(6), buf = await decodeVoice(f.blob); vfiles.set(sid, { blob: f.blob, buf, dur: buf.duration, text: f.text || '' }) }
+            else imgs[fid] = await blobToCanvas(f.blob)
+          } catch (e) { }
         }
         PID = id; PMETA = { id, created: rec.created, custom: !!rec.custom, name: rec.name, persisted: true }; savedF = new Set([...(rec.fids || []), ...(rec.mk ? [rec.mk] : [])]);
+        voices.clear(); vfiles.forEach((v, sid) => voices.set(sid, v)); voiceBusy = false; voiceJob++;
         hideHome(); applyState(rec.state, imgs, mus); lastSig = sigOf(capture());
         $('sv').className = ''; $('sv').textContent = ''; $('st').textContent = 'Opened: ' + rec.name + '. Continue from where you stopped.';
       } catch (e) { $('h_msg') && ($('h_msg').textContent = 'खोल्न सकिएन: ' + ((e && e.message) || e)) }

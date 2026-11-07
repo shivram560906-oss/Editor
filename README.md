@@ -44,6 +44,25 @@ While Gemini writes, the exact prompt and live progress appear in the AI Writer 
 
 No AI pictures are generated for this template; every picture comes from the local `Rashi/` folder. The headings, date position, subtitle and image paths stay fixed; only the four points per rashi come from Gemini.
 
+## Nepali narration (TTS)
+
+Open **Media → Nepali narration** and press **Generate narration**. The editor creates one Nepali voice clip per slide and adds the clip length to that slide's duration (plus a short gap). A slide therefore never changes before its narration finishes, and starting playback in the middle of a slide starts the voice at the matching offset.
+
+- Each slide row shows its voice length and has its own regenerate/remove button. **Remove all** clears the whole project's narration.
+- Music is automatically ducked to 22% while a voice clip plays, then returns to full volume.
+- Narration is mixed into both **direct export** (H.264 + AAC MP4) and the real-time **live recording** fallback.
+- Voice clips are stored in IndexedDB with the project and restored when it is reopened. Backup JSON files include them too.
+- If a slide's text changes, its row shows **Text changed — regenerate**; the old clip stays until you regenerate it.
+- Each slide's narration text is limited to 2,000 characters.
+
+The server tries these providers in order:
+
+1. **Google Cloud Text-to-Speech** when `GOOGLE_TTS_API_KEY` is set (default voice `ne-NP-Standard-A`).
+2. **Azure Speech** when `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION` are set (default voice `ne-NP-HemkalaNeural`).
+3. The free Google Translate Nepali voice, so the feature works with no extra credentials.
+
+Synthesized MP3s are cached in `.tts-cache/`, keyed by provider, voice and text. The folder is ignored by Git.
+
 ## Watermark
 
 New projects start with a movable watermark at bottom center:
@@ -80,11 +99,23 @@ POLLINATIONS_API=...
 
 `POLLINATIONS_API` is optional but recommended. Without it there is no fallback when Cloudflare runs out. On a host such as Render, add all three variables in the service's environment settings. `.env` is ignored by Git and is never committed.
 
-Optional overrides: `CLOUDFLARE_TEXT_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `CLOUDFLARE_IMAGE_STEPS`, `POLLINATIONS_IMAGE_MODEL`, `POLLINATIONS_TEXT_MODEL`, `PORT`.
+Narration credentials are optional. Add one of these groups to use a premium voice; otherwise the free Google Translate voice is used:
+
+```env
+GOOGLE_TTS_API_KEY=...
+GOOGLE_TTS_VOICE=ne-NP-Standard-A
+
+AZURE_SPEECH_KEY=...
+AZURE_SPEECH_REGION=...
+AZURE_TTS_VOICE=ne-NP-HemkalaNeural
+```
+
+Optional overrides: `CLOUDFLARE_TEXT_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `CLOUDFLARE_IMAGE_STEPS`, `POLLINATIONS_IMAGE_MODEL`, `POLLINATIONS_TEXT_MODEL`, `GOOGLE_TTS_VOICE`, `AZURE_TTS_VOICE`, `PORT`.
 
 ## Files
 
 - `index.html` — the whole editor (UI, timeline, canvas and export).
-- `server.js` — static server, `/ping` health check, `/Rashi/` pictures, and the Cloudflare/Pollinations AI proxy.
+- `server.js` — static server, `/ping` health check, `/Rashi/` pictures, the Cloudflare/Pollinations AI proxy, and the `/api/tts` narration proxy.
 - `Rashi/` — local rashi pictures used by `@imglink` (`0.png`, `1.png`–`12.png`).
+- `.tts-cache/` — generated narration MP3s (created automatically, ignored by Git).
 - `editor.original.html` — untouched backup of the original editor.

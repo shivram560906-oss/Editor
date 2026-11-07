@@ -1681,8 +1681,6 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
             <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
             <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
           </select>
-          <label for="ch_tmp">Creativity</label>
-          <input type="range" id="ch_tmp" min="0" max="1.2" step="0.1" value="0.6">
         </div>
         <div id="ch_log"></div>
         <div class="ch-chips" id="ch_chips"></div>
@@ -3795,7 +3793,7 @@ EXAMPLE:
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('rcal').hidden) closeRashiCal() });
     const chatH = []; let chatAC = null;
     const cfg = (k, d) => { try { return localStorage.getItem('ch_' + k) || d } catch (e) { return d } };
-    ['key', 'gm', 'tmp'].forEach(k => { const e = $('ch_' + k), d = e.value; e.value = cfg(k, d); if (e.value === '' && d) e.value = d; e.oninput = e.onchange = () => { try { localStorage.setItem('ch_' + k, e.value) } catch (_) { } } });
+    ['key', 'gm'].forEach(k => { const e = $('ch_' + k), d = e.value; e.value = cfg(k, d); if (e.value === '' && d) e.value = d; e.oninput = e.onchange = () => { try { localStorage.setItem('ch_' + k, e.value) } catch (_) { } } });
 
     /* turn the AI answer into text your slide parser understands */
     function toRaw(t) {
@@ -3837,7 +3835,7 @@ EXAMPLE:
         if (!key) throw new Error('No API key. Click the ⚙ button and paste your Gemini API key.');
         const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent($('ch_gm').value.trim()) + ':streamGenerateContent?alt=sse', {
           method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, signal: chatAC.signal,
-          body: JSON.stringify({ systemInstruction: { parts: [{ text: sysTxt }] }, contents, generationConfig: { temperature: +$('ch_tmp').value, topP: 0.9, maxOutputTokens: 8192 } })
+          body: JSON.stringify({ systemInstruction: { parts: [{ text: sysTxt }] }, contents, generationConfig: { temperature: 0.6, topP: 0.9, maxOutputTokens: 8192 } })
         });
         if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + (await r.text()).slice(0, 200));
         const rd = r.body.getReader(), dec = new TextDecoder(); let buf = '';

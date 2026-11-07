@@ -1530,6 +1530,52 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+/* ============================ Nepali date picker ============================ */
+#rcal { position: fixed; inset: 0; z-index: 420; display: flex; align-items: center; justify-content: center; padding: 16px; }
+#rcal[hidden] { display: none; }
+.rcal-back { position: absolute; inset: 0; background: rgba(0, 0, 0, .7); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.rcal-card {
+  position: relative; width: min(420px, 96vw); max-height: calc(100dvh - 32px); overflow: auto;
+  background: var(--panel); border: 1px solid var(--line-2); border-radius: 20px;
+  box-shadow: var(--shadow); padding: 16px;
+}
+.rcal-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+.rcal-head b { display: block; font-size: 16px; font-weight: 750; letter-spacing: -.01em; }
+.rcal-head span { display: block; color: var(--mut); font-size: 11.5px; margin-top: 2px; }
+.rcal-x {
+  margin-left: auto; width: 32px; height: 32px; flex: 0 0 auto; border-radius: 9px;
+  color: var(--mut); font-size: 22px; line-height: 1; display: grid; place-items: center;
+}
+.rcal-x:hover { color: var(--fg); background: var(--panel-3); }
+.rcal-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.rcal-navb {
+  width: 36px; height: 36px; flex: 0 0 auto; border-radius: 10px;
+  background: var(--panel-2); border: 1px solid var(--line); color: var(--fg);
+  font-size: 22px; line-height: 1; display: grid; place-items: center;
+}
+.rcal-navb:hover { background: var(--panel-3); }
+.rcal-sel { display: flex; gap: 6px; flex: 1 1 auto; min-width: 0; }
+.rcal-sel select { flex: 1 1 auto; min-width: 0; }
+.rcal-week, .rcal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.rcal-week span { text-align: center; font-size: 10.5px; color: var(--mut); padding: 4px 0; }
+.rcal-day {
+  aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center;
+  font-size: 13px; font-weight: 650; color: var(--fg); border: 1px solid transparent;
+  min-width: 0;
+}
+.rcal-day:hover { background: var(--panel-2); }
+.rcal-day.blank { visibility: hidden; }
+.rcal-day.today { border-color: var(--line-2); color: var(--cyan); }
+.rcal-day.on { background: linear-gradient(135deg, var(--ac), var(--ac-2)); color: #fff; box-shadow: 0 6px 18px rgba(255, 59, 92, .35); }
+.rcal-foot { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+#rcal_pick { display: block; font-size: 12px; color: var(--mut); margin-bottom: 10px; }
+.rcal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.rcal-actions .btn { min-height: 38px; }
+@media (max-width: 420px) {
+  .rcal-card { padding: 13px; }
+  .rcal-actions { flex-direction: column-reverse; }
+  .rcal-actions .btn { width: 100%; }
+}
 </style>
 </head>
 
@@ -1831,6 +1877,33 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
   </div>
   <div id="scrim"></div>
 
+  <div id="rcal" hidden>
+    <div class="rcal-back" data-rcal-close></div>
+    <div class="rcal-card" role="dialog" aria-modal="true" aria-labelledby="rcal_title">
+      <div class="rcal-head">
+        <div><b id="rcal_title">आजको राशिफल</b><span>नेपाली पात्रोबाट मिति छान्नुहोस्</span></div>
+        <button id="rcal_x" class="rcal-x" title="Close" aria-label="Close">×</button>
+      </div>
+      <div class="rcal-nav">
+        <button id="rcal_prev" class="rcal-navb" title="Previous month" aria-label="Previous month">‹</button>
+        <div class="rcal-sel">
+          <select id="rcal_y" aria-label="Year"></select>
+          <select id="rcal_m" aria-label="Month"></select>
+        </div>
+        <button id="rcal_next" class="rcal-navb" title="Next month" aria-label="Next month">›</button>
+      </div>
+      <div id="rcal_week" class="rcal-week"></div>
+      <div id="rcal_days" class="rcal-days"></div>
+      <div class="rcal-foot">
+        <span id="rcal_pick"></span>
+        <div class="rcal-actions">
+          <button id="rcal_cancel" class="btn">रद्द</button>
+          <button id="rcal_ok" class="btn btn-primary">यो मितिको राशिफल बनाउनुहोस्</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const $ = id => document.getElementById(id);
     const cv = $('cv'), ctx = cv.getContext('2d');
@@ -1953,7 +2026,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     const MOB = matchMedia('(pointer:coarse)').matches || Math.min(screen.width, innerWidth) < 700; let RS = MOB ? .75 : 1, lastD = 0, aiAsked = false, rfq = 0, tbox = null;
     let W = 720, H = 1280, U = 1, seed = 7, P = [], total = 1, cur = 0, sel = 0, selC = -1, selT = 's', raf = 0, playing = false, t0 = 0, from = 0, snapOn = true, cat = 'j';
     let _sn = 0, picJob = 0; const nid = () => 's' + (++_sn) + Date.now().toString(36);
-    const mk = (title, sub, body) => ({ id: nid(), q: '', title: title || '', sub: sub || '', body: body || '', an: '', font: '', te: '', hc: '', bc: '', dur: 0, sz: 1, oy: 0, ox: 0 });
+    const mk = (title, sub, body) => ({ id: nid(), q: '', link: '', title: title || '', sub: sub || '', body: body || '', an: '', font: '', te: '', hc: '', bc: '', dur: 0, sz: 1, oy: 0, ox: 0 });
     let slides = [mk('x', '', 'y')], clips = [], exporting = false, cdrag = null, musFile = null, cancelExp = false;
 
     /* tabs and design controls */
@@ -1988,7 +2061,8 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     }
     ['hsz', 'bsz', 'lh', 'pace', 'pg', 'ts', 'tc', 'fw', 'fi', 'kb', 'ls', 'ta'].forEach(k => $(k).oninput = () => refresh());
     /* watermarks: any number, each with its own settings */
-    const WMS = [], newWm = () => ({ text: '', img: null, thumb: '', rb: 'none', tol: 25, mask: 'none', pc: null, pos: 'br', mv: 'still', col: '#ffffff', size: 18, op: 55 });
+    const WM_TEXT = 'पं. ज्यो. शिवराम पराजुली\n९८४७४५२९०६';
+    const WMS = [], newWm = (text = WM_TEXT) => ({ text, img: null, thumb: '', rb: 'none', tol: 25, mask: 'none', pc: null, pos: 'bc', mv: 'bounce', col: '#ffffff', size: 18, op: 55 });
     const WPOS = { tl: 'Top left', tc: 'Top center', tr: 'Top right', ml: 'Middle left', mc: 'Center', mr: 'Middle right', bl: 'Bottom left', bc: 'Bottom center', br: 'Bottom right' }, WMV = { still: 'Still', float: 'Gentle float', bounce: 'Move around the screen' }, WBG = { none: 'Keep as is', ai: 'Remove background (AI, best)', auto: 'Remove background (offline)', white: 'Remove white', black: 'Remove black' };
     const SH = { sharp: 'Rectangle', round: 'Rounded', circle: 'Circle', oval: 'Oval', square: 'Square', sqround: 'Rounded square', diamond: 'Diamond', hex: 'Hexagon' }, MASKS = { none: 'No mask', ...SH };
     function renderWm() {
@@ -2022,7 +2096,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
         c.querySelector('[data-x]').onclick = ev => { ev.preventDefault(); ev.stopPropagation(); WMS.splice(i, 1); renderWm(); if (!playing) draw(cur) }
       });
     }
-    $('wadd').onclick = () => { const w = newWm(); w.pos = ['br', 'bl', 'tr', 'tl', 'bc', 'tc'][WMS.length % 6]; WMS.push(w); $('wm').checked = true; renderWm() };
+    $('wadd').onclick = () => { const w = newWm(''); w.pos = ['br', 'bl', 'tr', 'tl', 'bc', 'tc'][WMS.length % 6]; WMS.push(w); $('wm').checked = true; renderWm() };
     $('wclr').onclick = () => { WMS.length = 0; renderWm(); if (!playing) draw(cur) };
     $('wm').oninput = () => { if (!playing) draw(cur) };
 
@@ -2432,7 +2506,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
         const p = w.pos, tri = v => { v = ((v % 2) + 2) % 2; return v < 1 ? v : 2 - v };
         let x = p[1] == 'l' ? m : p[1] == 'r' ? W - bw - m : (W - bw) / 2, y = p[0] == 't' ? m : p[0] == 'b' ? H - bh - m : (H - bh) / 2;
         if (w.mv == 'float') { x += Math.sin(t * .8 + n) * 14 * U; y += Math.cos(t * .6 + n) * 10 * U }
-        else if (w.mv == 'bounce') { x = m + (W - bw - 2 * m) * tri(t * .07 + .13 + n * .31); y = m + (H - bh - 2 * m) * tri(t * .05 + .41 + n * .23) }
+        else if (w.mv == 'bounce') { x = m + (W - bw - 2 * m) * tri(t * .07 + .5 + n * .31); y = m + (H - bh - 2 * m) * tri(t * .05 + 1 + n * .23) }
         if (has) { ctx.imageSmoothingQuality = 'high'; const ix = x + (bw - lw) / 2; if (shp != 'none') { ctx.save(); shapePath(ctx, shp, ix, y, lw, lh, U); ctx.clip(); ctx.drawImage(im, cr[0], cr[1], cr[2], cr[3], ix, y, lw, lh); ctx.restore() } else ctx.drawImage(im, ix, y, lw, lh) }
         if (txt) { ctx.fillStyle = w.col; ctx.textAlign = 'left'; lines.forEach((l, j) => ctx.fillText(l, x + (bw - lws[j]) / 2, y + lh + gap + j * fs * 1.3)) }
         ctx.restore()
@@ -2577,26 +2651,117 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       const chunks = raw.replace(/\r/g, '').split(/\n[ \t]*\n[ \t]*\n\s*/).map(c => c.replace(/^\s*\n/, '').replace(/\s+$/, '')).filter(c => c.trim());
       let firstLine = true;
       return chunks.map(c => {
-        const ti = [], su = [], bo = []; let m, q = '';
+        const ti = [], su = [], bo = []; let m, q = '', link = '';
         c.split('\n').forEach(l => {
+          if (m = /^\s*@imglink\s*:\s*(.+)$/i.exec(l)) { link = m[1].trim().replace(/^["']+|["']+$/g, ''); return }
           if (m = /^\s*@(?:img|image|pic)\s*:\s*(.+)$/i.exec(l)) { q = m[1].trim(); return }
           if (m = /^\s*##\s*(.*)$/.exec(l)) { ti.push(m[1].trim()); if (l.trim()) firstLine = false }
           else if (m = /^\s*#\s*(.*)$/.exec(l)) { su.push(m[1].trim()); if (l.trim()) firstLine = false }
           else if (firstLine && l.trim()) { ti.push(l.trim()); firstLine = false }   /* the very first line is always the heading */
           else bo.push(l)
         });
-        const sl = mk(ti.join('\n'), su.join('\n'), bo.join('\n').replace(/^\n+|\n+$/g, '')); sl.q = q; return sl;
+        const sl = mk(ti.join('\n'), su.join('\n'), bo.join('\n').replace(/^\n+|\n+$/g, '')); sl.q = q; sl.link = link; return sl;
       });
     }
-    function autoGen() {
+    /* Bikram Sambat calendar data for the date picker (2070-2100 BS).
+       Month order: Baisakh ... Chaitra. 2083 uses the corrected published
+       month lengths (Ashad 31, Mangsir 29, Poush 30, Magh 29). */
+    const BS_MIN = 2070, BS_MAX = 2100, BS_DAY = 86400000;
+    const BS_MONTHS = ['वैशाख', 'जेठ', 'असार', 'श्रावण', 'भदौ', 'आश्विन', 'कार्तिक', 'मंसिर', 'पुष', 'माघ', 'फाल्गुन', 'चैत'];
+    const BS_WEEK = ['आइत', 'सोम', 'मंगल', 'बुध', 'बिही', 'शुक्र', 'शनि'];
+    const BS_DAYS = {
+      2070: [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+      2071: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+      2072: [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+      2073: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+      2074: [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+      2075: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+      2076: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+      2077: [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+      2078: [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+      2079: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+      2080: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+      2081: [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+      2082: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+      2083: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+      2084: [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30],
+      2085: [31, 32, 31, 32, 30, 31, 30, 30, 29, 30, 30, 30],
+      2086: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+      2087: [31, 31, 32, 31, 31, 31, 30, 30, 30, 30, 30, 30],
+      2088: [30, 31, 32, 32, 30, 31, 30, 30, 29, 30, 30, 30],
+      2089: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+      2090: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+      2091: [31, 31, 32, 31, 31, 31, 30, 30, 29, 30, 30, 30],
+      2092: [30, 31, 32, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+      2093: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+      2094: [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30],
+      2095: [31, 31, 32, 31, 31, 31, 30, 29, 30, 30, 30, 30],
+      2096: [30, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+      2097: [31, 32, 31, 31, 31, 30, 30, 30, 29, 30, 30, 30],
+      2098: [31, 31, 32, 31, 31, 31, 29, 30, 29, 30, 29, 31],
+      2099: [31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30],
+      2100: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31]
+    };
+    const BS_ANCHOR = Date.UTC(2013, 3, 14); /* 2070-01-01 BS */
+    const NE_D = '०१२३४५६७८९';
+    const neNum = n => String(n).replace(/\d/g, d => NE_D[+d]);
+    const bsYearDays = y => BS_DAYS[y].reduce((a, b) => a + b, 0);
+    const bsMonthDays = (y, m) => (BS_DAYS[y] && BS_DAYS[y][m - 1]) || 30;
+    function bsDayIndex(y, m, d) {
+      let n = 0;
+      for (let yy = BS_MIN; yy < y; yy++) n += bsYearDays(yy);
+      for (let mm = 1; mm < m; mm++) n += bsMonthDays(y, mm);
+      return n + d - 1;
+    }
+    function bsWeekday(y, m, d) { return ((bsDayIndex(y, m, d) % 7) + 7) % 7 }
+    function bsToAd(y, m, d) { return new Date(BS_ANCHOR + bsDayIndex(y, m, d) * BS_DAY) }
+    function adToBs(date) {
+      let n = Math.round((Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) - BS_ANCHOR) / BS_DAY);
+      if (n < 0) return { y: BS_MIN, m: 1, d: 1 };
+      let y = BS_MIN;
+      while (y <= BS_MAX && n >= bsYearDays(y)) { n -= bsYearDays(y); y++ }
+      if (y > BS_MAX) return { y: BS_MAX, m: 12, d: bsMonthDays(BS_MAX, 12) };
+      let m = 1;
+      while (m < 12 && n >= bsMonthDays(y, m)) { n -= bsMonthDays(y, m); m++ }
+      return { y, m, d: n + 1 };
+    }
+    function nepalTodayBs() {
+      const t = new Date(Date.now() + 5.75 * 3600000);
+      return adToBs(new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate())));
+    }
+    /* The 12 rashis and their four hard-coded points. Only these bullets are
+       content; the headings, date and @imglink paths never change. */
+    const RASHIS = [
+      { name: 'मेष', points: ['आज तपाईंको ऊर्जा र उत्साह उच्च रहनेछ।', 'नयाँ काम सुरु गर्न शुभ दिन', 'व्यापारमा प्रगति हुनेछ', 'स्वास्थ्यमा सुधार आउनेछ'] },
+      { name: 'वृष', points: ['आर्थिक लाभको राम्रो योग बनेको छ।', 'रोकिएका काम पुनः बन्नेछन्', 'परिवारमा खुसी छाउनेछ', 'मिहिनेतको फल मिल्नेछ'] },
+      { name: 'मिथुन', points: ['आज सोचेभन्दा राम्रो सफलता मिल्नेछ।', 'साथीभाइको सहयोग पाइनेछ', 'छोटो यात्राको सम्भावना छ', 'वाणीमा मधुरता राख्नुहोस्'] },
+      { name: 'कर्कट', points: ['मनमा केही चञ्चलता रहन सक्छ।', 'धैर्यताका साथ काम गर्नुहोस्', 'अनावश्यक खर्चबाट बच्नुहोस्', 'परिवारको ख्याल गर्नुहोस्'] },
+      { name: 'सिंह', points: ['मान-सम्मान र प्रतिष्ठामा वृद्धि हुनेछ।', 'कार्यक्षेत्रमा सफलता मिल्नेछ', 'नयाँ अवसर प्राप्त हुनेछन्', 'आत्मविश्वास उच्च रहनेछ'] },
+      { name: 'कन्या', points: ['आजको दिन फलदायी र सुखद रहनेछ।', 'पठनपाठनमा प्रगति हुनेछ', 'आर्थिक स्थिति बलियो हुनेछ', 'नयाँ योजना सफल हुनेछन्'] },
+      { name: 'तुला', points: ['सन्तुलित व्यवहारले सफलता दिलाउनेछ।', 'रोकिएको धन फिर्ता आउनेछ', 'सम्बन्धमा मधुरता आउनेछ', 'स्वास्थ्य अनुकूल रहनेछ'] },
+      { name: 'वृश्चिक', points: ['कडा मिहिनेत पछि सफलता पाइनेछ।', 'गोपनीयता कायम राख्नुहोस्', 'व्यापारमा नयाँ सम्झौता हुनेछ', 'यात्रा फलदायी रहनेछ'] },
+      { name: 'धनु', points: ['आज भाग्यले पूर्ण साथ दिनेछ।', 'धार्मिक कार्यमा रुचि बढ्नेछ', 'नयाँ काममा सफलता मिल्नेछ', 'परिवारबाट पूर्ण सहयोग'] },
+      { name: 'मकर', points: ['काम गर्दा केही सावधानी अपनाउनुहोला।', 'निर्णय गर्दा सोचविचार गर्नुहोस्', 'धैर्य र संयम अपनाउनुहोस्', 'स्वास्थ्यमा ध्यान दिनुहोस्'] },
+      { name: 'कुम्भ', points: ['नयाँ विचार र सिर्जनात्मकता बढ्नेछ।', 'आम्दानीका नयाँ स्रोत भेटिनेछन्', 'समाजमा मान-इज्जत बढ्नेछ', 'सबै योजनाहरू सफल हुनेछन्'] },
+      { name: 'मीन', points: ['आध्यात्मिक क्षेत्रमा रुचि जाग्नेछ।', 'सुखद समाचार प्राप्त हुनेछ', 'लगानीबाट राम्रो प्रतिफल मिल्नेछ', 'मन प्रसन्न र शान्त रहनेछ'] }
+    ];
+    function rashiRaw(bs) {
+      const dateLine = neNum(bs.y) + ' ' + BS_MONTHS[bs.m - 1] + ' ' + neNum(bs.d);
+      const out = [`## तपाइको आजको राशीफल\n# ${dateLine}\n# मेष देखि मीन राशिको भविष्यफल\n@imglink : "0.png"`];
+      RASHIS.forEach((r, i) => out.push(`## ${r.name} राशि\n${r.points.map(p => '- ' + p).join('\n')}\n@imglink : "${i + 1}.png"`));
+      return out.join('\n\n\n');
+    }
+    function autoGen(aiPics) {
       const raw = $('raw').value; if (!raw.trim()) { $('st').textContent = 'Write or paste your text first.'; return }
       slides = mdParse(raw); if (!slides.length) slides = [mk('', '', raw)];
       clips = clips.filter(c => !c.auto); selC = -1; picJob++;
       sel = 0; if ($('fx').value == 'mix') randFx(); layout(); pick(0); $('st').textContent = slides.length + ' slide' + (slides.length > 1 ? 's' : '') + ' ready. Press Play.';
-      autoPics();
+      autoPics(!!aiPics);
     }
-    /* automatic pictures: every slide gets a Cloudflare AI image below the text.
-       An "@img: description" line overrides the automatic English summary. */
+    /* Pictures are added in two modes:
+       - Manual "Make slides": only @img (AI) and @imglink (local) slides.
+       - AI Writer: every slide gets a picture, using @img when present and
+         the slide text otherwise. @imglink always stays local. */
     function slideText(s) { return [s.title, s.sub, s.body].map(x => (x || '').trim()).filter(Boolean).join('\n').trim() }
     async function addPic(s, job) {
       let r;
@@ -2620,23 +2785,46 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       clips.push({ img: im, src, name: 'AI: ' + label, pos: 'bottom', size: 80, mh: .36, start: s.s + .3, dur: Math.max(1, s.d - .6), fx: 'fade', shape: 'round', rb: 'none', tol: 25, cx: null, cy: null, pc: null, fid: uid(), ow: w0, oh: h0, auto: true, sid: s.id });
       layout(); renderCl(); refresh();
     }
-    async function autoPics() {
-      const job = picJob, todo = slides.filter(s => (s.q || '').trim() || slideText(s));
+    async function addLocalPic(s, job) {
+      const link = (s.link || '').trim().replace(/^["']+|["']+$/g, '');
+      const file = link.split(/[\\/]/).pop();
+      if (!file) throw new Error('Empty @imglink path.');
+      const urls = ['/Rashi/' + encodeURIComponent(file)];
+      if (/\.png$/i.test(file)) urls.push('/Rashi/' + encodeURIComponent(file.replace(/\.png$/i, '.jpg')));
+      let r = null;
+      for (const u of urls) { try { r = await fetch(u); if (r.ok) break } catch (e) { r = null } }
+      if (!r || !r.ok) throw new Error('Picture not found in Rashi folder: ' + file);
+      const blob = await r.blob();
+      const [im, src, w0, h0] = await new Promise((res, rej) => readImg(blob, (a, b, c, d) => res([a, b, c, d]), () => rej(new Error('Could not read ' + file))));
+      if (job !== picJob || !slides.includes(s)) return;
+      clips.push({ img: im, src, name: 'राशि: ' + file, pos: 'bottom', size: 80, mh: .36, start: s.s + .3, dur: Math.max(1, s.d - .6), fx: 'fade', shape: 'round', rb: 'none', tol: 25, cx: null, cy: null, pc: null, fid: uid(), ow: w0, oh: h0, auto: true, local: true, sid: s.id });
+      layout(); renderCl(); refresh();
+    }
+    async function autoPics(aiPics) {
+      const job = picJob;
+      const todo = slides.map(s => {
+        if ((s.link || '').trim()) return { s, local: true };
+        if ((s.q || '').trim() || aiPics) return { s, local: false };
+        return null;
+      }).filter(Boolean);
       if (!todo.length) return;
-      if (location.protocol === 'file:') { $('st').textContent = 'Slides ready. AI pictures need the app server (npm start).'; return }
+      if (location.protocol === 'file:') { $('st').textContent = 'Slides ready. Pictures need the app server (npm start).'; return }
       let ok = 0, err = '', next = 0, stop = false;
       const one = async () => {
         while (!stop && job === picJob && next < todo.length) {
-          const s = todo[next++];
-          $('st').textContent = 'Creating AI pictures… ' + ok + ' / ' + todo.length + ' done';
-          try { await addPic(s, job); ok++ }
-          catch (e) { err = e.message || String(e); console.warn('pic', s.q || s.title, e); if (/limit|credentials|not configured|not reachable/i.test(err)) stop = true }
+          const item = todo[next++], s = item.s;
+          $('st').textContent = (item.local ? 'Adding local pictures… ' : 'Creating AI pictures… ') + ok + ' / ' + todo.length + ' done';
+          try { if (item.local) await addLocalPic(s, job); else await addPic(s, job); ok++ }
+          catch (e) {
+            err = e.message || String(e); console.warn('pic', s.link || s.q || s.title, e);
+            if (!item.local && /limit|credentials|not configured|not reachable/i.test(err)) stop = true;
+          }
         }
       };
       await Promise.all([one(), one(), one()]);
-      if (job === picJob) $('st').textContent = ok + ' of ' + todo.length + ' AI pictures added.' + (err ? ' ' + err : '')
+      if (job === picJob) $('st').textContent = ok + ' of ' + todo.length + ' pictures added.' + (err ? ' ' + err : '')
     }
-    $('gen').onclick = autoGen; $('goman').onclick = () => { tab('man'); openSheet() };
+    $('gen').onclick = () => autoGen(false); $('goman').onclick = () => { tab('man'); openSheet() };
     const SAMPLE = `आजको राशिफल
 # सबै राशिका लागि
 
@@ -3053,14 +3241,14 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     function capture() {
       const ctl = {}; CTRL.forEach(id => ctl[id] = getC(id));
       return {
-        v: 1, raw: $('raw').value, S: { ...S }, cat, seed, ctl, zm: $('zm').value, tab: curTab, sel, selC, selT, cur: Math.round(cur * 100) / 100,
+        v: 2, raw: $('raw').value, S: { ...S }, cat, seed, ctl, zm: $('zm').value, tab: curTab, sel, selC, selT, cur: Math.round(cur * 100) / 100,
         slides: slides.map(x => ({ ...x })),
         clips: clips.map(c => { const { img, pc, ai, box, lane, ...r } = c; return r }),
         wms: WMS.map(w => { const { img, pc, ai, ...r } = w; return r }), mus: musName
       }
     }
     const sigOf = st => JSON.stringify({ ...st, cur: 0 });
-    const isBlank = st => !st.raw.trim() && !st.clips.length && !st.wms.some(w => w.text || w.fid) && st.slides.every(x => !x.title && !x.sub && !x.body);
+    const isBlank = st => !st.raw.trim() && !st.clips.length && st.slides.every(x => !x.title && !x.sub && !x.body) && st.wms.every(w => !w.fid && (!w.text || w.text === WM_TEXT));
     function autoName(st) {
       const t = st.slides.map(x => (x.title || '').split('\n')[0].trim()).find(Boolean) || (st.raw || '').split('\n').map(l => l.replace(/^[#\s]+/, '').trim()).find(Boolean) || '';
       return t ? t.slice(0, 40) : 'नयाँ प्रोजेक्ट ' + new Date().toLocaleDateString()
@@ -3074,7 +3262,16 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       slides = (st.slides && st.slides.length ? st.slides : [mk('', '', '')]).map(x => ({ ...mk(), ...x }));
       const wire = o => { o.img = (o.fid && imgs[o.fid]) || null; const a = o.fid && imgs[o.fid + '.ai']; o.ai = a ? { src: o.img, v: a, p: Promise.resolve() } : null; o.pc = null; if (o.rb == 'ai' && !o.ai && MOB) o.rb = 'auto'; return o };
       clips = (st.clips || []).map(c => wire({ box: null, ...c }));
-      WMS.length = 0; (st.wms && st.wms.length ? st.wms : [newWm()]).forEach(w => WMS.push(wire({ ...newWm(), ...w })));
+      /* v1 projects had an invisible blank watermark; give those the new
+         default text. A v2 project with no watermarks stays without them, so
+         deleting the watermark persists after reopening. */
+      const legacyWm = !st.v || st.v < 2;
+      WMS.length = 0;
+      if (!Array.isArray(st.wms)) WMS.push(wire(newWm()));
+      else st.wms.forEach(w => {
+        const blank = !w.text && !w.fid && !w.img;
+        WMS.push(wire({ ...newWm(), ...(blank && legacyWm ? {} : w) }));
+      });
       if (!keepMus) { if (mus) setMusic(mus, false); else clearMusic() }
       sel = clamp(st.sel || 0, 0, slides.length - 1); selC = st.selC >= 0 && st.selC < clips.length ? st.selC : -1; selT = st.selT == 'c' && selC >= 0 ? 'c' : st.selT == 'none' ? 'none' : 's';
       renderTpl(); layout(); renderCl(); renderWm(); renderEd(); tab(st.tab || 'auto');
@@ -3310,7 +3507,68 @@ EXAMPLE:
 2. दान दिनुहोस्
 @img: green meadow
 \`\`\``;
-    const CHIPS = ['आजको राशिफल (१२ राशि)', '५ वटा प्रेरक विचार', 'आरती / मन्त्र स्लाइड', 'Make it shorter', 'Add bullet points', 'Fix the format'];
+    const RASHI_CHIP = 'आजको राशिफल (१२ राशि)';
+    const CHIPS = [RASHI_CHIP, '५ वटा प्रेरक विचार', 'आरती / मन्त्र स्लाइड', 'Make it shorter', 'Add bullet points', 'Fix the format'];
+    /* Nepali (Bikram Sambat) date picker for the hard-coded rashi template. */
+    const RCAL = { sel: null, view: null };
+    function rcalClampSel() {
+      const max = bsMonthDays(RCAL.view.y, RCAL.view.m);
+      RCAL.sel = { y: RCAL.view.y, m: RCAL.view.m, d: clamp(RCAL.sel ? RCAL.sel.d : 1, 1, max) };
+    }
+    function rcalBuild() {
+      const ySel = $('rcal_y'), mSel = $('rcal_m');
+      if (!ySel.options.length) {
+        for (let y = BS_MIN; y <= BS_MAX; y++) ySel.add(new Option(neNum(y), y));
+        BS_MONTHS.forEach((n, i) => mSel.add(new Option(n, i + 1)));
+        ySel.onchange = () => { RCAL.view.y = +ySel.value; rcalClampSel(); rcalRender() };
+        mSel.onchange = () => { RCAL.view.m = +mSel.value; rcalClampSel(); rcalRender() };
+        $('rcal_week').innerHTML = BS_WEEK.map(d => `<span>${d}</span>`).join('');
+      }
+      ySel.value = RCAL.view.y; mSel.value = RCAL.view.m;
+    }
+    function rcalRender() {
+      const y = RCAL.view.y, m = RCAL.view.m, days = bsMonthDays(y, m), first = bsWeekday(y, m, 1), today = nepalTodayBs();
+      $('rcal_y').value = y; $('rcal_m').value = m;
+      let html = '';
+      for (let i = 0; i < first; i++) html += '<span class="rcal-day blank"></span>';
+      for (let d = 1; d <= days; d++) {
+        const on = RCAL.sel.y === y && RCAL.sel.m === m && RCAL.sel.d === d;
+        const isToday = today.y === y && today.m === m && today.d === d;
+        html += `<button type="button" class="rcal-day${on ? ' on' : ''}${isToday ? ' today' : ''}" data-d="${d}" aria-label="${neNum(d)} ${BS_MONTHS[m - 1]}">${neNum(d)}</button>`;
+      }
+      $('rcal_days').innerHTML = html;
+      $('rcal_days').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { RCAL.sel = { y, m, d: +b.dataset.d }; rcalRender() });
+      $('rcal_pick').textContent = 'छानिएको मिति: ' + neNum(RCAL.sel.d) + ' ' + BS_MONTHS[RCAL.sel.m - 1] + ' ' + neNum(RCAL.sel.y);
+      $('rcal_prev').disabled = y === BS_MIN && m === 1;
+      $('rcal_next').disabled = y === BS_MAX && m === 12;
+    }
+    function rcalStep(n) {
+      let y = RCAL.view.y, m = RCAL.view.m + n;
+      if (m < 1) { m = 12; y-- } else if (m > 12) { m = 1; y++ }
+      if (y < BS_MIN || y > BS_MAX) return;
+      RCAL.view = { y, m }; rcalClampSel(); rcalRender();
+    }
+    function openRashiCal() {
+      RCAL.sel = nepalTodayBs();
+      RCAL.view = { y: RCAL.sel.y, m: RCAL.sel.m };
+      rcalBuild(); rcalRender();
+      $('rcal').hidden = false;
+    }
+    function closeRashiCal() { $('rcal').hidden = true }
+    function makeRashiSlides() {
+      const bs = { ...RCAL.sel };
+      closeRashiCal();
+      $('raw').value = rashiRaw(bs);
+      setChat(false); tab('auto');
+      autoGen(false);
+    }
+    $('rcal_x').onclick = closeRashiCal;
+    $('rcal_cancel').onclick = closeRashiCal;
+    $('rcal_prev').onclick = () => rcalStep(-1);
+    $('rcal_next').onclick = () => rcalStep(1);
+    $('rcal_ok').onclick = makeRashiSlides;
+    document.querySelector('[data-rcal-close]').onclick = closeRashiCal;
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('rcal').hidden) closeRashiCal() });
     const chatH = []; let chatAC = null;
     const cfg = (k, d) => { try { return localStorage.getItem('ch_' + k) || d } catch (e) { return d } };
     ['key', 'gm', 'tmp'].forEach(k => { const e = $('ch_' + k), d = e.value; e.value = cfg(k, d); if (e.value === '' && d) e.value = d; e.oninput = e.onchange = () => { try { localStorage.setItem('ch_' + k, e.value) } catch (_) { } } });
@@ -3328,7 +3586,7 @@ EXAMPLE:
     function applyAI(txt, append) {
       const t = toRaw(txt); if (!t) { $('st').textContent = 'Nothing to apply.'; return }
       $('raw').value = append && $('raw').value.trim() ? $('raw').value.replace(/\s+$/, '') + '\n\n\n' + t : t;
-      autoGen();
+      autoGen(true);
     }
     function addMsg(role, text) {
       const d = document.createElement('div'); d.className = 'm ' + (role == 'user' ? 'u' : 'a'); d.textContent = text;
@@ -3394,7 +3652,12 @@ EXAMPLE:
     $('scrim').onclick = () => setChat(false);
     CHIPS.forEach(c => {
       const b = document.createElement('button'); b.textContent = c;
-      b.onclick = () => { if (/shorter|bullet|format/i.test(c)) $('ch_ctx').checked = true; chatSend(c) }; $('ch_chips').appendChild(b)
+      b.onclick = () => {
+        if (c === RASHI_CHIP) { openRashiCal(); return }
+        if (/shorter|bullet|format/i.test(c)) $('ch_ctx').checked = true;
+        chatSend(c);
+      };
+      $('ch_chips').appendChild(b)
     });
     addMsg('a', 'नमस्ते! म तपाईंको स्लाइडका लागि सामग्री लेख्न सक्छु। कुनै विषय भन्नुहोस्।');
   </script>

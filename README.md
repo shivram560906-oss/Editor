@@ -14,14 +14,35 @@ No npm packages are required — the server uses Node's built-in `http` and `fet
 
 ## Slide pictures (Cloudflare + Pollinations fallback)
 
-Every slide gets a picture automatically when you press **Make slides**.
+Pictures are added in two modes:
 
-- If the slide contains an `@img: description` line, that description is used as the image prompt.
-- Otherwise the server summarizes the slide text in English, then generates the picture.
+- **Manual "Make slides"**: only slides with an `@img: description` line get an AI picture. Slides without `@img` stay text-only.
+- **AI Writer**: every slide gets a picture. If the slide has `@img`, that description is used; otherwise the server summarizes the slide text in English.
+- `@imglink: "1.png"` loads a local picture from `Rashi/` and never calls an AI provider. A missing `0.png` automatically falls back to `0.jpg`.
 - Cloudflare Workers AI (`@cf/black-forest-labs/flux-1-schnell`) is tried first.
 - If Cloudflare is out of its free daily neurons, rate-limited, or returns an error, the server automatically switches to Pollinations (`gen.pollinations.ai`) for the prompt summary and the picture.
 - The switch happens per slide. If Cloudflare made 4 pictures and then hit its limit, the remaining slides continue with Pollinations instead of stopping or starting over.
 - The browser only talks to `/api/slide-image`; both API keys stay on the server.
+
+## आजको राशिफल (hard-coded)
+
+In the AI Writer, click **आजको राशिफल (१२ राशि)**. A Bikram Sambat calendar opens with today's Nepali date selected. Choose a date and confirm; the editor builds 13 slides:
+
+- The cover has `## तपाइको आजको राशीफल`, the chosen date, `# मेष देखि मीन राशिको भविष्यफल` and `@imglink: "0.png"`.
+- Each rashi from मेष to मीन gets its own slide with four fixed points and `@imglink: "1.png"` through `"12.png"`.
+
+No AI pictures are generated for this template; every picture comes from the local `Rashi/` folder. The four points are hard-coded. The headings, date position, subtitle and image paths stay fixed.
+
+## Watermark
+
+New projects start with a movable watermark at bottom center:
+
+```text
+पं. ज्यो. शिवराम पराजुली
+९८४७४५२९०६
+```
+
+Edit its text, position, movement, color, size or transparency in **Brand**, or remove it with the trash button. The default movement starts at bottom center and roams the frame.
 
 ### Safety
 
@@ -53,5 +74,6 @@ Optional overrides: `CLOUDFLARE_TEXT_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `CLOUDFLA
 ## Files
 
 - `index.html` — the whole editor (UI, timeline, canvas and export).
-- `server.js` — static server, `/ping` health check, and the Cloudflare/Pollinations AI proxy.
+- `server.js` — static server, `/ping` health check, `/Rashi/` pictures, and the Cloudflare/Pollinations AI proxy.
+- `Rashi/` — local rashi pictures used by `@imglink` (`0.jpg`, `1.png`–`12.png`).
 - `editor.original.html` — untouched backup of the original editor.

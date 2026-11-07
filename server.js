@@ -458,6 +458,59 @@ async function slideImage(req, res) {
   }
 }
 
+const RASHI_DIR = path.join(__dirname, "Rashi");
+const RASHI_MIME = {
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+  ".svg": "image/svg+xml",
+};
+
+/* Serve the local rashi pictures. The template asks for "0.png", but the
+   shipped cover is "0.jpg", so a missing .png falls back to the same name
+   with a .jpg extension. Only plain file names inside Rashi/ are allowed. */
+function serveRashi(req, res, pathname) {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    res.writeHead(405, { "Content-Type": "text/plain; charset=utf-8", Allow: "GET, HEAD" });
+    return res.end("Method not allowed");
+  }
+  let name = pathname.replace(/^\/[Rr]ashi\//, "");
+  try {
+    name = decodeURIComponent(name);
+  } catch (e) {
+    name = "";
+  }
+  name = path.basename(name);
+  if (!name || name === "." || name === ".." || !/^[A-Za-z0-9._-]+$/.test(name)) {
+    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    return res.end("Not found");
+  }
+  const candidates = [name];
+  if (/\.png$/i.test(name)) candidates.push(name.replace(/\.png$/i, ".jpg"));
+  if (/\.jpe?g$/i.test(name)) candidates.push(name.replace(/\.jpe?g$/i, ".png"));
+  const send404 = () => {
+    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    res.end("Not found");
+  };
+  const next = (i) => {
+    if (i >= candidates.length) return send404();
+    const file = path.join(RASHI_DIR, candidates[i]);
+    if (!file.startsWith(RASHI_DIR + path.sep)) return send404();
+    fs.readFile(file, (err, data) => {
+      if (err) return next(i + 1);
+      const ext = path.extname(candidates[i]).toLowerCase();
+      res.writeHead(200, {
+        "Content-Type": RASHI_MIME[ext] || "application/octet-stream",
+        "Cache-Control": "public, max-age=3600",
+      });
+      res.end(req.method === "HEAD" ? undefined : data);
+    });
+  };
+  next(0);
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://localhost");
 
@@ -468,6 +521,11 @@ const server = http.createServer((req, res) => {
 
   if (url.pathname === "/api/slide-image") {
     slideImage(req, res);
+    return;
+  }
+
+  if (/^\/[Rr]ashi\//.test(url.pathname)) {
+    serveRashi(req, res, url.pathname);
     return;
   }
 

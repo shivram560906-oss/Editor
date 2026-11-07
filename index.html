@@ -2362,7 +2362,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     }
     function drawText(s, lt, th) {
       const fam = s.font || S.font, mw = W * (W < H ? .8 : .66), an = s.an || S.an, k = s.sz, E0 = s.te || S.te, ST = +$('ts').value, TC = $('tc').value, A = S.al;
-      const hs = +$('hsz').value * U * k, bs = +$('bsz').value * U * k, lhv = +$('lh').value, IT = $('fi').checked ? 'italic ' : '', F = (z, w) => `${IT}${w} ${z}px "${fam}",sans-serif`, ANG = +$('ta').value * Math.PI / 180, AX = Math.cos(ANG), AY = Math.sin(ANG);
+      const hs = +$('hsz').value * U * k * .95, bs = +$('bsz').value * U * k * .95, lhv = +$('lh').value, IT = $('fi').checked ? 'italic ' : '', F = (z, w) => `${IT}${w} ${z}px "${fam}",sans-serif`, ANG = +$('ta').value * Math.PI / 180, AX = Math.cos(ANG), AY = Math.sin(ANG);
       if ('letterSpacing' in ctx) ctx.letterSpacing = (+$('ls').value * U) + 'px';
       const tf = F(hs * 1.5, 700), sf = F(hs * .85, 700), bf = F(bs, $('fw').value), left = (W - mw) / 2, c1 = s.hc || th.h, c2 = s.bc || th.b;
       const lay = (t, f, w) => {
@@ -2391,7 +2391,8 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
         else blk(p.t, bf, c2, bs * lhv, A, left, mw, '', 0)
       });
       const pcl = s.id && clips.find(c => c.sid === s.id && c.img && c.pos == 'bottom'), avH = pcl ? H - picH(pcl) - 60 * U : H;
-      const ox = (s.ox || 0) * U, tot = y, y0 = (pcl ? Math.max((avH - tot) / 2 - 30 * U, 70 * U) : (H - tot) / 2 - 30 * U) + s.oy * U; tbox = { s, x: left + ox - 24 * U, y: y0 - 24 * U, w: mw + 48 * U, h: tot + 48 * U }; const sh = (1 - eo(clamp(lt / .7))) * 30 * U, ao = clamp((s.d - lt) / .6);
+      const ox = (s.ox || 0) * U, tot = y, shift = bs * lhv, base = pcl ? Math.max((avH - tot) / 2 - 30 * U, 70 * U) : (H - tot) / 2 - 30 * U;
+      const y0 = (pcl ? Math.max(Math.min(base + shift, avH - tot), 70 * U) : base + shift) + s.oy * U; tbox = { s, x: left + ox - 24 * U, y: y0 - 24 * U, w: mw + 48 * U, h: tot + 48 * U }; const sh = (1 - eo(clamp(lt / .7))) * 30 * U, ao = clamp((s.d - lt) / .6);
       ctx.save();
       if (an == 'zoom') { const z = .8 + .2 * eo(clamp(lt / .9)); ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2) }
       if (S.panel != 'none') drawPanel(S.panel, lt, ao, th, mw, y0, tot, ox);
@@ -3459,14 +3460,23 @@ ${dateLine}
       const isC = b.dataset.c !== undefined, o = isC ? clips[+b.dataset.c] : slides[+b.dataset.i], side = e.target.tagName == 'U' ? 'r' : e.target.tagName == 'I' ? 'l' : 'm';
       if (isC) { selC = +b.dataset.c; selT = 'c'; showClip(o) } else { sel = +b.dataset.i; selT = 's' }
       const x0 = e.clientX, s0 = isC ? o.start : o.s, d0 = isC ? o.dur : o.d, end0 = s0 + d0, off = (e.clientX - L()) / p - s0;
+      let dragged = false;
       const mv = ev => {
         const dx = (ev.clientX - x0) / p;
+        if (Math.abs(ev.clientX - x0) > 3) dragged = true;
         if (isC) { o.sid = null; o.auto = false; if (side == 'm') o.start = Math.max(0, sn(s0 + dx, o)); else if (side == 'r') o.dur = Math.max(.5, sn(end0 + dx, o) - s0); else { const ns = clamp(sn(s0 + dx, o), 0, end0 - .5); o.start = ns; o.dur = end0 - ns } }
         else if (side == 'r') o.dur = Math.max(.5, sn(end0 + dx, o) - s0);
         else { const pt = (ev.clientX - L()) / p - off + o.d / 2; let j = 0; slides.forEach(x => { if (x !== o && x.s + x.d / 2 < pt) j++ }); const ci = slides.indexOf(o); if (j != ci) { slides.splice(ci, 1); slides.splice(j, 0, o); sel = j } }
         refresh()
       };
-      run(mv, () => { renderCl(); renderEd() }); refresh();
+      run(mv, ev => {
+        if (!isC && side == 'm' && !dragged && ev.type == 'pointerup') {
+          if (playing) pause();
+          cur = clamp(o.s + .001, 0, total);
+          draw(cur); head();
+        }
+        renderCl(); renderEd()
+      }); refresh();
     };
     function needSel() {
       if (selT != 'none') return true;

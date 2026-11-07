@@ -2,6 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const { synthesizeEdge } = require("./edge-tts");
 
 /* Local development: load .env if it exists. On a host, set the variables in
    the dashboard instead. Never commit real credentials. */
@@ -37,17 +38,14 @@ const POLLINATIONS_TEXT_MODEL = (process.env.POLLINATIONS_TEXT_MODEL || "").trim
 const HAS_CLOUDFLARE = !!(ACCOUNT_ID && API_TOKEN);
 const HAS_POLLINATIONS = !!POLLINATIONS_API;
 
-/* Nepali narration. Google Cloud TTS and Azure Speech are used when their
-   keys are configured. Without a key the server falls back to the free
-   Google Translate voice, so the editor works with no extra setup. */
-const GOOGLE_TTS_KEY = (process.env.GOOGLE_TTS_API_KEY || "").trim();
-const GOOGLE_TTS_VOICE = (process.env.GOOGLE_TTS_VOICE || "ne-NP-Standard-A").trim();
+/* Nepali narration. Azure Speech is used when its key is configured; without
+   a key the server uses Microsoft Edge's free Nepali neural voice. */
 const AZURE_TTS_KEY = (process.env.AZURE_SPEECH_KEY || "").trim();
 const AZURE_TTS_REGION = (process.env.AZURE_SPEECH_REGION || "").trim();
 const AZURE_TTS_VOICE = (process.env.AZURE_TTS_VOICE || "ne-NP-HemkalaNeural").trim();
+const EDGE_TTS_VOICE = (process.env.EDGE_TTS_VOICE || "ne-NP-HemkalaNeural").trim();
 const TTS_CACHE_DIR = path.join(__dirname, ".tts-cache");
 const TTS_MAX_CHARS = 2000;
-const HAS_GOOGLE_TTS = !!GOOGLE_TTS_KEY;
 const HAS_AZURE_TTS = !!(AZURE_TTS_KEY && AZURE_TTS_REGION);
 
 /* The editor is used for religious and cultural videos, so every picture must
@@ -531,74 +529,12 @@ function escapeXml(value) {
   return String(value).replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" }[c]));
 }
 
-function ttsSplit(text, max = 180) {
-  const clean = String(text || "").replace(/\s+/g, " ").trim();
-  const out = [];
-  let rest = clean;
-  while (rest.length > max) {
-    let cut = -1;
-    for (const re of [/[।.!?]\s/g, /[,;:]\s/g, /\s/g]) {
-      let m, last = -1;
-      re.lastIndex = 0;
-      while ((m = re.exec(rest))) {
-        if (m.index + m[0].length > max) break;
-        last = m.index + m[0].length;
-      }
-      if (last > 0) { cut = last; break; }
-    }
-    if (cut <= 0) cut = max;
-    out.push(rest.slice(0, cut).trim());
-    rest = rest.slice(cut).trim();
-  }
-  if (rest) out.push(rest);
-  return out;
-}
-
 function looksLikeMp3(buf) {
   return !!buf && buf.length > 2 && (buf[0] === 0xff || (buf[0] === 0x49 && buf[1] === 0x44 && buf[2] === 0x33));
 }
 
-async function ttsFreeChunk(text) {
-  const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ne&q=" + encodeURIComponent(text);
-  const r = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-      "Referer": "https://translate.google.com/",
-    },
-    signal: AbortSignal.timeout(20000),
-  });
-  if (!r.ok) throw new Error("Free TTS HTTP " + r.status);
-  const buf = Buffer.from(await r.arrayBuffer());
-  if (!looksLikeMp3(buf)) throw new Error("Free TTS returned non-MP3 data");
-  return buf;
-}
-
-async function ttsFree(text) {
-  const parts = ttsSplit(text, 180);
-  const chunks = [];
-  for (const part of parts) {
-    chunks.push(await ttsFreeChunk(part));
-    await new Promise((resolve) => setTimeout(resolve, 120));
-  }
-  return Buffer.concat(chunks);
-}
-
-async function ttsGoogleCloud(text) {
-  const r = await fetch("https://texttospeech.googleapis.com/v1/text:synthesize?key=" + encodeURIComponent(GOOGLE_TTS_KEY), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    signal: AbortSignal.timeout(30000),
-    body: JSON.stringify({
-      input: { text },
-      voice: { languageCode: "ne-NP", name: GOOGLE_TTS_VOICE },
-      audioConfig: { audioEncoding: "MP3", speakingRate: 1, pitch: 0 },
-    }),
-  });
-  let data = null;
-  try { data = await r.json(); } catch (e) { }
-  if (!r.ok) throw new Error((data && data.error && data.error.message) || ("Google TTS HTTP " + r.status));
-  if (!data || !data.audioContent) throw new Error("Google TTS returned no audio");
-  return Buffer.from(data.audioContent, "base64");
+async function ttsEdge(text) {
+  return synthesizeEdge(text, EDGE_TTS_VOICE);
 }
 
 async function ttsAzure(text) {
@@ -618,7 +554,7 @@ async function ttsAzure(text) {
 }
 
 function ttsCacheFile(provider, text) {
-  const voice = provider === "google-cloud" ? GOOGLE_TTS_VOICE : provider === "azure" ? AZURE_TTS_VOICE : "ne";
+  const voice = provider === "azure" ? AZURE_TTS_VOICE : provider === "edge" ? EDGE_TTS_VOICE : "ne";
   const hash = crypto.createHash("sha256").update(provider + "|" + voice + "|" + text).digest("hex");
   return path.join(TTS_CACHE_DIR, hash + ".mp3");
 }
@@ -627,9 +563,8 @@ async function synthesizeTts(text) {
   const clean = String(text || "").replace(/\s+/g, " ").trim().slice(0, TTS_MAX_CHARS);
   if (!clean) throw new Error("Empty text");
   const providers = [];
-  if (HAS_GOOGLE_TTS) providers.push({ name: "google-cloud", run: () => ttsGoogleCloud(clean) });
   if (HAS_AZURE_TTS) providers.push({ name: "azure", run: () => ttsAzure(clean) });
-  providers.push({ name: "google-translate", run: () => ttsFree(clean) });
+  providers.push({ name: "edge", run: () => ttsEdge(clean) });
   let lastError = null;
   for (const provider of providers) {
     try {
@@ -736,7 +671,7 @@ if (require.main === module) {
       if (!HAS_CLOUDFLARE) console.warn("Cloudflare is not configured; using Pollinations only.");
       if (!HAS_POLLINATIONS) console.warn("Pollinations fallback is not configured; using Cloudflare only.");
     }
-    console.log("Nepali TTS: " + (HAS_GOOGLE_TTS ? "Google Cloud" : HAS_AZURE_TTS ? "Azure Speech" : "free Google Translate"));
+    console.log("Nepali TTS: " + (HAS_AZURE_TTS ? "Azure Speech" : "free Microsoft Edge neural voice"));
   });
 }
 

@@ -5,12 +5,13 @@ A single-page Nepali text-to-video editor. Write a script, generate slides, add 
 ## Run locally
 
 ```bash
+npm install
 npm start
 ```
 
 Open <http://localhost:8765> (the included `.env` sets `PORT=8765`; without a `.env` the server uses port 10000, or the `PORT` your host provides).
 
-No npm packages are required — the server uses Node's built-in `http` and `fetch`.
+`npm install` is required once: narration uses the `ws` package to reach Microsoft Edge's speech service.
 
 ## Slide pictures (Cloudflare + Pollinations fallback)
 
@@ -57,9 +58,8 @@ Open **Media → Nepali narration** and press **Generate narration**. The editor
 
 The server tries these providers in order:
 
-1. **Google Cloud Text-to-Speech** when `GOOGLE_TTS_API_KEY` is set (default voice `ne-NP-Standard-A`).
-2. **Azure Speech** when `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION` are set (default voice `ne-NP-HemkalaNeural`).
-3. The free Google Translate Nepali voice, so the feature works with no extra credentials.
+1. **Azure Speech** when `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION` are set (default voice `ne-NP-HemkalaNeural`).
+2. **Microsoft Edge neural voice**, which is free and needs no API key (default `ne-NP-HemkalaNeural`; set `EDGE_TTS_VOICE=ne-NP-SagarNeural` for the male voice). This is the recommended default.
 
 Synthesized MP3s are cached in `.tts-cache/`, keyed by provider, voice and text. The folder is ignored by Git.
 
@@ -99,23 +99,21 @@ POLLINATIONS_API=...
 
 `POLLINATIONS_API` is optional but recommended. Without it there is no fallback when Cloudflare runs out. On a host such as Render, add all three variables in the service's environment settings. `.env` is ignored by Git and is never committed.
 
-Narration credentials are optional. Add one of these groups to use a premium voice; otherwise the free Google Translate voice is used:
+Narration credentials are optional. The free Microsoft Edge neural voice works with no setup. If you want an official key, add Azure Speech (the free tier includes the same `ne-NP-HemkalaNeural` voice):
 
 ```env
-GOOGLE_TTS_API_KEY=...
-GOOGLE_TTS_VOICE=ne-NP-Standard-A
-
 AZURE_SPEECH_KEY=...
 AZURE_SPEECH_REGION=...
 AZURE_TTS_VOICE=ne-NP-HemkalaNeural
 ```
 
-Optional overrides: `CLOUDFLARE_TEXT_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `CLOUDFLARE_IMAGE_STEPS`, `POLLINATIONS_IMAGE_MODEL`, `POLLINATIONS_TEXT_MODEL`, `GOOGLE_TTS_VOICE`, `AZURE_TTS_VOICE`, `PORT`.
+Optional overrides: `CLOUDFLARE_TEXT_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `CLOUDFLARE_IMAGE_STEPS`, `POLLINATIONS_IMAGE_MODEL`, `POLLINATIONS_TEXT_MODEL`, `EDGE_TTS_VOICE`, `AZURE_TTS_VOICE`, `PORT`.
 
 ## Files
 
 - `index.html` — the whole editor (UI, timeline, canvas and export).
 - `server.js` — static server, `/ping` health check, `/Rashi/` pictures, the Cloudflare/Pollinations AI proxy, and the `/api/tts` narration proxy.
+- `edge-tts.js` — free Nepali narration through Microsoft Edge's neural voice (v2 token, chunking and MP3 assembly).
 - `Rashi/` — local rashi pictures used by `@imglink` (`0.png`, `1.png`–`12.png`).
 - `.tts-cache/` — generated narration MP3s (created automatically, ignored by Git).
 - `editor.original.html` — untouched backup of the original editor.

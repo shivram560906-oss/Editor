@@ -468,9 +468,10 @@ const RASHI_MIME = {
   ".svg": "image/svg+xml",
 };
 
-/* Serve the local rashi pictures. The template asks for "0.png", but the
-   shipped cover is "0.jpg", so a missing .png falls back to the same name
-   with a .jpg extension. Only plain file names inside Rashi/ are allowed. */
+/* Serve the local rashi pictures. The template asks for "0.png"; older
+   copies may only have "0.jpg", so a missing .png falls back to the same name
+   with a .jpg extension. Only plain file names inside Rashi/ are allowed.
+   These pictures are replaced locally, so the browser must revalidate them. */
 function serveRashi(req, res, pathname) {
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.writeHead(405, { "Content-Type": "text/plain; charset=utf-8", Allow: "GET, HEAD" });
@@ -503,7 +504,7 @@ function serveRashi(req, res, pathname) {
       const ext = path.extname(candidates[i]).toLowerCase();
       res.writeHead(200, {
         "Content-Type": RASHI_MIME[ext] || "application/octet-stream",
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": "no-cache",
       });
       res.end(req.method === "HEAD" ? undefined : data);
     });

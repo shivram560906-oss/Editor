@@ -2776,6 +2776,9 @@ ${dateLine}
       });
       return out.join('\n\n\n');
     }
+    function rashiAnswerText(pointsByRashi) {
+      return RASHI_NAMES.map(name => name + '\n' + (pointsByRashi[name] || []).map(p => '• ' + p).join('\n')).join('\n\n');
+    }
     function parseRashiJson(text) {
       let s = String(text).trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim(), obj;
       try { obj = JSON.parse(s) }
@@ -2923,8 +2926,8 @@ ${dateLine}
       const link = (s.link || '').trim().replace(/^["']+|["']+$/g, '');
       const file = link.split(/[\\/]/).pop();
       if (!file) throw new Error('Empty @imglink path.');
-      const urls = ['/Rashi/' + encodeURIComponent(file)];
-      if (/\.png$/i.test(file)) urls.push('/Rashi/' + encodeURIComponent(file.replace(/\.png$/i, '.jpg')));
+      const urls = ['/Rashi/' + encodeURIComponent(file) + '?v=2'];
+      if (/\.png$/i.test(file)) urls.push('/Rashi/' + encodeURIComponent(file.replace(/\.png$/i, '.jpg')) + '?v=2');
       let r = null;
       for (const u of urls) { try { r = await fetch(u); if (r.ok) break } catch (e) { r = null } }
       if (!r || !r.ok) throw new Error('Picture not found in Rashi folder: ' + file);
@@ -3756,11 +3759,16 @@ EXAMPLE:
         if (seq !== rashiSeq) return;
         const raw = rashiRaw(bs, points);
         rashiAC = null;
-        if (rashiBub) { rashiBub.className = 'm a'; rashiBub.textContent = 'राशिफल तयार भयो — १३ स्लाइड बनाइयो।'; rashiBub = null }
+        if (rashiBub) {
+          rashiBub.className = 'm a';
+          rashiBub.textContent = 'राशिफल तयार भयो — १३ स्लाइड बनाइयो।\n\nGemini ले दिएको जवाफ:\n\n' + rashiAnswerText(points);
+          if (document.body.classList.contains('chat-open')) { try { rashiBub.scrollIntoView({ block: 'start' }) } catch (e) { } }
+          rashiBub = null;
+        }
         $('ch_stat').textContent = 'तयार भयो।';
         hideRashiCal();
         $('raw').value = raw;
-        setChat(false); tab('auto');
+        tab('auto');
         autoGen(false);
       } catch (e) {
         if (seq !== rashiSeq || e.name === 'AbortError') return;

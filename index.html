@@ -1571,6 +1571,14 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
 #rcal_pick { display: block; font-size: 12px; color: var(--mut); margin-bottom: 10px; }
 .rcal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 .rcal-actions .btn { min-height: 38px; }
+.rcal-msg {
+  margin: 0 0 10px; padding: 8px 10px; border-radius: 9px;
+  background: var(--panel-2); border: 1px solid var(--line);
+  font-size: 11.5px; line-height: 1.55; color: var(--mut);
+}
+.rcal-msg.err { color: #ff9a9a; border-color: rgba(255, 80, 80, .35); background: rgba(255, 60, 60, .08); }
+#rcal.busy .rcal-nav, #rcal.busy #rcal_week, #rcal.busy #rcal_days { pointer-events: none; opacity: .55; }
+#rcal.busy .rcal-card { cursor: progress; }
 @media (max-width: 420px) {
   .rcal-card { padding: 13px; }
   .rcal-actions { flex-direction: column-reverse; }
@@ -1896,6 +1904,7 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
       <div id="rcal_days" class="rcal-days"></div>
       <div class="rcal-foot">
         <span id="rcal_pick"></span>
+        <div id="rcal_msg" class="rcal-msg" role="status" aria-live="polite" hidden></div>
         <div class="rcal-actions">
           <button id="rcal_cancel" class="btn">रद्द</button>
           <button id="rcal_ok" class="btn btn-primary">यो मितिको राशिफल बनाउनुहोस्</button>
@@ -2506,7 +2515,13 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
         const p = w.pos, tri = v => { v = ((v % 2) + 2) % 2; return v < 1 ? v : 2 - v };
         let x = p[1] == 'l' ? m : p[1] == 'r' ? W - bw - m : (W - bw) / 2, y = p[0] == 't' ? m : p[0] == 'b' ? H - bh - m : (H - bh) / 2;
         if (w.mv == 'float') { x += Math.sin(t * .8 + n) * 14 * U; y += Math.cos(t * .6 + n) * 10 * U }
-        else if (w.mv == 'bounce') { x = m + (W - bw - 2 * m) * tri(t * .07 + .5 + n * .31); y = m + (H - bh - 2 * m) * tri(t * .05 + 1 + n * .23) }
+        else if (w.mv == 'bounce') {
+          /* Every moving watermark starts at bottom center; the index only
+             changes the speed so several watermarks do not overlap forever. */
+          const bx = .07 + (n % 5) * .006, by = .05 + (n % 5) * .005;
+          x = m + (W - bw - 2 * m) * tri(t * bx + .5);
+          y = m + (H - bh - 2 * m) * tri(t * by + 1);
+        }
         if (has) { ctx.imageSmoothingQuality = 'high'; const ix = x + (bw - lw) / 2; if (shp != 'none') { ctx.save(); shapePath(ctx, shp, ix, y, lw, lh, U); ctx.clip(); ctx.drawImage(im, cr[0], cr[1], cr[2], cr[3], ix, y, lw, lh); ctx.restore() } else ctx.drawImage(im, ix, y, lw, lh) }
         if (txt) { ctx.fillStyle = w.col; ctx.textAlign = 'left'; lines.forEach((l, j) => ctx.fillText(l, x + (bw - lws[j]) / 2, y + lh + gap + j * fs * 1.3)) }
         ctx.restore()
@@ -2729,27 +2744,91 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       const t = new Date(Date.now() + 5.75 * 3600000);
       return adToBs(new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate())));
     }
-    /* The 12 rashis and their four hard-coded points. Only these bullets are
-       content; the headings, date and @imglink paths never change. */
-    const RASHIS = [
-      { name: 'मेष', points: ['आज तपाईंको ऊर्जा र उत्साह उच्च रहनेछ।', 'नयाँ काम सुरु गर्न शुभ दिन', 'व्यापारमा प्रगति हुनेछ', 'स्वास्थ्यमा सुधार आउनेछ'] },
-      { name: 'वृष', points: ['आर्थिक लाभको राम्रो योग बनेको छ।', 'रोकिएका काम पुनः बन्नेछन्', 'परिवारमा खुसी छाउनेछ', 'मिहिनेतको फल मिल्नेछ'] },
-      { name: 'मिथुन', points: ['आज सोचेभन्दा राम्रो सफलता मिल्नेछ।', 'साथीभाइको सहयोग पाइनेछ', 'छोटो यात्राको सम्भावना छ', 'वाणीमा मधुरता राख्नुहोस्'] },
-      { name: 'कर्कट', points: ['मनमा केही चञ्चलता रहन सक्छ।', 'धैर्यताका साथ काम गर्नुहोस्', 'अनावश्यक खर्चबाट बच्नुहोस्', 'परिवारको ख्याल गर्नुहोस्'] },
-      { name: 'सिंह', points: ['मान-सम्मान र प्रतिष्ठामा वृद्धि हुनेछ।', 'कार्यक्षेत्रमा सफलता मिल्नेछ', 'नयाँ अवसर प्राप्त हुनेछन्', 'आत्मविश्वास उच्च रहनेछ'] },
-      { name: 'कन्या', points: ['आजको दिन फलदायी र सुखद रहनेछ।', 'पठनपाठनमा प्रगति हुनेछ', 'आर्थिक स्थिति बलियो हुनेछ', 'नयाँ योजना सफल हुनेछन्'] },
-      { name: 'तुला', points: ['सन्तुलित व्यवहारले सफलता दिलाउनेछ।', 'रोकिएको धन फिर्ता आउनेछ', 'सम्बन्धमा मधुरता आउनेछ', 'स्वास्थ्य अनुकूल रहनेछ'] },
-      { name: 'वृश्चिक', points: ['कडा मिहिनेत पछि सफलता पाइनेछ।', 'गोपनीयता कायम राख्नुहोस्', 'व्यापारमा नयाँ सम्झौता हुनेछ', 'यात्रा फलदायी रहनेछ'] },
-      { name: 'धनु', points: ['आज भाग्यले पूर्ण साथ दिनेछ।', 'धार्मिक कार्यमा रुचि बढ्नेछ', 'नयाँ काममा सफलता मिल्नेछ', 'परिवारबाट पूर्ण सहयोग'] },
-      { name: 'मकर', points: ['काम गर्दा केही सावधानी अपनाउनुहोला।', 'निर्णय गर्दा सोचविचार गर्नुहोस्', 'धैर्य र संयम अपनाउनुहोस्', 'स्वास्थ्यमा ध्यान दिनुहोस्'] },
-      { name: 'कुम्भ', points: ['नयाँ विचार र सिर्जनात्मकता बढ्नेछ।', 'आम्दानीका नयाँ स्रोत भेटिनेछन्', 'समाजमा मान-इज्जत बढ्नेछ', 'सबै योजनाहरू सफल हुनेछन्'] },
-      { name: 'मीन', points: ['आध्यात्मिक क्षेत्रमा रुचि जाग्नेछ।', 'सुखद समाचार प्राप्त हुनेछ', 'लगानीबाट राम्रो प्रतिफल मिल्नेछ', 'मन प्रसन्न र शान्त रहनेछ'] }
-    ];
-    function rashiRaw(bs) {
+    /* The 12 rashis in the fixed template order. Their four points are
+       generated by Gemini for the chosen date; the headings, date, subtitle
+       and @imglink paths are the only fixed parts. */
+    const RASHI_NAMES = ['मेष', 'वृष', 'मिथुन', 'कर्कट', 'सिंह', 'कन्या', 'तुला', 'वृश्चिक', 'धनु', 'मकर', 'कुम्भ', 'मीन'];
+    const RASHI_EN = { aries: 'मेष', taurus: 'वृष', gemini: 'मिथुन', cancer: 'कर्कट', leo: 'सिंह', virgo: 'कन्या', libra: 'तुला', scorpio: 'वृश्चिक', sagittarius: 'धनु', capricorn: 'मकर', aquarius: 'कुम्भ', pisces: 'मीन' };
+    const RASHI_CACHE = new Map();
+    const RASHI_SYS = `You are a careful Vedic (Parashari) astrologer writing a daily horoscope in Nepali (Devanagari) for a Nepali audience.
+You will receive one Bikram Sambat date, its Gregorian equivalent, and the weekday. Write date-specific predictions for all 12 rashis for that exact date, using the Moon's transit and the day's astrological factors. Do not write generic filler.
+For every rashi give exactly 4 different, short, concrete points. Each point is one sentence in Nepali, at most 18 words, with no bullet character, no numbering, no heading, and no extra commentary.
+Return only valid JSON in this exact shape:
+{"rashis":[{"name":"मेष","points":["...","...","...","..."]},{"name":"वृष","points":["...","...","...","..."]}]}
+Use exactly these names in this order: मेष, वृष, मिथुन, कर्कट, सिंह, कन्या, तुला, वृश्चिक, धनु, मकर, कुम्भ, मीन. The JSON must contain all 12 rashis and exactly 4 points per rashi.`;
+    function rashiRaw(bs, pointsByRashi) {
       const dateLine = neNum(bs.y) + ' ' + BS_MONTHS[bs.m - 1] + ' ' + neNum(bs.d);
       const out = [`## तपाइको आजको राशीफल\n# ${dateLine}\n# मेष देखि मीन राशिको भविष्यफल\n@imglink : "0.png"`];
-      RASHIS.forEach((r, i) => out.push(`## ${r.name} राशि\n${r.points.map(p => '- ' + p).join('\n')}\n@imglink : "${i + 1}.png"`));
+      RASHI_NAMES.forEach((name, i) => {
+        const pts = pointsByRashi && pointsByRashi[name];
+        if (!Array.isArray(pts) || pts.length !== 4) throw new Error('राशिफल अपूरो छ: ' + name);
+        out.push(`## ${name} राशि\n${pts.map(p => '- ' + p).join('\n')}\n@imglink : "${i + 1}.png"`);
+      });
       return out.join('\n\n\n');
+    }
+    function parseRashiJson(text) {
+      let s = String(text).trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim(), obj;
+      try { obj = JSON.parse(s) }
+      catch (e) {
+        const a = s.indexOf('{'), b = s.lastIndexOf('}'), c = s.indexOf('['), d = s.lastIndexOf(']');
+        const start = a >= 0 && (c < 0 || a < c) ? a : c, end = start === a ? b : d;
+        if (start < 0 || end <= start) throw new Error('Gemini ले मान्य JSON फर्काएन।');
+        try { obj = JSON.parse(s.slice(start, end + 1)) } catch (e2) { throw new Error('Gemini ले मान्य JSON फर्काएन।') }
+      }
+      const out = {};
+      const take = (name, raw) => {
+        let n = String(name || '').replace(/\s*राशि\s*$/i, '').trim();
+        n = RASHI_EN[n.toLowerCase()] || n;
+        if (!RASHI_NAMES.includes(n)) return;
+        let pts = raw;
+        if (pts && !Array.isArray(pts) && typeof pts === 'object') pts = pts.points || pts.bullets || pts.predictions || pts.list;
+        if (!Array.isArray(pts)) return;
+        pts = pts.map(p => String(p).replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').replace(/\s+/g, ' ').trim()).filter(Boolean).slice(0, 4);
+        if (pts.length === 4) out[n] = pts;
+      };
+      const list = arr => arr.forEach(item => {
+        if (Array.isArray(item)) { if (item.length >= 2) take(item[0], item[1]) }
+        else if (item && typeof item === 'object') take(item.name || item.rashi || item.sign || item.zodiac, item.points || item.bullets || item.predictions || item.list);
+      });
+      if (Array.isArray(obj)) list(obj);
+      else if (obj && typeof obj === 'object') {
+        if (Array.isArray(obj.rashis)) list(obj.rashis);
+        else if (obj.rashis && typeof obj.rashis === 'object') for (const k of Object.keys(obj.rashis)) take(k, obj.rashis[k]);
+        else for (const k of Object.keys(obj)) take(k, obj[k]);
+      }
+      const missing = RASHI_NAMES.filter(n => !out[n]);
+      if (missing.length) throw new Error('Gemini ले सबै १२ राशिको ४/४ बुँदा दिएन (' + missing.join(', ') + ')।');
+      return out;
+    }
+    async function generateRashiPoints(bs, signal) {
+      const key = $('ch_key').value.trim();
+      if (!key) throw new Error('Gemini API key छैन। AI settings (⚙) बाट key हाल्नुहोस्।');
+      const model = $('ch_gm').value.trim() || 'gemini-3.8-flash';
+      const ck = model + '|' + bs.y + '-' + bs.m + '-' + bs.d;
+      if (RASHI_CACHE.has(ck)) return RASHI_CACHE.get(ck);
+      const ad = bsToAd(bs.y, bs.m, bs.d), adStr = ad.toISOString().slice(0, 10);
+      const wd = BS_WEEK[bsWeekday(bs.y, bs.m, bs.d)];
+      const wdEn = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][ad.getUTCDay()];
+      const bsStr = neNum(bs.y) + ' ' + BS_MONTHS[bs.m - 1] + ' ' + neNum(bs.d);
+      const user = `Bikram Sambat date: ${bsStr}\nGregorian date: ${adStr}\nWeekday: ${wd} (${wdEn})\nLocation: Nepal (Asia/Kathmandu)\n\nWrite the 12-rashi daily horoscope for this date. Make every rashi's four points specific to this date, not generic. Return only the JSON.`;
+      const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, signal,
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: RASHI_SYS }] },
+          contents: [{ role: 'user', parts: [{ text: user }] }],
+          generationConfig: { temperature: 0.85, topP: 0.9, maxOutputTokens: 8192, responseMimeType: 'application/json' }
+        })
+      });
+      let j = null; try { j = await r.json() } catch (e) { }
+      if (!r.ok) throw new Error('Gemini: ' + ((j && j.error && j.error.message) || ('HTTP ' + r.status)));
+      if (j && j.promptFeedback && j.promptFeedback.blockReason) throw new Error('Gemini ले यो अनुरोध अस्वीकार गर्यो: ' + j.promptFeedback.blockReason);
+      const parts = j && j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts;
+      const text = parts ? parts.map(p => p.text || '').join('') : '';
+      if (!text.trim()) throw new Error('Gemini ले खाली जवाफ फर्कायो।');
+      const data = parseRashiJson(text);
+      RASHI_CACHE.set(ck, data);
+      if (RASHI_CACHE.size > 30) RASHI_CACHE.delete(RASHI_CACHE.keys().next().value);
+      return data;
     }
     function autoGen(aiPics) {
       const raw = $('raw').value; if (!raw.trim()) { $('st').textContent = 'Write or paste your text first.'; return }
@@ -3509,8 +3588,16 @@ EXAMPLE:
 \`\`\``;
     const RASHI_CHIP = 'आजको राशिफल (१२ राशि)';
     const CHIPS = [RASHI_CHIP, '५ वटा प्रेरक विचार', 'आरती / मन्त्र स्लाइड', 'Make it shorter', 'Add bullet points', 'Fix the format'];
-    /* Nepali (Bikram Sambat) date picker for the hard-coded rashi template. */
+    /* Nepali (Bikram Sambat) date picker. The 12 rashi points are generated
+       by Gemini for the chosen date; only the template structure is fixed. */
     const RCAL = { sel: null, view: null };
+    let rashiBusy = false, rashiAC = null, rashiSeq = 0;
+    function rcalSetMsg(msg, err) {
+      const el = $('rcal_msg');
+      el.textContent = msg || '';
+      el.hidden = !msg;
+      el.classList.toggle('err', !!err);
+    }
     function rcalClampSel() {
       const max = bsMonthDays(RCAL.view.y, RCAL.view.m);
       RCAL.sel = { y: RCAL.view.y, m: RCAL.view.m, d: clamp(RCAL.sel ? RCAL.sel.d : 1, 1, max) };
@@ -3553,14 +3640,49 @@ EXAMPLE:
       RCAL.view = { y: RCAL.sel.y, m: RCAL.sel.m };
       rcalBuild(); rcalRender();
       $('rcal').hidden = false;
+      if (!$('ch_key').value.trim()) rcalSetMsg('Gemini API key छैन। AI settings (⚙) बाट key हाल्नुहोस्।', true);
+      else rcalSetMsg('');
     }
-    function closeRashiCal() { $('rcal').hidden = true }
-    function makeRashiSlides() {
-      const bs = { ...RCAL.sel };
-      closeRashiCal();
-      $('raw').value = rashiRaw(bs);
-      setChat(false); tab('auto');
-      autoGen(false);
+    function closeRashiCal() {
+      rashiSeq++;
+      if (rashiAC) { try { rashiAC.abort() } catch (e) { } rashiAC = null }
+      rashiBusy = false;
+      $('rcal').hidden = true;
+      $('rcal').classList.remove('busy');
+      $('rcal_ok').disabled = false;
+      $('rcal_ok').textContent = 'यो मितिको राशिफल बनाउनुहोस्';
+      rcalSetMsg('');
+    }
+    async function makeRashiSlides() {
+      if (rashiBusy) return;
+      const bs = { ...RCAL.sel }, seq = ++rashiSeq;
+      rashiBusy = true;
+      rashiAC = new AbortController();
+      $('rcal').classList.add('busy');
+      $('rcal_ok').disabled = true;
+      $('rcal_ok').textContent = 'Gemini ले लेख्दैछ…';
+      rcalSetMsg('Gemini ले ' + neNum(bs.d) + ' ' + BS_MONTHS[bs.m - 1] + ' ' + neNum(bs.y) + ' का लागि १२ राशिको भविष्यफल लेख्दैछ…');
+      try {
+        const points = await generateRashiPoints(bs, rashiAC.signal);
+        if (seq !== rashiSeq) return;
+        const raw = rashiRaw(bs, points);
+        rashiAC = null;
+        closeRashiCal();
+        $('raw').value = raw;
+        setChat(false); tab('auto');
+        autoGen(false);
+      } catch (e) {
+        if (seq !== rashiSeq || e.name === 'AbortError') return;
+        rcalSetMsg('Gemini error: ' + (e.message || e), true);
+      } finally {
+        if (seq === rashiSeq) {
+          rashiBusy = false;
+          if (rashiAC) rashiAC = null;
+          $('rcal').classList.remove('busy');
+          $('rcal_ok').disabled = false;
+          $('rcal_ok').textContent = 'यो मितिको राशिफल बनाउनुहोस्';
+        }
+      }
     }
     $('rcal_x').onclick = closeRashiCal;
     $('rcal_cancel').onclick = closeRashiCal;

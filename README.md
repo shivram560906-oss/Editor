@@ -36,6 +36,8 @@ In the AI Writer, click **आजको राशिफल (१२ राशि)*
 हरेक राशीको ४ वटा फरक टपिकमा बनाउनु होस ।
 ```
 
+In the AI Writer chat, **Enter** starts a new paragraph; press **Ctrl+Enter** (or **Send**) to send the message.
+
 While Gemini writes, the exact prompt and live progress appear in the AI Writer chat and the editor status bar. When it finishes, the chat also shows Gemini's four points for every rashi. If the selected model is busy or too slow, the editor automatically tries `gemini-2.5-flash`, `gemini-2.5-flash-lite` and `gemini-flash-latest`; the first attempt gets 15 seconds and each fallback 35 seconds. Gemini thinking is disabled so the 12-rashi JSON returns quickly. Errors stay visible in the chat and status bar without changing the previous slides. Reopen the calendar to retry, or close it again to cancel a pending request. When the answer arrives the editor builds 13 slides:
 
 - The cover has `## तपाइको आजको राशीफल`, the chosen date, `# मेष देखि मीन राशिको भविष्यफल` and `@imglink: "0.png"`.
@@ -73,7 +75,7 @@ New projects start with a movable watermark at bottom center:
 ९८४७४५२९०६
 ```
 
-Edit its text, position, movement, color, size or transparency in **Brand**, or remove it with the trash button. With **Move around the screen**, the watermark starts at bottom center and roams the frame.
+Edit its text, position, movement, color, size or transparency in **Brand**, or remove it with the trash button. Each watermark also has its own **font**, **weight**, **text effect** (including **3D extrude**, deep 3D and outline), **3D depth** and **effect color**. With **Move around the screen**, the watermark starts at bottom center and roams the frame.
 
 ### Safety
 

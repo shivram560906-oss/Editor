@@ -1708,7 +1708,7 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
           <label><input type="checkbox" id="ch_auto"> Auto-apply to editor when finished</label>
         </div>
         <div class="ch-in">
-          <textarea id="ch_in" rows="2" placeholder="जस्तै: मेष देखि मीन सम्मको आजको राशिफल बनाऊ"></textarea>
+          <textarea id="ch_in" rows="2" title="Enter = नयाँ लाइन · Ctrl+Enter = पठाउनुहोस्" placeholder="जस्तै: मेष देखि मीन सम्मको आजको राशिफल बनाऊ — Enter = नयाँ लाइन, Ctrl+Enter = पठाउनुहोस्"></textarea>
           <button id="ch_send" class="btn btn-primary">Send</button>
         </div>
       </aside>
@@ -1905,7 +1905,7 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
               <button id="wadd" class="btn btn-primary btn-sm"><svg class="ic"><use href="#i-plus"></use></svg> Add watermark</button>
               <button id="wclr" class="btn btn-sm">Clear all</button>
             </div>
-            <p class="hint">Each watermark can have its own text, logo, position, movement and size.</p>
+            <p class="hint">Each watermark can have its own text, logo, position, movement, size, font and 3D effect.</p>
           </div>
         </div>
       </section>
@@ -2100,11 +2100,13 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     ['hsz', 'bsz', 'lh', 'pace', 'pg', 'ts', 'tc', 'fw', 'fi', 'kb', 'ls', 'ta'].forEach(k => $(k).oninput = () => refresh());
     /* watermarks: any number, each with its own settings */
     const WM_TEXT = 'पं. ज्यो. शिवराम पराजुली\n९८४७४५२९०६';
-    const WMS = [], newWm = (text = WM_TEXT) => ({ text, img: null, thumb: '', rb: 'none', tol: 25, mask: 'none', pc: null, pos: 'bc', mv: 'bounce', col: '#ffffff', size: 18, op: 55 });
+    const WMS = [], newWm = (text = WM_TEXT) => ({ text, img: null, thumb: '', rb: 'none', tol: 25, mask: 'none', pc: null, pos: 'bc', mv: 'bounce', col: '#ffffff', size: 18, op: 55, font: '', fw: 700, te: '3d', depth: 5, ecol: '#000000' });
     const WPOS = { tl: 'Top left', tc: 'Top center', tr: 'Top right', ml: 'Middle left', mc: 'Center', mr: 'Middle right', bl: 'Bottom left', bc: 'Bottom center', br: 'Bottom right' }, WMV = { still: 'Still', float: 'Gentle float', bounce: 'Move around the screen' }, WBG = { none: 'Keep as is', ai: 'Remove background (AI, best)', auto: 'Remove background (offline)', white: 'Remove white', black: 'Remove black' };
     const SH = { sharp: 'Rectangle', round: 'Rounded', circle: 'Circle', oval: 'Oval', square: 'Square', sqround: 'Rounded square', diamond: 'Diamond', hex: 'Hexagon' }, MASKS = { none: 'No mask', ...SH };
     function renderWm() {
       const op = (o, v) => Object.entries(o).map(([k, n]) => `<option value="${k}"${k == v ? ' selected' : ''}>${n}</option>`).join('');
+      const fopts = w => '<option value="">Template font</option>' + op(OPT.font, w.font || '');
+      const fwopts = w => op({ 400: 'Regular', 500: 'Medium', 600: 'Semi bold', 700: 'Bold', 800: 'Extra bold' }, w.fw || 700);
       $('wml').innerHTML = WMS.map((w, i) => {
         const label = w.text ? w.text.replace(/\s+/g, ' ').slice(0, 20) : 'Watermark ' + (i + 1);
         return `<details class="wc" data-i="${i}"${i == WMS.length - 1 ? ' open' : ''}><summary class="wch"><i class="wc-dot" style="background:${w.col}"></i><b>${esc(label)}</b><span class="wc-preview">${w.thumb ? `<img class="wt" src="${w.thumb}" alt="">` : ''}</span><button class="btn btn-icon sm" data-x title="Remove watermark" aria-label="Remove watermark"><svg class="ic"><use href="#i-trash"></use></svg></button></summary>
@@ -2120,8 +2122,13 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
         <div class="field"><label>Text color</label><input type="color" data-k="col" value="${w.col}"></div>
         <div class="field"><label>Size</label><input type="range" data-k="size" min="6" max="40" value="${w.size}"></div>
         <div class="field"><label>Transparency</label><input type="range" data-k="op" min="10" max="100" value="${w.op}"></div>
+        <div class="field"><label>Font</label><select data-k="font">${fopts(w)}</select></div>
+        <div class="field"><label>Weight</label><select data-k="fw">${fwopts(w)}</select></div>
+        <div class="field"><label>Text effect</label><select data-k="te">${op(OPT.te, w.te || 'none')}</select></div>
+        <div class="field"><label>3D depth</label><input type="range" data-k="depth" min="1" max="20" value="${w.depth || 5}"></div>
+        <div class="field"><label>Effect color</label><input type="color" data-k="ecol" value="${w.ecol || '#000000'}"></div>
       </div>
-      <p class="hint">Low transparency = more see-through.</p>
+      <p class="hint">Low transparency = more see-through. 3D depth and effect color apply to 3D, outline, long shadow and neon effects.</p>
     </div></details>`;
       }).join('');
       $('wml').querySelectorAll('.wc').forEach(c => {
@@ -2545,7 +2552,8 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       WMS.forEach((w, n) => {
         const txt = w.text.trim(), im = procImg(w); if (!txt && !iw(im)) return;
         const has = iw(im) > 0, sz = W * w.size / 100, fs = (has ? sz * .22 : sz * .3), m = 36 * U, gap = has && txt ? 8 * U : 0;
-        ctx.save(); ctx.globalAlpha = w.op / 100; ctx.textBaseline = 'top'; ctx.font = `700 ${fs}px "${S.font}",sans-serif`;
+        const fam = w.font || S.font, fw = w.fw || 700;
+        ctx.save(); ctx.globalAlpha = w.op / 100; ctx.textBaseline = 'top'; ctx.font = `${fw} ${fs}px "${fam}",sans-serif`;
         const shp = w.mask || 'none', cr = has ? (shp == 'none' ? [0, 0, iw(im), ih_(im)] : crop(shp, iw(im), ih_(im))) : [0, 0, 1, 1], k = has ? sz / Math.max(cr[2], cr[3]) : 0, lw = has ? cr[2] * k : 0, lh = has ? cr[3] * k : 0;
         const lines = txt ? txt.split('\n') : [], lws = lines.map(l => ctx.measureText(l).width), tw = Math.max(0, ...lws), bw = Math.max(lw, tw), bh = lh + gap + lines.length * fs * 1.3;
         const p = w.pos, tri = v => { v = ((v % 2) + 2) % 2; return v < 1 ? v : 2 - v };
@@ -2559,7 +2567,28 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
           y = m + (H - bh - 2 * m) * tri(t * by + 1);
         }
         if (has) { ctx.imageSmoothingQuality = 'high'; const ix = x + (bw - lw) / 2; if (shp != 'none') { ctx.save(); shapePath(ctx, shp, ix, y, lw, lh, U); ctx.clip(); ctx.drawImage(im, cr[0], cr[1], cr[2], cr[3], ix, y, lw, lh); ctx.restore() } else ctx.drawImage(im, ix, y, lw, lh) }
-        if (txt) { ctx.fillStyle = w.col; ctx.textAlign = 'left'; lines.forEach((l, j) => ctx.fillText(l, x + (bw - lws[j]) / 2, y + lh + gap + j * fs * 1.3)) }
+        if (txt) {
+          ctx.textAlign = 'left';
+          const E = w.te || 'none', ST = Math.max(1, +w.depth || 5), TC = w.ecol || '#000000', AX = Math.cos(Math.PI / 4), AY = Math.sin(Math.PI / 4);
+          lines.forEach((l, j) => {
+            const lx = x + (bw - lws[j]) / 2, ly = y + lh + gap + j * fs * 1.3;
+            ctx.shadowColor = 'rgba(0,0,0,0)'; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+            let fill = w.col;
+            if (E == 'gold') { const g = ctx.createLinearGradient(0, ly, 0, ly + fs); g.addColorStop(0, '#fff6bf'); g.addColorStop(.5, '#e8b923'); g.addColorStop(1, '#8a5a00'); fill = g; ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 3 * U; ctx.shadowOffsetY = 2 * U }
+            else if (E == 'shadow') { ctx.shadowColor = 'rgba(0,0,0,.65)'; ctx.shadowBlur = ST * 2.2 * U; ctx.shadowOffsetX = ctx.shadowOffsetY = ST * .5 * U }
+            else if (E == 'hard') { ctx.shadowColor = TC; ctx.shadowOffsetX = ST * 1.3 * U; ctx.shadowOffsetY = ST * 1.3 * U }
+            else if (E == 'long') { const n = ST * 5; for (let i = n; i > 0; i--) { ctx.fillStyle = TC; ctx.globalAlpha = w.op / 100 * (.55 * (1 - i / n) + .05); ctx.fillText(l, lx + AX * i * U * 1.1, ly + AY * i * U * 1.1) } ctx.globalAlpha = w.op / 100 }
+            else if (E == '3d' || E == '3do' || E == 'deep') {
+              const n = E == 'deep' ? ST * 2 : ST;
+              for (let i = n; i > 0; i--) { ctx.fillStyle = E == 'deep' ? shade(TC, .5 * (1 - i / n)) : TC; ctx.fillText(l, lx + AX * i * .9 * U, ly + AY * i * .9 * U) }
+              if (E == '3do') { ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(2, ST * .35) * U; ctx.strokeStyle = TC; ctx.strokeText(l, lx, ly) }
+            }
+            else if (E == 'outline') { ctx.lineJoin = 'round'; ctx.lineWidth = ST * .9 * U; ctx.strokeStyle = TC; ctx.strokeText(l, lx, ly) }
+            else if (E == 'neon') { ctx.shadowColor = w.col; ctx.shadowBlur = ST * 4 * U }
+            ctx.fillStyle = fill; ctx.fillText(l, lx, ly);
+            ctx.shadowColor = 'rgba(0,0,0,0)'; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+          });
+        }
         ctx.restore()
       });
     }
@@ -4141,7 +4170,8 @@ EXAMPLE:
       chatAC = null; $('ch_send').textContent = 'Send'; $('ch_stat').textContent = ''; $('ch_log').scrollTop = 1e9;
     }
     $('ch_send').onclick = () => chatSend($('ch_in').value);
-    $('ch_in').onkeydown = e => { if (e.key == 'Enter' && !e.shiftKey) { e.preventDefault(); chatSend($('ch_in').value) } };
+    /* Enter makes a new paragraph; Ctrl/Cmd+Enter sends. */
+    $('ch_in').onkeydown = e => { if (e.key == 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); chatSend($('ch_in').value) } };
     $('ch_cfg').onclick = () => { $('ch_set').hidden = !$('ch_set').hidden };
     $('ch_clr').onclick = () => { chatH.length = 0; $('ch_log').innerHTML = ''; addMsg('a', 'नमस्ते! म तपाईंको स्लाइडका लागि सामग्री लेख्न सक्छु। कुनै विषय भन्नुहोस्।') };
     function setChat(open) {

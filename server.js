@@ -26,6 +26,16 @@ const IMAGE_MODEL = process.env.CLOUDFLARE_IMAGE_MODEL || "@cf/black-forest-labs
 const IMAGE_STEPS = Math.min(8, Math.max(1, parseInt(process.env.CLOUDFLARE_IMAGE_STEPS || "4", 10) || 4));
 const CF_BASE = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/`;
 
+/* Pollinations is the fallback provider. It is used automatically when
+   Cloudflare is out of quota, rate-limited, or otherwise failing. Both the
+   prompt summary and the picture can fall back independently. */
+const POLLINATIONS_API = (process.env.POLLINATIONS_API || process.env.POLLINATIONS_API_KEY || "").trim();
+const POLLINATIONS_BASE = "https://gen.pollinations.ai";
+const POLLINATIONS_IMAGE_MODEL = process.env.POLLINATIONS_IMAGE_MODEL || "flux";
+const POLLINATIONS_TEXT_MODEL = (process.env.POLLINATIONS_TEXT_MODEL || "").trim();
+const HAS_CLOUDFLARE = !!(ACCOUNT_ID && API_TOKEN);
+const HAS_POLLINATIONS = !!POLLINATIONS_API;
+
 /* The editor is used for religious and cultural videos, so every picture must
    stay respectful and family-friendly. The summary prompt below is instructed
    to produce safe scenes, explicit "@img" prompts are screened, and every
@@ -65,8 +75,9 @@ function unsafePrompt(text) {
 }
 
 function safeImagePrompt(prompt) {
-  const base = String(prompt || "").replace(/[.\s]+$/, "").trim();
-  return `${base}${IMAGE_SAFETY}`.slice(0, 2000);
+  const base = String(prompt || "").replace(/[.\s]+$/, "").trim().slice(0, 700);
+  if (!base) return SAFE_FALLBACK;
+  return `${base}${IMAGE_SAFETY}`.slice(0, 1000);
 }
 
 const MAX_BODY = 100 * 1024;
@@ -75,9 +86,10 @@ const RATE_LIMIT = 80;
 const rate = new Map();
 
 class HttpError extends Error {
-  constructor(status, message) {
+  constructor(status, message, code) {
     super(message);
     this.status = status;
+    this.code = code || "";
   }
 }
 
@@ -131,9 +143,41 @@ function limited(ip) {
   return b.count > RATE_LIMIT;
 }
 
+/* Cloudflare circuit breaker. A daily-quota error stops all Cloudflare calls
+   until the next UTC midnight, so the remaining slides go straight to the
+   fallback instead of waiting for the same error on every picture. */
+let cfDownUntil = 0;
+let cfDownReason = "";
+
+function nextUtcMidnight() {
+  const now = new Date();
+  return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+}
+
+function cloudflareAvailable() {
+  return HAS_CLOUDFLARE && Date.now() >= cfDownUntil;
+}
+
+function noteCloudflareFailure(err) {
+  const wasDown = Date.now() < cfDownUntil;
+  if (err && err.code === "daily_quota") {
+    cfDownUntil = Math.max(cfDownUntil, nextUtcMidnight());
+    cfDownReason = "daily free limit reached";
+  } else if (err && err.code !== "not_configured") {
+    cfDownUntil = Math.max(cfDownUntil, Date.now() + 60 * 1000);
+    cfDownReason = err.message || "temporary error";
+  } else {
+    return;
+  }
+  if (!wasDown) {
+    const next = HAS_POLLINATIONS ? "Falling back to Pollinations." : "No fallback provider is configured.";
+    console.warn(`Cloudflare unavailable (${cfDownReason}). ${next}`);
+  }
+}
+
 async function cloudflare(model, input, timeoutMs) {
-  if (!ACCOUNT_ID || !API_TOKEN) {
-    throw new HttpError(503, "AI is not configured on the server. Set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN.");
+  if (!HAS_CLOUDFLARE) {
+    throw new HttpError(503, "Cloudflare is not configured on the server. Set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN.", "not_configured");
   }
   let r;
   try {
@@ -148,32 +192,33 @@ async function cloudflare(model, input, timeoutMs) {
     });
   } catch (e) {
     if (e && (e.name === "TimeoutError" || e.name === "AbortError")) {
-      throw new HttpError(504, "The AI service took too long. Please try again.");
+      throw new HttpError(504, "Cloudflare took too long. Please try again.", "timeout");
     }
-    throw new HttpError(502, "Could not reach the AI service.");
+    throw new HttpError(502, "Could not reach Cloudflare.", "network");
   }
   const text = await r.text();
   let data;
   try {
     data = JSON.parse(text);
   } catch (e) {
-    throw new HttpError(502, "The AI service returned an invalid response.");
+    throw new HttpError(502, "Cloudflare returned an invalid response.", "invalid_response");
   }
   if (!r.ok || !data.success) {
     const detail = data.errors && data.errors[0] && data.errors[0].message ? data.errors[0].message : `HTTP ${r.status}`;
     if (r.status === 401 || r.status === 403) {
-      throw new HttpError(502, "Cloudflare rejected the API credentials. Check the server settings.");
+      throw new HttpError(502, "Cloudflare rejected the API credentials. Check the server settings.", "auth");
     }
-    if (r.status === 429) {
-      const daily = /daily free allocation|neurons/i.test(detail);
+    const daily = /daily free allocation|neurons/i.test(detail);
+    if (r.status === 429 || daily) {
       throw new HttpError(
         429,
         daily
-          ? "The daily free AI limit is used up. Please try again tomorrow or upgrade the Cloudflare Workers plan."
-          : "AI rate limit reached. Please wait a minute and try again."
+          ? "The daily free Cloudflare AI limit is used up."
+          : "Cloudflare rate limit reached. Please wait a minute and try again.",
+        daily ? "daily_quota" : "rate_limit"
       );
     }
-    throw new HttpError(502, `AI service error: ${String(detail).slice(0, 180)}`);
+    throw new HttpError(502, `Cloudflare error: ${String(detail).slice(0, 180)}`, "service");
   }
   return data.result || {};
 }
@@ -193,7 +238,52 @@ Safety rules that must always be followed:
 
 Return only the prompt. No quotes, labels, or explanation.`;
 
-async function summarize(text) {
+function cleanPrompt(value) {
+  return String(value || "")
+    .replace(/\r?\n+/g, " ")
+    .replace(/^["'\s]+|["'\s]+$/g, "")
+    .replace(/^(?:image\s+)?prompt\s*:\s*/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function pollinationsFetch(pathAndQuery, timeoutMs, init) {
+  if (!HAS_POLLINATIONS) {
+    throw new HttpError(503, "Pollinations fallback is not configured. Set POLLINATIONS_API.", "not_configured");
+  }
+  let r;
+  try {
+    r = await fetch(POLLINATIONS_BASE + pathAndQuery, {
+      ...(init || {}),
+      headers: {
+        Authorization: `Bearer ${POLLINATIONS_API}`,
+        ...((init && init.headers) || {}),
+      },
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (e) {
+    if (e && (e.name === "TimeoutError" || e.name === "AbortError")) {
+      throw new HttpError(504, "Pollinations took too long. Please try again.", "timeout");
+    }
+    throw new HttpError(502, "Could not reach Pollinations.", "network");
+  }
+  return r;
+}
+
+function pollinationsError(status, detail) {
+  if (status === 401 || status === 403) {
+    return new HttpError(502, "Pollinations rejected the API key. Check POLLINATIONS_API.", "auth");
+  }
+  if (status === 402) {
+    return new HttpError(502, "The Pollinations balance is used up. Add Pollen or wait for the free allowance.", "payment");
+  }
+  if (status === 429) {
+    return new HttpError(429, "Pollinations rate limit reached. Please wait and try again.", "rate_limit");
+  }
+  return new HttpError(502, `Pollinations error: ${String(detail).slice(0, 180)}`, "service");
+}
+
+async function summarizeCloudflare(text) {
   const result = await cloudflare(
     TEXT_MODEL,
     {
@@ -206,26 +296,124 @@ async function summarize(text) {
     },
     30000
   );
-  let prompt = typeof result.response === "string" ? result.response : "";
-  prompt = prompt
-    .replace(/\r?\n+/g, " ")
-    .replace(/^["'\s]+|["'\s]+$/g, "")
-    .replace(/^(?:image\s+)?prompt\s*:\s*/i, "")
-    .replace(/\s+/g, " ")
-    .trim();
-  if (!prompt) throw new HttpError(502, "The AI could not write an image prompt for this slide.");
+  const prompt = cleanPrompt(result.response);
+  if (!prompt) throw new HttpError(502, "Cloudflare could not write an image prompt.", "invalid_response");
+  return prompt;
+}
+
+async function summarizePollinations(text) {
+  const r = await pollinationsFetch("/v1/chat/completions", 45000, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: POLLINATIONS_TEXT_MODEL || "openai",
+      messages: [
+        { role: "system", content: PROMPT_SYSTEM },
+        { role: "user", content: text.slice(0, 4000) },
+      ],
+      max_tokens: 120,
+      temperature: 0.5,
+    }),
+  });
+  const body = await r.text();
+  if (!r.ok) throw pollinationsError(r.status, body);
+  let data = null;
+  try {
+    data = JSON.parse(body);
+  } catch (e) {
+    throw new HttpError(502, "Pollinations returned an invalid text response.", "invalid_response");
+  }
+  const content = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  const prompt = cleanPrompt(content);
+  if (!prompt) throw new HttpError(502, "Pollinations could not write an image prompt.", "invalid_response");
+  return prompt;
+}
+
+async function summarize(text) {
+  const errors = [];
+  let prompt = "";
+  if (cloudflareAvailable()) {
+    try {
+      prompt = await summarizeCloudflare(text);
+    } catch (e) {
+      noteCloudflareFailure(e);
+      errors.push(`Cloudflare: ${e.message}`);
+    }
+  } else if (HAS_CLOUDFLARE) {
+    errors.push(`Cloudflare: temporarily unavailable (${cfDownReason}).`);
+  }
+  if (!prompt && HAS_POLLINATIONS) {
+    try {
+      prompt = await summarizePollinations(text);
+    } catch (e) {
+      errors.push(`Pollinations: ${e.message}`);
+    }
+  }
+  if (!prompt) {
+    console.warn(`AI prompt summary failed; using the safe fallback scene. ${errors.join(" ")}`);
+    return SAFE_FALLBACK;
+  }
   if (unsafePrompt(prompt)) return SAFE_FALLBACK;
   return prompt.slice(0, 600);
 }
 
-async function generateImage(prompt) {
+async function generateCloudflareImage(prompt) {
   const result = await cloudflare(
     IMAGE_MODEL,
-    { prompt: safeImagePrompt(prompt), steps: IMAGE_STEPS },
+    { prompt, steps: IMAGE_STEPS },
     60000
   );
-  if (!result.image) throw new HttpError(502, "The AI did not return an image.");
+  if (!result.image) throw new HttpError(502, "Cloudflare did not return an image.", "invalid_response");
   return `data:image/jpeg;base64,${result.image}`;
+}
+
+async function generatePollinationsImage(prompt) {
+  const u = new URL(`${POLLINATIONS_BASE}/image/${encodeURIComponent(prompt)}`);
+  u.searchParams.set("model", POLLINATIONS_IMAGE_MODEL);
+  u.searchParams.set("width", "1024");
+  u.searchParams.set("height", "1024");
+  u.searchParams.set("safe", "true");
+  u.searchParams.set("nologo", "true");
+  u.searchParams.set("seed", String(Math.floor(Math.random() * 1e9)));
+  u.searchParams.set("negative_prompt", "nudity, naked, sexual, violence, blood, weapons, drugs, alcohol, text, watermark, logo");
+  const r = await pollinationsFetch(u.pathname + u.search, 90000);
+  if (!r.ok) {
+    const detail = await r.text();
+    throw pollinationsError(r.status, detail);
+  }
+  const type = String(r.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
+  if (!type.startsWith("image/")) {
+    const detail = await r.text();
+    throw new HttpError(502, `Pollinations returned ${type || "an unknown response"} instead of an image: ${String(detail).slice(0, 120)}`, "invalid_response");
+  }
+  const image = Buffer.from(await r.arrayBuffer());
+  if (!image.length) throw new HttpError(502, "Pollinations returned an empty image.", "invalid_response");
+  return `data:${type};base64,${image.toString("base64")}`;
+}
+
+async function generateImage(prompt) {
+  const safePrompt = safeImagePrompt(prompt);
+  const errors = [];
+  if (cloudflareAvailable()) {
+    try {
+      return { image: await generateCloudflareImage(safePrompt), provider: "cloudflare" };
+    } catch (e) {
+      noteCloudflareFailure(e);
+      errors.push(`Cloudflare: ${e.message}`);
+    }
+  } else if (HAS_CLOUDFLARE) {
+    errors.push(`Cloudflare: temporarily unavailable (${cfDownReason}).`);
+  }
+  if (HAS_POLLINATIONS) {
+    try {
+      return { image: await generatePollinationsImage(safePrompt), provider: "pollinations" };
+    } catch (e) {
+      errors.push(`Pollinations: ${e.message}`);
+    }
+  } else {
+    errors.push("Pollinations: fallback is not configured (set POLLINATIONS_API).");
+  }
+  throw new HttpError(502, `Could not create the picture. ${errors.join(" ")}`, "all_failed");
 }
 
 async function slideImage(req, res) {
@@ -260,9 +448,9 @@ async function slideImage(req, res) {
     else prompt = SAFE_FALLBACK;
     if (unsafePrompt(prompt)) prompt = SAFE_FALLBACK;
     if (explicit && prompt !== explicit) console.warn("Unsafe @img prompt was replaced with a safe scene.");
-    const image = await generateImage(prompt);
-    console.log(`AI picture ${Date.now() - started}ms | ${prompt.slice(0, 100)}`);
-    sendJSON(res, 200, { success: true, prompt, image });
+    const result = await generateImage(prompt);
+    console.log(`AI picture ${Date.now() - started}ms via ${result.provider} | ${prompt.slice(0, 100)}`);
+    sendJSON(res, 200, { success: true, prompt, image: result.image, provider: result.provider });
   } catch (e) {
     const status = e instanceof HttpError ? e.status : 500;
     if (!(e instanceof HttpError)) console.error("slide-image:", e);
@@ -309,10 +497,17 @@ const server = http.createServer((req, res) => {
 if (require.main === module) {
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
-    if (!ACCOUNT_ID || !API_TOKEN) {
-      console.warn("Cloudflare credentials are missing. Add them to .env or the host environment.");
+    const providers = [];
+    if (HAS_CLOUDFLARE) providers.push("Cloudflare");
+    if (HAS_POLLINATIONS) providers.push("Pollinations");
+    if (!providers.length) {
+      console.warn("No AI provider is configured. Set CLOUDFLARE_ACCOUNT_ID/CLOUDFLARE_API_TOKEN or POLLINATIONS_API.");
+    } else {
+      console.log(`AI providers: ${providers.join(" -> ")}`);
+      if (!HAS_CLOUDFLARE) console.warn("Cloudflare is not configured; using Pollinations only.");
+      if (!HAS_POLLINATIONS) console.warn("Pollinations fallback is not configured; using Cloudflare only.");
     }
   });
 }
 
-module.exports = { unsafePrompt, safeImagePrompt, SAFE_FALLBACK };
+module.exports = { unsafePrompt, safeImagePrompt, SAFE_FALLBACK, summarize, generateImage };

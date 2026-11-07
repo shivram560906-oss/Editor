@@ -5,3 +5,7 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# Local AI test scratch files
+gen.js
+pollinations-test.png

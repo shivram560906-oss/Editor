@@ -23,7 +23,6 @@ from calculator import avasthas as avasthas_calc
 from calculator import kaal_sarp_dosha as kaal_sarp_dosha_calc
 from calculator import lal_kitab as lal_kitab_calc
 from calculator import remedies as remedies_calc
-from calculator.comprehensive_book_engine import build_comprehensive_kundali_book
 from cities_data import CITIES
 from location_hierarchy import build_location_hierarchy
 from rate_limit import limiter
@@ -1074,6 +1073,10 @@ def perform_calculations(
     # Add comprehensive 50+ page book generator model. The web proxy strips it
     # from responses, so it can be skipped entirely for browser requests.
     if include_comprehensive_book:
+        # Imported lazily: the book engine pulls in PySide6 for image rendering,
+        # which the API image intentionally does not install.
+        from calculator.comprehensive_book_engine import build_comprehensive_kundali_book
+
         result_payload["comprehensive_book"] = build_comprehensive_kundali_book(
             result_payload, language="ne"
         )

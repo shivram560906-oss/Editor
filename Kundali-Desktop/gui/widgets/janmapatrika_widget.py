@@ -775,7 +775,8 @@ class JanmapatrikaPage(QWidget):
     @staticmethod
     def _dasha_table_html(periods: list, *, children_key: Optional[str] = None,
                           visible_rows: Optional[int] = None,
-                          show_more: bool = False) -> str:
+                          show_more: bool = False,
+                          actual_birth_date: Optional[datetime.date] = None) -> str:
         """Render a classical dasha grid constrained to the document width."""
         if not periods:
             return ""
@@ -784,11 +785,16 @@ class JanmapatrikaPage(QWidget):
         duration_by_name = {name: years for name, _, years in spec}
         if children_key:
             timeline = JanmapatrikaPage._dasha_timeline(periods)
-            birth_start = timeline[0].get("start") if timeline else None
-            try:
-                birth_date = datetime.date.fromisoformat(str(birth_start)[:10])
-            except (TypeError, ValueError):
-                birth_date = None
+            # Use the actual birth date passed in; fall back to the first
+            # mahadasha's start only when no explicit date is provided.
+            if actual_birth_date is not None:
+                birth_date: Optional[datetime.date] = actual_birth_date
+            else:
+                birth_start = timeline[0].get("start") if timeline else None
+                try:
+                    birth_date = datetime.date.fromisoformat(str(birth_start)[:10])
+                except (TypeError, ValueError):
+                    birth_date = None
 
             # Rotate the column headers so they start from the birth Mahadasha
             # lord and follow the classical cycle from that point.  This way the
@@ -939,7 +945,8 @@ class JanmapatrikaPage(QWidget):
         document.setTextWidth(max(1, width))
         label.setMinimumHeight(int(math.ceil(document.size().height())) + 8)
 
-    def _dasha_section_widget(self, title: str, periods: list, *, children_key: Optional[str] = None) -> Optional[QFrame]:
+    def _dasha_section_widget(self, title: str, periods: list, *, children_key: Optional[str] = None,
+                               actual_birth_date: Optional[datetime.date] = None) -> Optional[QFrame]:
         """Build one compact table and optional incremental +/- controls."""
         spec, _ = self._dasha_spec(periods)
         if children_key:
@@ -988,6 +995,7 @@ class JanmapatrikaPage(QWidget):
                         children_key=children_key,
                         visible_rows=state["rows"],
                         show_more=state["rows"] < max_rows,
+                        actual_birth_date=actual_birth_date,
                     ),
                 )
                 minus.setEnabled(state["rows"] > min(3, max_rows))
@@ -1067,6 +1075,13 @@ class JanmapatrikaPage(QWidget):
             f"color:{_JP_BLACK}; font-size:12pt; font-weight:600; background:transparent;"
         )
         self._paper_layout.addWidget(planet_table)
+        # Extract the actual birth date once so antardasha "बाँकी उमेर" cells are
+        # measured from the person's real birth date, not the mahadasha start.
+        _raw_bd = (data.get("metadata") or {}).get("birth_date", "")
+        try:
+            _actual_bd: Optional[datetime.date] = datetime.date.fromisoformat(str(_raw_bd)[:10])
+        except (TypeError, ValueError):
+            _actual_bd = None
         dasha_sections = [
             ("विंशोत्तरी महादशा चक्रम्", data.get("dasha") or [], None),
             ("विंशोत्तरी अन्तरदशा चक्रम्", data.get("dasha") or [], "antardashas"),
@@ -1074,7 +1089,8 @@ class JanmapatrikaPage(QWidget):
             ("योगिनी अन्तरदशा चक्रम्", data.get("yogini_dasha") or [], "antardashas"),
         ]
         for title, periods, children_key in dasha_sections:
-            section = self._dasha_section_widget(title, periods, children_key=children_key)
+            section = self._dasha_section_widget(title, periods, children_key=children_key,
+                                                 actual_birth_date=_actual_bd)
             if section is not None:
                 self._paper_layout.addWidget(section)
         if model["family"] != UNAVAILABLE or model["spouse"] != UNAVAILABLE:

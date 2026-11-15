@@ -23,21 +23,22 @@
   const GOOD = '#34d399', BAD = '#fb7185', MID = '#fbbf24';
   const BS_MONTHS_NE = ['बैशाख', 'जेठ', 'असार', 'साउन', 'भदौ', 'असोज', 'कात्तिक', 'मंसिर', 'पुष', 'माघ', 'फागुन', 'चैत'];
 
+  const KUN_ORDER_ACTIVE = (typeof KUN_ORDER !== 'undefined') ? KUN_ORDER : ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+  const KUN_NE_ACTIVE = (typeof KUN_NE !== 'undefined') ? KUN_NE : { Sun: 'सूर्य', Moon: 'चन्द्र', Mars: 'मङ्गल', Mercury: 'बुध', Jupiter: 'गुरु', Venus: 'शुक्र', Saturn: 'शनि', Rahu: 'राहु', Ketu: 'केतु' };
+  const KUN_SIGN_LORD_ACTIVE = (typeof KUN_SIGN_LORD !== 'undefined') ? KUN_SIGN_LORD : ['Mars', 'Venus', 'Mercury', 'Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Saturn', 'Jupiter'];
+  const KUN_HOUSE_NE_ACTIVE = (typeof KUN_HOUSE_NE !== 'undefined') ? KUN_HOUSE_NE : ['', 'तनु', 'धन', 'सहज', 'सुख', 'सन्तान', 'रोग', 'कलत्र', 'आयु', 'भाग्य', 'कर्म', 'लाभ', 'व्यय'];
+
   /* ═══════════════════════════════════════════════════════════════
-     FOUR AUTOMATIC DESIGN MODELS
+     AUTOMATIC DESIGN MODEL — COSMIC GOLD (EXCLUSIVE)
      ------------------------------------------------------------------
-     Each model owns its palette, fonts, card-surface treatment, header
-     composition, animation rhythm and transition. The content builders
-     below emit one canonical SVG; `themeSvg()` remaps the palette and
-     fonts per model. Charts keep their real Vedic colours so data stays
-     readable and accurate in every model. Models are isolated through
-     their own template id and their own saved layout fingerprint.
+     Only one premium, celestial Vedic model is active.
+     Deep cosmic space, glowing orbits, gold/cyan highlights.
      ═══════════════════════════════════════════════════════════════ */
   const MODELS = {
     cosmic: {
       id: 1, key: 'cosmic', tpl: 'cosmic', badge: 'DEFAULT',
       name: 'Cosmic Gold', ne: 'कस्मिक गोल्ड', tag: 'ब्रह्माण्ड · गहिराइ',
-      desc: 'गहिरो नीलो ब्रह्माण्ड, सुनौलो प्रकाश, कक्षा र ताराहरू — सुधारिएको डिफल्ट मोडेल।',
+      desc: 'गहिरो नीलो ब्रह्माण्ड, सुनौलो प्रकाश, कक्षा र ताराहरू — आधिकारिक वैदिक मोडेल।',
       body: 'Mukta', display: 'Rozha One', textScale: 1, lineScale: 1, durScale: 1,
       minDur: 7, maxDur: 28, readWps: 3.0,
       seqStep: .10, seqBand: .16, seqMax: 2.0,
@@ -56,104 +57,23 @@
         delay: .10, kind: 'float'
       },
       fx: ['Rise + float', 'Smooth crossfade', 'Orbit depth']
-    },
-    nebula: {
-      id: 2, key: 'nebula', tpl: 'nebula', badge: 'NEW · 2',
-      name: 'Nebula Glass', ne: 'नेबुला ग्लास', tag: 'नीहारिका · काँच',
-      desc: 'बैजनी–निलो नीहारिका, तैरिने काँचका प्यानल, नरम प्रकाश र डिसोल्भ ट्रान्जिसन।',
-      body: 'Hind', display: 'Baloo 2', textScale: 1.02, lineScale: 1.04, durScale: 1,
-      minDur: 7, maxDur: 28, readWps: 2.82,
-      seqStep: .13, seqBand: .20, seqMax: 2.1,
-      colors: {
-        accent: '#e9d5ff', accent2: '#22d3ee', ink: '#f8f5ff', mut: '#c4b5fd', dim: '#8b7bb8',
-        good: '#34d399', bad: '#fb7185', mid: '#fbbf24', panel: '#170b34', panel2: '#211048',
-        deep: '#0b0422', chrome: '#2a1550', line: '#4b2d78', line2: '#5b3a8a',
-        tableHead: '#2a1550', tableRow: '#150a30', tableRow2: '#1b0e3b',
-        badPanel: '#2a0e2a', cyan: '#67e8f9', violet: '#d8b4fe', blue: '#93c5fd',
-        badText: '#fecdd3', goodText: '#bbf7d0', violetText: '#ede9fe', badMut: '#e9a5b0'
-      },
-      set: { speed: .98, entry: 'fade', exit: 'none', trans: 'dissolve', depth: 30, radius: 26, stagger: .13, animDur: .96, gap: .72 },
-      anim: {
-        heading: 'zoom', caption: 'soft', text: 'soft', chart: 'zoom', art: 'zoom',
-        cards: 'soft', table: 'rise', graph: 'rise', report: 'soft', note: 'rise',
-        delay: .14, kind: 'float'
-      },
-      fx: ['Zoom + float', 'Dissolve', 'Glass panes']
-    },
-    vedic: {
-      id: 3, key: 'vedic', tpl: 'vedic', badge: 'NEW · 3',
-      name: 'Vedic Parchment', ne: 'वैदिक पोथी', tag: 'पोथी · मण्डल',
-      desc: 'पुरानो पोथीको कागज, मारुन–सुनौलो किनारा, घुम्ने राशि मण्डल र सफा टाइपोग्राफी।',
-      body: 'Tiro Devanagari Hindi', display: 'Rozha One', textScale: .99, lineScale: 1.05, durScale: 1,
-      minDur: 7, maxDur: 28, readWps: 2.78,
-      seqStep: .09, seqBand: .14, seqMax: 1.9,
-      colors: {
-        accent: '#8a1c1c', accent2: '#a16207', ink: '#2b160d', mut: '#5b3d26', dim: '#7a5c3a',
-        good: '#1f6b3a', bad: '#a51c30', mid: '#b45309', panel: '#fbf1dc', panel2: '#f6e7c8',
-        deep: '#efdcb8', chrome: '#e7cfa6', line: '#c8a978', line2: '#d6bd93',
-        tableHead: '#e7cfa6', tableRow: '#fdf6e7', tableRow2: '#f7e9cf',
-        badPanel: '#f7e2dc', cyan: '#0e7490', violet: '#6d28d9', blue: '#1d4ed8',
-        badText: '#8a1c1c', goodText: '#1f6b3a', violetText: '#5b21b6', badMut: '#7f1d1d'
-      },
-      set: { speed: 1.02, entry: 'reveal', exit: 'none', trans: 'wipe', depth: 10, radius: 5, stagger: .09, animDur: .90, gap: .58 },
-      anim: {
-        heading: 'grow-x', caption: 'fade', text: 'reveal', chart: 'grow-y', art: 'fade',
-        cards: 'reveal', table: 'grow-y', graph: 'grow-y', report: 'reveal', note: 'fade',
-        delay: .09, kind: 'none'
-      },
-      fx: ['Page reveal', 'Wipe', 'Ruled parchment']
-    },
-    orbit: {
-      id: 4, key: 'orbit', tpl: 'orbit', badge: 'NEW · 4',
-      name: 'Solar Orbit', ne: 'सोलार अर्बिट', tag: 'सौर्यमण्डल · HUD',
-      desc: 'सौर्यमण्डलको कक्षीय गति, नियोन HUD, गाढा टिल प्यानल र छिटो स्लाइड एनिमेसन।',
-      body: 'Mukta', display: 'Yatra One', textScale: 1, lineScale: 1.03, durScale: 1,
-      minDur: 7, maxDur: 28, readWps: 3.12,
-      seqStep: .06, seqBand: .10, seqMax: 1.5,
-      colors: {
-        accent: '#a3e635', accent2: '#22d3ee', ink: '#ecfeff', mut: '#8fd8cf', dim: '#5b9a94',
-        good: '#4ade80', bad: '#fb7185', mid: '#facc15', panel: '#04181c', panel2: '#06252a',
-        deep: '#020e10', chrome: '#083036', line: '#0f4a44', line2: '#13645b',
-        tableHead: '#083036', tableRow: '#031214', tableRow2: '#04191c',
-        badPanel: '#2a0e14', cyan: '#22d3ee', violet: '#c4b5fd', blue: '#60a5fa',
-        badText: '#fecdd3', goodText: '#bbf7d0', violetText: '#ddd6fe', badMut: '#e9a5b0'
-      },
-      set: { speed: 1.02, entry: 'slide', exit: 'none', trans: 'zoom', depth: 18, radius: 8, stagger: .06, animDur: .68, gap: .50 },
-      anim: {
-        heading: 'slide', caption: 'slide', text: 'slide', chart: 'zoom', art: 'zoom',
-        cards: 'slide', table: 'slide', graph: 'slide', report: 'slide', note: 'slide',
-        delay: .075, kind: 'scan'
-      },
-      fx: ['HUD slide', 'Zoom push', 'Telemetry rail']
     }
   };
-  const MODEL_KEYS = ['cosmic', 'nebula', 'vedic', 'orbit'];
+  const MODEL_KEYS = ['cosmic'];
 
-  /* Playback order — one source of truth for the presentation sequence.
-     The content id (`no`) of a card never changes; only this priority puts
-     it in the story. Continuation pages use the base priority plus 0.5 so
-     they always stay directly after their first page.
-     Story flow: birth chart → other charts → planet analysis → strength →
-     yogas → time (dasha) → document → closing. */
+  /* Playback order — EXACT 11 CARDS SEQUENCE */
   const ORDER = {
     birth: 10,
-    moon: 20,
-    d9: 30,
-    relation: 40,
-    strength: 50,
-    pillars: 60,
-    sav: 70,
-    savHouses: 75,
-    goodYoga: 80,
-    badYoga: 90,
-    sadeSati: 95,
-    lalKitab: 100,
-    dasha: 110,
-    dashaEffect: 120,
-    yoginiEffect: 130,
-    janmapatrika: 140,
-    wishes: 150,
-    consult: 160
+    avakahada: 20,
+    vimshottari: 30,
+    yogini: 40,
+    pillars: 50,
+    thisYear: 60,
+    janmapatrika: 70,
+    remedies: 80,
+    yogas: 90,
+    youthQA: 100,
+    consult: 110
   };
 
   let MODEL = MODELS.cosmic;
@@ -216,78 +136,62 @@
     return o;
   }
   function T(x, y, txt, size, color, weight, anchor) {
-    return kunT(x, y, txt == null ? '' : String(txt), Math.round((size || 14) * MODEL.textScale * 10) / 10, color || INK, weight == null ? 500 : weight, anchor || 'start');
+    if (typeof kunT === 'function') {
+      return kunT(x, y, txt == null ? '' : String(txt), Math.round((size || 14) * MODEL.textScale * 10) / 10, color || INK, weight == null ? 500 : weight, anchor || 'start');
+    }
+    const fs = Math.round((size || 14) * MODEL.textScale * 10) / 10;
+    const anch = anchor === 'middle' ? ' text-anchor="middle"' : anchor === 'end' ? ' text-anchor="end"' : '';
+    return '<text x="' + x + '" y="' + y + '" font-size="' + fs + '" fill="' + (color || INK) + '" font-weight="' + (weight || 500) + '"' + anch + '>' + String(txt == null ? '' : txt).replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</text>';
   }
   function P(x, y, txt, chars, size, lineH, color, maxLines) {
-    const sc = MODEL.textScale, lh = Math.round((lineH || 20) * MODEL.lineScale * 10) / 10;
-    return kunPara(x, y, txt == null ? '' : String(txt), chars, Math.round((size || 14) * sc * 10) / 10, lh, color || INK, maxLines || 4);
+    if (typeof kunPara === 'function') {
+      const sc = MODEL.textScale, lh = Math.round((lineH || 20) * MODEL.lineScale * 10) / 10;
+      return kunPara(x, y, txt == null ? '' : String(txt), chars, Math.round((size || 14) * sc * 10) / 10, lh, color || INK, maxLines || 4);
+    }
+    return T(x, y, txt, size, color);
   }
-  function num(v, d) { return (v == null || !isFinite(+v)) ? '—' : kunNum(v, d == null ? 2 : d); }
-  function ne(v) { return neNum(v == null ? '—' : v); }
-  function sign(n) { return kunSignByNum(n); }
-  function pName(n) { return KUN_NE[n] || n || '—'; }
-  function dt(iso) { return /^\d{4}-\d{2}-\d{2}/.test(String(iso || '')) ? kunDateNe(iso) : '—'; }
+  function num(v, d) { return (v == null || !isFinite(+v)) ? '—' : (typeof kunNum === 'function' ? kunNum(v, d == null ? 2 : d) : ne(Number(v).toFixed(d == null ? 2 : d))); }
+  function ne(v) { return typeof neNum === 'function' ? neNum(v == null ? '—' : v) : String(v == null ? '—' : v); }
+  function sign(n) { return typeof kunSignByNum === 'function' ? kunSignByNum(n) : ('राशि ' + n); }
+  function dms(v) {
+    if (typeof kunDMS === 'function') return kunDMS(v);
+    if (v == null || !isFinite(+v)) return '—';
+    const a = Math.abs(+v), d = Math.floor(a), mf = (a - d) * 60, m = Math.floor(mf), s = Math.round((mf - m) * 60);
+    return ne(d) + '°' + ne(String(m).padStart(2, '0')) + '′' + ne(String(s).padStart(2, '0')) + '″';
+  }
+  function pName(n) { return KUN_NE_ACTIVE[n] || n || '—'; }
+  function dt(iso) { return /^\d{4}-\d{2}-\d{2}/.test(String(iso || '')) ? (typeof kunDateNe === 'function' ? kunDateNe(iso) : iso) : '—'; }
   function bsText(s) {
     if (!s) return '—';
     if (/^\d{4}-\d{2}-\d{2}/.test(String(s))) return dt(s);
-    return kunBsShort(s);
+    return typeof kunBsShort === 'function' ? kunBsShort(s) : s;
   }
   /* Prefer the backend's BS value when it exists (format: BS YYYY-MM-DD);
      only convert from AD when the BS field is unavailable. */
   function bsOf(bs, ad) {
-    if (bs) return kunBsShort(bs);
+    if (bs) return (typeof kunBsShort === 'function' ? kunBsShort(bs) : bs);
     return ad ? dt(ad) : '—';
   }
   function range(a, b) { return bsText(a) + ' – ' + bsText(b); }
-  function houseName(h) { return KUN_HOUSE_NE[h] || '—'; }
-  function dignity(p) { return kunStateText(p) || '—'; }
-  function short(txt, n) { return kunFit(txt == null ? '—' : txt, n || 46); }
+  function houseName(h) { return KUN_HOUSE_NE_ACTIVE[h] || '—'; }
+  function dignity(p) { return typeof kunStateText === 'function' ? kunStateText(p) : '—'; }
+  function short(txt, n) { return typeof kunFit === 'function' ? kunFit(txt == null ? '—' : txt, n || 46) : String(txt || '').slice(0, n || 46); }
 
   function header(no, title, sub) {
-    /* Every model gets its own title composition. The heading is never
-       truncated: the font size is derived from the real title width. */
-    const m = MODEL.key;
-    let s = '', box = [L - 6, 88, W + 12, 90], st = null;
-    if (m === 'nebula') {
-      const fs = fitTitle(title, 552, 33);
-      s += T(360, 104, '✦  नेबुला ज्योतिष  ✦', 13, MODEL.colors.dim, 600, 'middle');
-      s += T(360, 146, title, fs, GOLD, 700, 'middle');
-      s += '<line x1="58" y1="166" x2="300" y2="166" stroke="' + GOLD2 + '" stroke-opacity=".40" stroke-width="1.2"/>';
-      s += '<line x1="420" y1="166" x2="662" y2="166" stroke="' + GOLD2 + '" stroke-opacity=".40" stroke-width="1.2"/>';
-      s += '<rect x="354" y="161" width="12" height="10" rx="2" transform="rotate(45 360 166)" fill="' + GOLD + '" opacity=".7"/>';
-      box = [L - 6, 84, W + 12, 94];
-      st = { x: 360, y: 146, size: fs, color: GOLD, weight: 700, single: true, anchor: 'middle' };
-    } else if (m === 'vedic') {
-      const fs = fitTitle(title, 492, 31);
-      s += '<rect x="58" y="94" width="604" height="78" rx="7" fill="' + MODEL.colors.panel + '" stroke="' + GOLD2 + '" stroke-opacity=".62" stroke-width="1.6"/>';
-      s += '<rect x="65" y="101" width="590" height="64" rx="4" fill="none" stroke="' + GOLD2 + '" stroke-opacity=".30" stroke-width="1"/>';
-      s += T(76, 137, '॥', 17, GOLD2, 700);
-      s += T(644, 137, '॥', 17, GOLD2, 700, 'end');
-      s += T(360, 143, title, fs, GOLD, 700, 'middle');
-      s += '<circle cx="360" cy="181" r="3" fill="' + GOLD2 + '"/><circle cx="348" cy="181" r="2" fill="' + GOLD2 + '" opacity=".6"/><circle cx="372" cy="181" r="2" fill="' + GOLD2 + '" opacity=".6"/>';
-      box = [L - 6, 88, W + 12, 98];
-      st = { x: 360, y: 143, size: fs, color: GOLD, weight: 700, single: true, anchor: 'middle' };
-    } else if (m === 'orbit') {
-      const fs = fitTitle(title, 486, 32);
-      s += '<path d="M58 100h24M58 100v54" fill="none" stroke="' + GOLD + '" stroke-width="2.4" stroke-linecap="round"/>';
-      s += '<path d="M662 100h-24M662 100v54" fill="none" stroke="' + GOLD + '" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>';
-      s += T(78, 114, '◈  अटो मोड्युल ' + ne(no), 12.5, MODEL.colors.dim, 700);
-      s += T(78, 153, title, fs, GOLD, 700);
-      s += '<line x1="58" y1="170" x2="662" y2="170" stroke="' + GOLD + '" stroke-opacity=".22" stroke-width="1.2"/>';
-      s += '<rect x="58" y="178" width="46" height="3" rx="1.5" fill="' + MODEL.colors.accent2 + '"/>';
-      s += '<rect x="110" y="178" width="8" height="3" rx="1.5" fill="' + GOLD + '" opacity=".6"/>';
-      box = [L - 6, 88, W + 12, 98];
-      st = { x: 78, y: 153, size: fs, color: GOLD, weight: 700, single: true };
+    const n = String(title || '').length;
+    const fs = n <= 20 ? 32 : n <= 26 ? 28 : n <= 32 ? 25 : 22;
+    let s = '<rect x="' + L + '" y="94" width="56" height="4" rx="2" fill="' + GOLD2 + '"/>';
+    s += '<circle cx="636" cy="96" r="3.2" fill="' + GOLD + '" opacity=".65"/>';
+    s += '<circle cx="650" cy="96" r="1.8" fill="' + GOLD + '" opacity=".35"/>';
+    s += T(L, 136, title, fs, GOLD, 700);
+    if (sub) {
+      s += T(L, 160, sub, 13.5, MUT, 500);
+      s += '<line x1="' + L + '" y1="174" x2="' + R + '" y2="174" stroke="' + GOLD2 + '" stroke-opacity=".28" stroke-width="1.3"/>';
     } else {
-      const n = String(title || '').length;
-      const fs = n <= 24 ? 34 : n <= 29 ? 30 : n <= 34 ? 27 : n <= 40 ? 23 : 20;
-      s += '<rect x="' + L + '" y="96" width="54" height="4" rx="2" fill="' + GOLD2 + '"/>';
-      s += '<circle cx="636" cy="99" r="3.2" fill="' + GOLD + '" opacity=".65"/>';
-      s += '<circle cx="650" cy="99" r="1.8" fill="' + GOLD + '" opacity=".35"/>';
-      s += T(L, 138, title, fs, GOLD, 700);
-      s += '<line x1="' + L + '" y1="168" x2="' + R + '" y2="168" stroke="' + GOLD2 + '" stroke-opacity=".30" stroke-width="1.4"/>';
-      st = { x: L, y: 138, size: fs, color: GOLD, weight: 700, single: true };
+      s += '<line x1="' + L + '" y1="154" x2="' + R + '" y2="154" stroke="' + GOLD2 + '" stroke-opacity=".28" stroke-width="1.3"/>';
     }
+    const box = [L - 6, 88, W + 12, sub ? 96 : 82];
+    const st = { x: L, y: 136, size: fs, color: GOLD, weight: 700, single: true };
     return el(no, title, 'heading', 'शीर्षक — ' + title, box, s, 5.4, { editable: true, textStyle: st, defaultText: title });
   }
   function pz(el, id, label, x, y, w, h) {
@@ -563,7 +467,18 @@
 
   /* ── real data helpers ─────────────────────────────────────────── */
 
-  function findPlanet(data, name) { return (data.planets || []).find(p => p.name === name) || {}; }
+  function getPlanetsList(data) {
+    if (!data || !data.planets) return [];
+    if (Array.isArray(data.planets)) return data.planets;
+    if (typeof data.planets === 'object') {
+      return Object.keys(data.planets).map(k => Object.assign({ name: k, planet: k }, data.planets[k]));
+    }
+    return [];
+  }
+  function findPlanet(data, name) {
+    const list = getPlanetsList(data);
+    return list.find(p => p.name === name || p.planet === name) || {};
+  }
   function lagnaSignOf(data) { return +((data.lagna || {}).sign_number) || 1; }
 
   function activeVim(data) {
@@ -669,7 +584,24 @@
      is the only case that falls back to a word boundary, so no sentence is
      ever cut just because a page happened to end. */
   function flowWrap(txt, chars) {
-    return kunWrap(String(txt == null ? '' : txt).replace(/\s+/g, ' ').trim(), Math.max(8, Math.floor(chars || 40)));
+    if (typeof kunWrap === 'function') {
+      return kunWrap(String(txt == null ? '' : txt).replace(/\s+/g, ' ').trim(), Math.max(8, Math.floor(chars || 40)));
+    }
+    const str = String(txt == null ? '' : txt).replace(/\s+/g, ' ').trim();
+    const max = Math.max(8, Math.floor(chars || 40));
+    const words = str.split(' ');
+    const lines = [];
+    let cur = '';
+    for (const w of words) {
+      if ((cur + ' ' + w).trim().length > max) {
+        if (cur) lines.push(cur);
+        cur = w;
+      } else {
+        cur = (cur + ' ' + w).trim();
+      }
+    }
+    if (cur) lines.push(cur);
+    return lines;
   }
   function flowSentences(txt) {
     const s = String(txt == null ? '' : txt).replace(/\r/g, '').replace(/[ \t]+/g, ' ').trim();
@@ -837,7 +769,7 @@
     ALIAS = aliasMap(MODEL.colors);
     const transit = opts.transit || null;
     const items = [];
-    const planets = data.planets || [];
+    const planets = getPlanetsList(data);
     const lagna = data.lagna || {};
     const ls = lagnaSignOf(data);
     const moon = findPlanet(data, 'Moon');
@@ -937,162 +869,231 @@
       }
     };
 
-    /* 01 — name, BS date/time/place, heading, then D1 at the bottom */
-    {
-      const no = 1, title = 'जन्म कुण्डली';
-      const houses = kunHouses(planets, ls, 'd1');
-      const chipW = 190, gap = 17, x0 = L + (W - (chipW * 3 + gap * 2)) / 2;
-      const chip = (i, label, value, accent) => card(no, title, label, x0 + i * (chipW + gap), 878, chipW, 116, label, value, accent, { fs: 20, chars: 11, lh: 27, lfs: 13, vtop: 62, lines: 2 });
-      /* Fit the name inside the fixed privacy rect, not just inside the card.
-         A long name must never extend past the blurred band. */
-      const nameFs = fitFlowSize(name, 452, 40, 12.5);
-      const nameEl = pz(el(no, title, 'heading', 'जातकको नाम', [L, 100, W, 80], T(360, 150, name, nameFs, GOLD, 700, 'middle'), 5.8, { editable: true, textStyle: { x: 360, y: 150, size: nameFs, color: GOLD, weight: 700, single: true, anchor: 'middle' }, defaultText: name }), 'name', 'जातकको नाम (मुख्य शीर्षक)', 122, 108, 476, 70);
-      const coords = 'अक्षांश ' + num(meta.latitude, 4) + '°  ·  देशान्तर ' + num(meta.longitude, 4) + '°';
-      push(no, title, 'जन्म परिचय', [
-        el(no, title, 'caption', 'शीर्षक रेखा', [L, 84, W, 22],
-          '<rect x="334" y="92" width="52" height="4" rx="2" fill="' + GOLD2 + '"/>', 5.2, { editable: false }),
-        nameEl,
-        el(no, title, 'caption', 'जन्म मिति र समय', [L, 171, W, 36], T(360, 192, dateLine, 18, INK, 600, 'middle'), 5.4, { editable: true, textStyle: { x: 360, y: 192, size: 18, color: INK, weight: 600, single: true, anchor: 'middle' }, defaultText: dateLine }),
-        el(no, title, 'caption', 'जन्म स्थान', [L, 210, W, 30], T(360, 228, place, 14.5, MUT, 500, 'middle'), 5.4, { editable: true, textStyle: { x: 360, y: 228, size: 14.5, color: MUT, weight: 500, single: true, anchor: 'middle' }, defaultText: place }),
-        el(no, title, 'heading', 'जन्म कुण्डली शीर्षक', [L, 248, W, 58],
-          '<line x1="200" y1="277" x2="316" y2="277" stroke="' + GOLD2 + '" stroke-opacity=".5" stroke-width="1.3"/>' +
-          '<line x1="404" y1="277" x2="520" y2="277" stroke="' + GOLD2 + '" stroke-opacity=".5" stroke-width="1.3"/>' +
-          T(360, 281, 'जन्म कुण्डली', 30, GOLD, 700, 'middle'), 6, { editable: true, textStyle: { x: 360, y: 281, size: 30, color: GOLD, weight: 700, single: true, anchor: 'middle' }, defaultText: 'जन्म कुण्डली' }),
-        artEl(no, title, 'सूर्य-चन्द्र मण्डल', [82, 306, 556, 556], (() => {
-          let s = '<circle cx="360" cy="584" r="238" fill="none" stroke="' + GOLD2 + '" stroke-opacity=".18" stroke-width="2"/>';
-          for (let i = 0; i < 24; i++) {
-            const a = (i * 15 - 90) * Math.PI / 180;
-            s += '<circle cx="' + (360 + 238 * Math.cos(a)) + '" cy="' + (584 + 238 * Math.sin(a)) + '" r="' + (i % 6 === 0 ? 4 : 2) + '" fill="' + GOLD + '" opacity="' + (i % 6 === 0 ? .65 : .28) + '"/>';
-          }
-          s += T(360, 362, 'ॐ', 36, GOLD, 700, 'middle');
-          return s;
-        })(), 7.4),
-        chart(no, title, 'लग्न कुण्डली D1', houses, ls, 82, 310, 556),
-        chip(0, 'लग्न राशि', sign(ls) + ' · ' + kunDMS(lagna.longitude_in_sign || 0), GOLD2),
-        chip(1, 'चन्द्र राशि', sign(moon.sign_number || 1) + ' · ' + (moon.nakshatra_nepali || '—'), '#6ee7ff'),
-        chip(2, 'जन्म नक्षत्र', (moon.nakshatra_nepali || '—') + ' · पद ' + ne(moon.nakshatra_pada || '—'), '#c4b5fd'),
-        note(no, title, 'जन्म निर्देशांक', [L, 1000, W, 44], coords, { size: 14.5, lh: 20, lines: 1, color: MUT }),
-        footer(no, title)
-      ], { priority: ORDER.birth, privacyStyle: 'strong' });
-    }
+    /* ═══════════════════════════════════════════════════════════════
+       ११ पूर्ण स्वचालित कार्डहरू (11 CANONICAL AUTOMATIC CARDS)
+       ═══════════════════════════════════════════════════════════════ */
 
-    /* 02 — karaka / maraka / sama (own card for readability) */
+    /* ── CARD 01: जन्म विवरण (Birth Details & Entry Form with Animated Space BG) ── */
     {
-      const no = 2, title = 'ग्रह सम्बन्ध';
-      const groups = { karaka: [], maraka: [], sama: [] };
-      planets.forEach(p => { const k = (p.relationship || '').toLowerCase(); if (groups[k]) groups[k].push(pName(p.name)); });
-      const relRows = [
-        ['कारक', groups.karaka, GOOD, 'शुभ फल दिने ग्रह'],
-        ['मारक', groups.maraka, BAD, 'चुनौती वा हानिसँग जोडिने ग्रह'],
-        ['सम', groups.sama, '#60a5fa', 'सन्तुलित प्रभाव दिने ग्रह']
-      ];
-      const rowEl = (i, label, list, accent, meaning) => el(no, title, 'cards', label + ' ग्रह पङ्क्ति', [L, 206 + i * 156, W, 144], (() => {
-        let s = '<rect x="' + L + '" y="' + (206 + i * 156) + '" width="' + W + '" height="144" rx="15" fill="#0d1830" stroke="' + accent + '" stroke-opacity=".38" stroke-width="1.4"/>';
-        s += '<rect x="' + L + '" y="' + (216 + i * 156) + '" width="5" height="124" rx="2.5" fill="' + accent + '"/>';
-        s += T(L + 24, 242 + i * 156, label, 20, accent, 700);
-        s += T(L + 24, 270 + i * 156, meaning, 13.5, DIM, 600);
-        s += T(R - 24, 242 + i * 156, ne(list.length) + ' ग्रह', 14, MUT, 600, 'end');
-        s += P(L + 24, 308 + i * 156, list.length ? list.join(', ') : 'कुनै ग्रह यो वर्गमा छैन', Math.max(24, Math.floor((W - 48) / 9.6)), 18, 27, INK, 2);
+      const no = 1, title = 'जन्म विवरण';
+      const nameFs = fitFlowSize(name, 452, 40, 22);
+      const coords = 'अक्षांश: ' + num(meta.latitude, 4) + '°  ·  देशान्तर: ' + num(meta.longitude, 4) + '°';
+      const fName = meta.father_name || (data.metadata || {}).father_name || '';
+      const mName = meta.mother_name || (data.metadata || {}).mother_name || '';
+      const gotra = meta.gotra || (data.metadata || {}).gotra || '';
+      const adDate = meta.birth_date || (data.metadata || {}).birth_date || '';
+
+      const spaceArt = (() => {
+        let s = '<defs>';
+        s += '<radialGradient id="spcGlow" cx="50%" cy="45%" r="60%"><stop offset="0%" stop-color="#f6d365" stop-opacity=".22"/><stop offset="35%" stop-color="#3b82f6" stop-opacity=".15"/><stop offset="85%" stop-color="#050b18" stop-opacity="0"/></radialGradient>';
+        s += '<linearGradient id="orbG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f6d365" stop-opacity=".65"/><stop offset="100%" stop-color="#38bdf8" stop-opacity=".25"/></linearGradient>';
+        s += '</defs>';
+        s += '<rect x="' + L + '" y="80" width="' + W + '" height="940" rx="24" fill="url(#spcGlow)"/>';
+        const stars = [
+          [90, 110, 2.4, .85], [160, 130, 1.6, .5], [230, 95, 2.8, .9], [320, 115, 1.8, .6], [500, 105, 2.5, .85], [590, 125, 1.8, .6],
+          [78, 230, 1.5, .5], [626, 210, 2.4, .8], [98, 370, 2.0, .7], [612, 390, 1.8, .6], [88, 520, 2.2, .75], [632, 540, 2.0, .7],
+          [82, 690, 1.7, .6], [618, 710, 2.6, .85], [105, 860, 2.0, .7], [604, 880, 1.6, .5], [240, 960, 2.4, .8], [480, 950, 2.0, .7],
+          [135, 460, 1.4, .4], [575, 480, 1.6, .5], [175, 640, 2.1, .7], [535, 660, 1.8, .6], [360, 120, 3.2, .95]
+        ];
+        stars.forEach(st => {
+          s += '<circle cx="' + st[0] + '" cy="' + st[1] + '" r="' + st[2] + '" fill="#ffffff" opacity="' + st[3] + '"/>';
+        });
+        s += '<ellipse cx="360" cy="510" rx="275" ry="115" fill="none" stroke="url(#orbG1)" stroke-width="1.6" stroke-dasharray="7 5" transform="rotate(-18 360 510)"/>';
+        s += '<ellipse cx="360" cy="510" rx="225" ry="88" fill="none" stroke="' + GOLD2 + '" stroke-opacity=".32" stroke-width="1.3" transform="rotate(22 360 510)"/>';
+        s += '<ellipse cx="360" cy="510" rx="165" ry="62" fill="none" stroke="#60a5fa" stroke-opacity=".38" stroke-width="1.2"/>';
+        const pls = [
+          [170, 475, 7.5, GOLD], [545, 570, 6.5, '#6ee7ff'], [235, 550, 5.5, '#fb7185'],
+          [480, 465, 5.2, '#34d399'], [360, 445, 8.0, '#fbbf24'], [430, 595, 6.8, '#c4b5fd'], [275, 460, 6.2, '#60a5fa']
+        ];
+        pls.forEach(p => {
+          s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (p[2] + 4) + '" fill="' + p[3] + '" opacity=".22"/>';
+          s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + p[2] + '" fill="' + p[3] + '"/>';
+        });
         return s;
-      })(), 7.4);
-      push(no, title, 'ग्रह सम्बन्ध', [
-        header(no, title, 'कारक · मारक · सम'),
-        rowEl(0, 'कारक', groups.karaka, GOOD, 'शुभ फल दिने ग्रह'),
-        rowEl(1, 'मारक', groups.maraka, BAD, 'चुनौती वा हानिसँग जोडिने ग्रह'),
-        rowEl(2, 'सम', groups.sama, '#60a5fa', 'सन्तुलित प्रभाव दिने ग्रह'),
-        el(no, title, 'report', 'ग्रह सम्बन्ध व्याख्या', [L, 684, W, 190], (() => {
-          let s = '<rect x="' + L + '" y="684" width="' + W + '" height="190" rx="16" fill="#0d1830" stroke="' + GOLD2 + '" stroke-opacity=".32" stroke-width="1.4"/>';
-          s += '<rect x="' + L + '" y="696" width="4" height="166" rx="2" fill="' + GOLD2 + '"/>';
-          s += T(L + 24, 714, 'वर्गीकरणको अर्थ', 16, MUT, 700);
-          s += T(L + 24, 754, 'कारक', 16.5, GOOD, 700);
-          s += T(L + 118, 754, 'शुभ फल दिने', 16, INK, 500);
-          s += T(L + 24, 792, 'मारक', 16.5, BAD, 700);
-          s += T(L + 118, 792, 'चुनौती / हानि सम्बन्धी', 16, INK, 500);
-          s += T(L + 24, 830, 'सम', 16.5, '#60a5fa', 700);
-          s += T(L + 118, 830, 'सन्तुलित प्रभाव', 16, INK, 500);
-          s += T(R - 24, 714, 'कुल ' + ne(groups.karaka.length + groups.maraka.length + groups.sama.length) + ' ग्रह', 13.5, DIM, 600, 'end');
-          s += T(R - 24, 858, 'स्रोत: Kundali-Desktop · relationship', 12.5, DIM, 500, 'end');
-          return s;
-        })(), 8),
+      })();
+
+      const infoBox = (() => {
+        let s = '';
+        s += '<circle cx="360" cy="118" r="28" fill="#12233f" stroke="' + GOLD + '" stroke-opacity=".5" stroke-width="1.4"/>';
+        s += T(360, 118, 'ॐ', 28, GOLD, 700, 'middle');
+        s += T(360, 168, name, nameFs, GOLD, 700, 'middle');
+        s += T(360, 198, '॥ वैदिक जन्म पत्रिका विवरण ॥', 15.5, MUT, 600, 'middle');
+        s += '<line x1="200" y1="214" x2="520" y2="214" stroke="' + GOLD2 + '" stroke-opacity=".35" stroke-width="1.4"/>';
+
+        const fields = [
+          ['📅', 'जन्म मिति', dateBs + (adDate ? '  (ई.सं. ' + adDate + ')' : ''), GOLD],
+          ['⏰', 'जन्म समय', timeNe, '#6ee7ff'],
+          ['📍', 'जन्म स्थान', place, '#34d399'],
+          ['🌐', 'भौगोलिक स्थिति', coords, '#c4b5fd']
+        ];
+        fields.forEach((f, idx) => {
+          const fy = 236 + idx * 102;
+          s += '<rect x="' + L + '" y="' + fy + '" width="' + W + '" height="90" rx="16" fill="#0c1830" stroke="' + f[3] + '" stroke-opacity=".35" stroke-width="1.3"/>';
+          s += '<rect x="' + L + '" y="' + (fy + 14) + '" width="5" height="62" rx="2.5" fill="' + f[3] + '"/>';
+          s += T(L + 24, fy + 32, f[0] + '  ' + f[1], 15.5, MUT, 600);
+          s += T(L + 24, fy + 68, f[2], 21, INK, 700);
+        });
+
+        const extraList = [];
+        if (fName) extraList.push('बुबा: ' + fName);
+        if (mName) extraList.push('आमा: ' + mName);
+        if (gotra) extraList.push('गोत्र: ' + gotra);
+        if (extraList.length) {
+          s += '<rect x="' + L + '" y="654" width="' + W + '" height="60" rx="14" fill="#0d1f3c" stroke="#223052" stroke-width="1"/>';
+          s += T(360, 688, extraList.join('   ·   '), 15.5, '#e9eefb', 600, 'middle');
+        }
+
+        const cy = extraList.length ? 730 : 660;
+        const cw = 190, cg = 17;
+        const chips = [
+          ['लग्न राशि', sign(ls) + ' · ' + dms(lagna.longitude_in_sign || 0), GOLD2],
+          ['चन्द्र राशि', sign(moon.sign_number || 1) + ' · ' + (moon.nakshatra_nepali || '—'), '#6ee7ff'],
+          ['जन्म नक्षत्र', (moon.nakshatra_nepali || '—') + ' · पद ' + ne(moon.nakshatra_pada || '१'), '#c4b5fd']
+        ];
+        chips.forEach((c, i) => {
+          const cx = L + i * (cw + cg);
+          s += '<rect x="' + cx + '" y="' + cy + '" width="' + cw + '" height="110" rx="14" fill="#0d1830" stroke="' + c[2] + '" stroke-opacity=".4" stroke-width="1.3"/>';
+          s += '<rect x="' + cx + '" y="' + (cy + 10) + '" width="4" height="90" rx="2" fill="' + c[2] + '"/>';
+          s += T(cx + 16, cy + 34, c[0], 13.5, MUT, 600);
+          s += T(cx + 16, cy + 72, c[1], 17.5, INK, 700);
+        });
+
+        return s;
+      })();
+
+      push(no, title, 'जन्म परिचय', [
+        artEl(no, title, 'अन्तरिक्ष पृष्ठभूमि कला', [L, 80, W, 940], spaceArt, 7.8),
+        el(no, title, 'report', 'जन्म विवरण फाराम', [L, 90, W, 880], infoBox, 8.4),
         footer(no, title)
-      ], { priority: ORDER.relation, key: 'card-02' });
+      ], { priority: ORDER.birth, key: 'card-01', privacyStyle: 'strong' });
     }
 
-    /* 02b — Sade Sati + Kaal Sarp as their own readable card */
+    /* ── CARD 02: अवकाहडा चक्र (Avakahada Chakra Details) ── */
     {
-      const no = 2, title = 'साढे साती र कालसर्प';
-      const ss = sadeSati(data, transit);
-      const ssBody = (ss.known ? ('वर्तमान शनि गोचर: ' + sign(ss.saturnSign) + ' (' + (transit.current.start ? dt(String(transit.current.start).slice(0, 10)) : '—') + ' – ' + (transit.current.end ? dt(String(transit.current.end).slice(0, 10)) : '—') + ')\n') : '') + ss.text;
-      const kNarr = K.narrative_ne || (K.present ? ('कालसर्प दोष सक्रिय छ — ' + (K.type || '') + '।') : 'कालसर्प दोष सम्बन्धी विवरण उपलब्ध छैन।');
-      const kBody = (K.present && !/सक्रिय/.test(kNarr) ? 'कालसर्प दोष सक्रिय छ।\n' : '') + short(kNarr, 260);
-      push(no, title, 'साढे साती र कालसर्प', [
-        header(no, title, 'शनि गोचर · कालसर्प दोष'),
-        el(no, title, 'report', 'साढे साती कार्ड', [L, 208, W, 268], (() => {
-          const col = ss.phase.indexOf('सक्रिय छैन') >= 0 ? GOOD : MID;
-          let s = '<rect x="' + L + '" y="208" width="' + W + '" height="268" rx="16" fill="#0d1830" stroke="' + col + '" stroke-opacity=".45" stroke-width="1.6"/>';
-          s += '<rect x="' + L + '" y="220" width="4" height="244" rx="2" fill="' + col + '"/>';
-          s += T(L + 24, 244, 'साढे साती · शनि गोचर', 16, MUT, 600);
-          s += T(L + 24, 288, ss.phase, 30, col === GOOD ? GOOD : GOLD, 700);
-          s += P(L + 24, 328, ssBody, 52, 16, 24, MUT, 4);
-          s += T(R - 22, 244, 'चन्द्र: ' + sign(ss.moonSign) + (ss.known ? ' · शनि: ' + sign(ss.saturnSign) : ''), 13.5, DIM, 600, 'end');
-          return s;
-        })(), 8.6),
-        el(no, title, 'report', 'कालसर्प कार्ड', [L, 492, W, 268], (() => {
-          const col = K.present ? BAD : GOOD;
-          let s = '<rect x="' + L + '" y="492" width="' + W + '" height="268" rx="16" fill="#0d1830" stroke="' + col + '" stroke-opacity=".45" stroke-width="1.6"/>';
-          s += '<rect x="' + L + '" y="504" width="4" height="244" rx="2" fill="' + col + '"/>';
-          s += T(L + 24, 528, 'कालसर्प दोष', 16, MUT, 600);
-          s += T(L + 24, 572, K.present ? 'सक्रिय' : 'छैन', 31, col, 700);
-          s += P(L + 24, 612, kBody, 52, 15.5, 24, MUT, 5);
-          return s;
-        })(), 8.6),
-        note(no, title, 'गोचर तथा दोष नोट', [L, 776, W, 92], 'साढे साती शनिको गोचरमा आधारित छ; कालसर्प दोषको विवरण Kundali-Desktop को kaal_sarp_dosha बाट लिइएको हो।', { size: 14, lh: 21, lines: 3 }),
-        footer(no, title)
-      ], { priority: ORDER.sadeSati, key: 'card-02b' });
-    }
+      const no = 2, title = 'अवकाहडा चक्र';
+      const itemsGrid = [
+        ['जन्म राशि', av.rashi || sign(moon.sign_number || 1), GOLD, 'चन्द्रमा रहेको राशि'],
+        ['राशि स्वामी', av.rashi_lord || KUN_NE_ACTIVE[KUN_SIGN_LORD_ACTIVE[(moon.sign_number || 1) - 1]] || '—', '#6ee7ff', 'राशिको अधिपती ग्रह'],
+        ['जन्म नक्षत्र', (av.nakshatra || moon.nakshatra_nepali || '—') + ' (' + ne(av.pada || moon.nakshatra_pada || 1) + ' चरण)', '#c4b5fd', 'जन्मकालीन नक्षत्र'],
+        ['नक्षत्र स्वामी', KUN_NE_ACTIVE[moon.nakshatra_lord] || moon.nakshatra_lord || '—', '#34d399', 'नक्षत्रको ग्रह स्वामी'],
+        ['नामाक्षर', av.name_akshara || '—', GOLD2, 'राशिअनुसारको आदि अक्षर'],
+        ['वर्ण', av.varna || 'विप्र', '#60a5fa', 'प्रवृत्ति र कार्य तत्त्व'],
+        ['वश्य', av.vashya || 'जलचर', '#38bdf8', 'प्रकृतिको आकर्षण तत्त्व'],
+        ['योनि', (av.yoni || '—') + (av.viryoni ? ' (वैर: ' + av.viryoni + ')' : ''), '#f472b6', 'स्वभाव र जैविक प्रकृति'],
+        ['गण', av.gana || 'देव', '#a78bfa', 'विचार र मानसिक प्रकृति'],
+        ['नाडी', av.nadi || 'आदि', '#fbbf24', 'स्वास्थ्य र शारीरिक त्रिदोष'],
+        ['वर्ग / शत्रु', (av.varga || '—') + ' / ' + (av.shatru_varga || '—'), '#fb7185', 'नामाक्षर शत्रु/मित्र वर्ग'],
+        ['तिथि र करण', ((pc.tithi && (pc.tithi.nepali || pc.tithi.birth_nepali)) || '—') + ' · ' + ((pc.karana && pc.karana.nepali) || '—'), '#34d399', 'पञ्चाङ्ग तिथि र करण']
+      ];
 
-    /* 03 — planet strength */
-    {
-      const no = 3, title = 'ग्रह बल (षड्बल)';
-      const sb = data.shadbala || {}, sp = sb.planets || {};
-      const names = KUN_ORDER.slice(0, 7).filter(n => sp[n]);
-      let max = 1; names.forEach(n => { max = Math.max(max, +sp[n].total_rupas || 0, +sp[n].required_rupas || 0) }); max *= 1.12;
-      const rank = sb.ranking || names;
-      let bars = '';
-      names.forEach((n, i) => {
-        const p = sp[n], y = 360 + i * 84, v = +p.total_rupas || 0, req = +p.required_rupas || 0;
-        const col = p.is_strong ? GOOD : BAD;
-        const bx = 172, bw = 330;
-        bars += T(L + 4, y + 14, pName(n), 19, INK, 700);
-        bars += T(L + 4, y + 38, '#' + ne((rank.indexOf(n) + 1) || i + 1), 13, DIM, 500);
-        bars += '<rect x="' + bx + '" y="' + (y + 2) + '" width="' + bw + '" height="28" rx="14" fill="#0a1224" stroke="#223052" stroke-width="1"/>';
-        bars += '<rect x="' + bx + '" y="' + (y + 2) + '" width="' + Math.max(2, bw * v / max) + '" height="28" rx="14" fill="' + col + '"/>';
-        if (req > 0) bars += '<line x1="' + (bx + bw * req / max) + '" y1="' + (y - 3) + '" x2="' + (bx + bw * req / max) + '" y2="' + (y + 34) + '" stroke="' + GOLD + '" stroke-width="2" stroke-dasharray="4 4"/>';
-        bars += T(520, y + 18, num(v, 2) + ' रूप', 17, INK, 700);
-        bars += T(R - 4, y + 18, p.is_strong ? 'बलवान' : 'दुर्बल', 13, col, 700, 'end');
+      const bw = 292, bh = 108, gx = 20, gy = 14;
+      let gridSvg = '';
+      itemsGrid.forEach((it, idx) => {
+        const col = idx % 2, row = Math.floor(idx / 2);
+        const bx = L + col * (bw + gx), by = 196 + row * (bh + gy);
+        gridSvg += '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh + '" rx="14" fill="#0d1830" stroke="' + it[2] + '" stroke-opacity=".35" stroke-width="1.3"/>';
+        gridSvg += '<rect x="' + bx + '" y="' + (by + 12) + '" width="4" height="' + (bh - 24) + '" rx="2" fill="' + it[2] + '"/>';
+        gridSvg += T(bx + 18, by + 30, it[0], 14, MUT, 600);
+        gridSvg += T(bx + 18, by + 66, it[1], 19, INK, 700);
+        gridSvg += T(bx + 18, by + 94, it[3], 12, DIM, 500);
       });
-      const nodeNote = 'राहु/केतुको षड्बल यो backend प्रतिक्रियामा उपलब्ध छैन — ती दुईको मान “—” राखिएको छ।';
-      push(no, title, 'ग्रह बल', [
-        header(no, title, 'शुद्ध षड्बल · रूपमा कुल योग'),
-        card(no, title, 'सर्वाधिक बल', L, 210, 290, 108, 'सर्वाधिक बल', pName(sb.strongest) + ' · ' + num((sp[sb.strongest] || {}).total_rupas, 2) + ' रूप', GOOD, { fs: 20, chars: 17, lh: 26, lfs: 13.5 }),
-        card(no, title, 'सबैभन्दा कमजोर', L + 314, 210, 290, 108, 'सबैभन्दा कमजोर', pName(sb.weakest) + ' · ' + num((sp[sb.weakest] || {}).total_rupas, 2) + ' रूप', BAD, { fs: 20, chars: 17, lh: 26, lfs: 13.5 }),
-        graphEl(no, title, 'षड्बल बार चार्ट', [L, 338, W, 632], bars, 9.4),
-        note(no, title, 'षड्बल नोट', [L, 964, W, 90], 'हरियो = आवश्यक रूपभन्दा माथि, रातो = मुनि। सुनौलो थोप्लो = required रूप। ' + nodeNote, { size: 14, lh: 21, lines: 3 }),
+
+      push(no, title, 'अवकाहडा', [
+        header(no, title, 'अवकाहडा चक्र · १२ शास्त्रीय अङ्गहरूको विवरण'),
+        graphEl(no, title, 'अवकाहडा ग्रिड', [L, 192, W, 740], gridSvg, 8.8),
+        note(no, title, 'अवकाहडा नोट', [L, 946, W, 68], 'अवकाहडा चक्रले जातकको मूल प्रकृति, स्वभाव, विवाह-मेलापक (अष्टकूट) र दैनिक गुण निर्धारण गर्दछ।', { size: 14, lh: 21, lines: 2 }),
         footer(no, title)
-      ], { priority: ORDER.strength, key: 'card-03' });
+      ], { priority: ORDER.avakahada, key: 'card-02' });
     }
 
-    /* 04 — real 3D planet pillars: height = actual degree inside the sign */
+    /* ── CARD 03: सक्रिय विंशोत्तरी महादशा र अन्तर्दशा (Active Vimshottari Dasha) ── */
     {
-      const no = 4, title = 'ग्रह स्तम्भ';
-      const retro = planets.filter(p => p.is_retrograde).length;
-      const combust = planets.filter(p => p.is_combust).length;
-      const varg = planets.filter(p => p.is_vargottama).length;
-      const baseY = 786, minH = 38, maxH = 512, colW = 54, gap = 11;
+      const no = 3, title = 'सक्रिय विंशोत्तरी दशा';
+      const vim = dashas.length ? dashas : [];
+      const md = vim.find(x => +x.level === 1) || vim[0] || {};
+      const ad = vim.find(x => +x.level === 2) || {};
+      const rows = vim.slice(0, 5).map((x, i) => [['महादशा', 'अन्तर्दशा', 'प्रत्यन्तर', 'सूक्ष्म', 'प्राण'][i] || ('स्तर ' + ne(x.level)), x.lordNe || pName(x.lord), bsOf(x.startBs, x.start), bsOf(x.endBs, x.end)]);
+      if (!rows.length) rows.push(['महादशा', '—', '—', '—']);
+
+      const mdEffect = 'महादशा स्वामी ' + (md.lordNe || '—') + ' (' + lordEffect(data, md.lord) + ')। यस अवधिमा जातकको जीवनको मुख्य दिशा, दीर्घकालीन कर्म, प्रतिष्ठा र भाग्यको मूल प्रवाह निर्धारित हुन्छ।';
+      const adEffect = 'अन्तर्दशा स्वामी ' + (ad.lordNe || '—') + ' (' + lordEffect(data, ad.lord) + ')। वर्तमान समयमा दैनिक कार्य, पारिवारिक वातावरण, आम्दानी र तत्कालीन निर्णयहरू यसबाट प्रभावित छन्।';
+
+      push(no, title, 'विंशोत्तरी दशा', [
+        header(no, title, 'सक्रिय विंशोत्तरी महादशा र अन्तर्दशा · वि.सं. मिति र फल'),
+        dashaBox(no, title, 'सक्रिय महादशा', L, 196, 290, 164, 'सक्रिय महादशा', md.lordNe || '—', bsOf(md.startBs, md.start), bsOf(md.endBs, md.end), GOLD2),
+        dashaBox(no, title, 'सक्रिय अन्तर्दशा', L + 314, 196, 290, 164, 'सक्रिय अन्तर्दशा', ad.lordNe || '—', bsOf(ad.startBs, ad.start), bsOf(ad.endBs, ad.end), '#6ee7ff'),
+        el(no, title, 'report', 'महादशा प्रभाव विवरण', [L, 376, W, 140], (() => {
+          let s = '<rect x="' + L + '" y="376" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="' + GOLD2 + '" stroke-opacity=".38" stroke-width="1.3"/>';
+          s += T(L + 22, 404, 'महादशा प्रभाव · ' + (md.lordNe || '—'), 18, GOLD, 700);
+          s += P(L + 22, 434, mdEffect, 52, 15, 21, MUT, 4);
+          return s;
+        })(), 8.2),
+        el(no, title, 'report', 'अन्तर्दशा प्रभाव विवरण', [L, 528, W, 140], (() => {
+          let s = '<rect x="' + L + '" y="528" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="#6ee7ff" stroke-opacity=".35" stroke-width="1.3"/>';
+          s += T(L + 22, 556, 'अन्तर्दशा प्रभाव · ' + (ad.lordNe || '—'), 18, '#8be9ff', 700);
+          s += P(L + 22, 586, adEffect, 52, 15, 21, MUT, 4);
+          return s;
+        })(), 8.2),
+        table(no, title, 'विंशोत्तरी दशा स्तर तालिका', L, 682, W, [
+          { t: 'स्तर', w: 136 }, { t: 'दशा स्वामी', w: 134 }, { t: 'सुरु (वि.सं.)', w: 164 }, { t: 'अन्त्य (वि.सं.)', w: 170 }
+        ], rows, { rowH: 52, headH: 46, fs: 14.5, hfs: 13, align: ['left', 'left', 'left', 'left'] }, 9),
+        footer(no, title)
+      ], { priority: ORDER.vimshottari, key: 'card-03' });
+    }
+
+    /* ── CARD 04: सक्रिय योगिनी महादशा र अन्तर्दशा (Active Yogini Dasha) ── */
+    {
+      const no = 4, title = 'सक्रिय योगिनी दशा';
+      const md = yoginis.find(x => +x.level === 1) || {};
+      const ad = yoginis.find(x => +x.level === 2) || yoginis[1] || {};
+      const rows = yoginis.slice(0, 4).map((x, i) => [['योगिनी महादशा', 'योगिनी अन्तर्दशा', 'योगिनी प्रत्यन्तर', 'योगिनी सूक्ष्म'][i] || ('स्तर ' + ne(x.level)), (x.nameNe || '—') + ' (' + (x.lord ? pName(x.lord) : '—') + ')', bsOf(x.startBs, x.start), bsOf(x.endBs, x.end)]);
+      if (!rows.length) rows.push(['योगिनी महादशा', '—', '—', '—']);
+
+      const yoginiPhalMap = {
+        'Mangala': 'मङ्गला दशा (चन्द्र स्वामी) अत्यन्त शुभ मानिन्छ। यसले मनमा शान्ति, गृहसुख, नयाँ काममा सफलता र पारिवारिक सौहार्दता प्रदान गर्दछ।',
+        'Pingala': 'पिङ्गला दशा (सूर्य स्वामी) ले पराक्रम र मान-सम्मान बढाउँछ। स्वास्थ्य र क्रोधमा संयम अपनाउनु लाभदायक हुन्छ।',
+        'Dhanya': 'धान्या दशा (गुरु स्वामी) ले विद्या, धन-धान्य, ज्ञान र ईश्वरीय कृपा दिलाउँछ। आर्थिक संचयका लागि उत्तम समय रहन्छ।',
+        'Bhramari': 'भ्रामरी दशा (मङ्गल स्वामी) ले यात्रा, स्थान परिवर्तन र साहस बढाउँछ। हतारमा गरिने निर्णयबाट बच्नुपर्छ।',
+        'Bhadrika': 'भद्रिका दशा (बुध स्वामी) ले बुद्धि, व्यापार, अध्ययन र मित्रवर्गबाट लाभ गराउँछ। कार्यक्षेत्रमा बौद्धिक प्रगति हुन्छ।',
+        'Ulka': 'उल्का दशा (शनि स्वामी) ले कडा परिश्रम र धैर्यको माग गर्दछ। मुद्दा-मामिला र अनावश्यक दौडधुपबाट सतर्क रहनुपर्छ।',
+        'Siddha': 'सिद्धा दशा (शुक्र स्वामी) ले कार्यसिद्धि, भौतिक समृद्धि, विवाह वा प्रेम सम्बन्धमा अनुकूलता र यश दिलाउँछ।',
+        'Sankata': 'संकटा दशा (राहु स्वामी) मा विशेष सतर्कता र कुलदेवताको साधना आवश्यक हुन्छ। मानसिक शान्तिका लागि उपाय गर्नु उत्तम हुन्छ।'
+      };
+      const mdPhal = yoginiPhalMap[md.name] || ('योगिनी ' + (md.nameNe || '—') + ' (ग्रह ' + (md.lord ? pName(md.lord) : '—') + ') को चक्रीय प्रभाव सक्रिय छ। मन, कर्म र आत्मबलमा अनुकूल प्रभाव पर्नेछ।');
+      const adPhal = 'अन्तर्दशा ' + (ad.nameNe || '—') + (ad.lord ? ' (ग्रह ' + pName(ad.lord) + ')' : '') + ' ले तत्कालीन परिस्थिति, स्वास्थ्य र मनोबलमा योगिनीको फललाई प्रत्यक्ष रूपमा प्रकट गर्दछ।';
+
+      push(no, title, 'योगिनी दशा', [
+        header(no, title, 'सक्रिय योगिनी महादशा र अन्तर्दशा · वि.सं. मिति र फल'),
+        dashaBox(no, title, 'योगिनी महादशा', L, 196, 290, 164, 'योगिनी महादशा', (md.nameNe || '—') + ' (' + (md.lord ? pName(md.lord) : '—') + ')', bsOf(md.startBs, md.start), bsOf(md.endBs, md.end), '#c4b5fd'),
+        dashaBox(no, title, 'योगिनी अन्तर्दशा', L + 314, 196, 290, 164, 'योगिनी अन्तर्दशा', (ad.nameNe || '—') + ' (' + (ad.lord ? pName(ad.lord) : '—') + ')', bsOf(ad.startBs, ad.start), bsOf(ad.endBs, ad.end), GOOD),
+        el(no, title, 'report', 'योगिनी महादशा फल', [L, 376, W, 140], (() => {
+          let s = '<rect x="' + L + '" y="376" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="#c4b5fd" stroke-opacity=".35" stroke-width="1.3"/>';
+          s += T(L + 22, 404, 'महादशा प्रभाव · ' + (md.nameNe || '—'), 18, '#d8ccff', 700);
+          s += P(L + 22, 434, mdPhal, 52, 15, 21, MUT, 4);
+          return s;
+        })(), 8.2),
+        el(no, title, 'report', 'योगिनी अन्तर्दशा फल', [L, 528, W, 140], (() => {
+          let s = '<rect x="' + L + '" y="528" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="' + GOOD + '" stroke-opacity=".35" stroke-width="1.3"/>';
+          s += T(L + 22, 556, 'अन्तर्दशा प्रभाव · ' + (ad.nameNe || '—'), 18, '#b9f6d9', 700);
+          s += P(L + 22, 586, adPhal, 52, 15, 21, MUT, 4);
+          return s;
+        })(), 8.2),
+        table(no, title, 'योगिनी दशा तालिका', L, 682, W, [
+          { t: 'स्तर', w: 148 }, { t: 'योगिनी (स्वामी)', w: 172 }, { t: 'सुरु (वि.सं.)', w: 142 }, { t: 'अन्त्य (वि.सं.)', w: 142 }
+        ], rows, { rowH: 52, headH: 46, fs: 14, hfs: 13, align: ['left', 'left', 'left', 'left'] }, 9),
+        footer(no, title)
+      ], { priority: ORDER.yogini, key: 'card-04' });
+    }
+
+    /* ── CARD 05: ग्रह स्तम्भ (3D Bar Chart) + कारक / मारक / सम ग्रह ── */
+    {
+      const no = 5, title = 'ग्रह स्तम्भ र सम्बन्ध';
+      const baseY = 550, minH = 28, maxH = 340, colW = 54, gap = 11;
       const x0 = Math.round(L + (W - (colW * 9 + gap * 8)) / 2);
-      let cols = T(L, 214, 'स्तम्भको उचाइ = राशिभित्रको वास्तविक अंश (०–३०°)', 13.5, DIM, 500);
+
+      let cols = T(L, 196, 'स्तम्भको उचाइ = राशिभित्रको वास्तविक अंश (०°–३०°)', 14, DIM, 500);
       cols += '<line x1="' + L + '" y1="' + (baseY + 2) + '" x2="' + R + '" y2="' + (baseY + 2) + '" stroke="#2b3856" stroke-width="1.2"/>';
-      KUN_ORDER.forEach((n, i) => {
+      KUN_ORDER_ACTIVE.forEach((n, i) => {
         const p = planets.find(x => x.name === n);
         if (!p) return;
         const deg = Math.max(0, Math.min(30, +p.longitude_in_sign || 0));
@@ -1107,403 +1108,242 @@
         cols += '<rect x="' + x + '" y="' + y + '" width="' + colW + '" height="' + h + '" rx="3" fill="' + col + '" opacity=".82" stroke="' + col + '" stroke-opacity=".9"/>';
         cols += '<rect x="' + (x + 5) + '" y="' + (y + 9) + '" width="4" height="' + Math.max(6, h - 18) + '" rx="2" fill="#ffffff" opacity=".22"/>';
         cols += T(cx, y - 16, pName(n), 13.5, INK, 700, 'middle');
-        cols += T(cx, baseY + 23, sign(p.sign_number || 1), 12.5, MUT, 600, 'middle');
-        cols += T(cx, baseY + 43, kunDMS(deg).replace(/″$/, ''), 12.5, GOLD, 700, 'middle');
+        cols += T(cx, baseY + 22, sign(p.sign_number || 1), 12.5, MUT, 600, 'middle');
+        cols += T(cx, baseY + 42, dms(deg).replace(/″$/, ''), 12.5, GOLD, 700, 'middle');
       });
-      push(no, title, 'ग्रह स्तम्भ', [
-        header(no, title, 'नौ ग्रह — ३डी स्तम्भ, वास्तविक अंश र रङ'),
-        graphEl(no, title, '३डी ग्रह स्तम्भ चार्ट', [L, 196, W, 648], cols, 10.2),
-        card(no, title, 'वक्री ग्रह', L, 848, 192, 108, 'वक्री ग्रह', ne(retro) + ' ग्रह', '#6ee7ff', { fs: 22, chars: 10, lh: 27, lfs: 13.5 }),
-        card(no, title, 'अस्त ग्रह', L + 206, 848, 192, 108, 'अस्त ग्रह', ne(combust) + ' ग्रह', '#fbbf24', { fs: 22, chars: 10, lh: 27, lfs: 13.5 }),
-        card(no, title, 'वर्गोत्तम', L + 412, 848, 192, 108, 'वर्गोत्तम', ne(varg) + ' ग्रह', '#c4b5fd', { fs: 22, chars: 10, lh: 27, lfs: 13.5 }),
-        note(no, title, 'स्तम्भ व्याख्या', [L, 966, W, 84], 'हरियो = स्वराशि/मूलत्रिकोण, सुनौलो = उच्च, रातो = नीच, नीलो = सामान्य। उचाइ राशिभित्रको वास्तविक अंशबाट, नाम/राशि/अंश सबै Kundali-Desktop गणनाबाट लिइएका हुन्।', { size: 14, lh: 21, lines: 3 }),
-        footer(no, title)
-      ], { priority: ORDER.pillars, key: 'card-04' });
-    }
 
-    /* 05 — Vimshottari + Yogini dasha with BS dates */
-    {
-      const no = 5, title = 'महादशा, अन्तर्दशा र योगिनी दशा';
-      const vim = dashas.length ? dashas : [];
-      const md = vim.find(x => +x.level === 1) || vim[0] || {};
-      const ad = vim.find(x => +x.level === 2) || {};
-      const ymd = yoginis.find(x => +x.level === 1) || {};
-      const yad = yoginis.find(x => +x.level === 2) || yoginis[1] || {};
-      const rows = vim.slice(0, 5).map((x, i) => [['महादशा', 'अन्तर्दशा', 'प्रत्यन्तर्दशा', 'सूक्ष्मदशा', 'प्राणदशा'][i] || ('स्तर ' + ne(x.level)), x.lordNe || pName(x.lord), bsOf(x.startBs, x.start), bsOf(x.endBs, x.end)]);
-      if (!rows.length) rows.push(['महादशा', '—', '—', '—']);
-      push(no, title, 'दशा काल', [
-        header(no, title, 'विंशोत्तरी + योगिनी · वास्तविक BS मिति'),
-        dashaBox(no, title, 'विंशोत्तरी महादशा', L, 204, 290, 164, 'विंशोत्तरी महादशा', md.lordNe || '—', bsOf(md.startBs, md.start), bsOf(md.endBs, md.end), GOLD2),
-        dashaBox(no, title, 'विंशोत्तरी अन्तर्दशा', L + 314, 204, 290, 164, 'विंशोत्तरी अन्तर्दशा', ad.lordNe || '—', bsOf(ad.startBs, ad.start), bsOf(ad.endBs, ad.end), '#6ee7ff'),
-        dashaBox(no, title, 'योगिनी महादशा', L, 384, 290, 164, 'योगिनी महादशा', (ymd.nameNe || '—') + ' · ' + (ymd.lord ? pName(ymd.lord) : '—'), bsOf(ymd.startBs, ymd.start), bsOf(ymd.endBs, ymd.end), '#c4b5fd'),
-        dashaBox(no, title, 'योगिनी अन्तर्दशा', L + 314, 384, 290, 164, 'योगिनी अन्तर्दशा', yad.nameNe || '—', bsOf(yad.startBs, yad.start), bsOf(yad.endBs, yad.end), GOOD),
-        table(no, title, 'सक्रिय दशा स्तर तालिका', L, 568, W, [
-          { t: 'स्तर', w: 138 }, { t: 'दशा स्वामी', w: 134 }, { t: 'सुरु (BS)', w: 158 }, { t: 'अन्त्य (BS)', w: 174 }
-        ], rows, { rowH: 56, headH: 50, fs: 15, hfs: 13, align: ['left', 'left', 'left', 'left'] }, 9.4),
-        note(no, title, 'दशा नोट', [L, 912, W, 90], 'सबै मिति BS मा देखाइएका छन्; AD मिति आन्तरिक गणनाका लागि मात्र हो। सक्रिय दशा Kundali-Desktop को dasha_reports बाट लिइएको हो।', { size: 14, lh: 21, lines: 3 }),
-        footer(no, title)
-      ], { priority: ORDER.dasha, key: 'card-05' });
-    }
-
-    /* 06 — auspicious yogas, dynamically paginated by measured height.
-       Every yoga keeps its full result text. A long result continues on a
-       titled follow-up card at a sentence boundary; its number and category
-       carry over so the sequence stays continuous. */
-    const pushYogaFlow = (no, baseTitle, list, good, priority, keyBase, noteTxt, fallback) => {
-      const entries = (list || []).map((yg, i) => ({
-        no: i + 1,
-        name: yg.nepali || yg.name || 'योग',
-        category: yg.category || 'yoga',
-        body: yg.result_ne || yg.result || yg.cause_ne || '—',
-        accent: good ? (i % 2 ? '#22c55e' : GOLD2) : BAD
-      }));
-      const bodyLH = flowLineH(22);
-      const pages = entries.length ? paginateFlowRows(entries, {
-        firstTop: 318, nextTop: 206,
-        firstBottom: 962, nextBottom: 1048,
-        rowGap: 8, bodyChars: Math.max(24, Math.floor((W - 40) / 8.2)),
-        bodyLH: bodyLH, padTop: 10, padBottom: 6,
-        headerHeight: () => 34
-      }) : [[]];
-      const total = pages.length;
-      pages.forEach((rows, pi) => {
-        const first = pi === 0;
-        const pgTitle = flowPageTitle(baseTitle, pi + 1, total);
-        const listTop = first ? 318 : 206;
-        let inner = '';
-        if (rows.length) {
-          let y = listTop;
-          rows.forEach(row => { inner += yogaFlowRow(row, L, y, W, good); y += row.h + 8; });
-        } else {
-          inner = fallback;
-        }
-        const listH = rows.length ? rows.reduce((a, r) => a + r.h, 0) + (rows.length - 1) * 8 : 220;
-        const els = [header(no, pgTitle, good ? 'राज · धन · महापुरुष · चन्द्र योग' : 'दोष, अशुभ ग्रह र उपाय')];
-        if (first) els.push(card(no, pgTitle, good ? 'शुभ योग संख्या' : 'अशुभ योग संख्या', L, 204, W, 96, good ? 'कुल शुभ योग' : 'कुल अशुभ योग', ne(list.length) + ' योग' + (good ? ' · उच्च ' + ne(list.filter(y => /highly/.test(y.severity || '')).length) : ''), good ? GOOD : BAD, { fs: 23, chars: 22, lh: 28, lfs: 13.5 }));
-        els.push(graphEl(no, pgTitle, good ? 'शुभ योग सूची' : 'अशुभ संकेत सूची', [L, listTop - 6, W, listH + 12], inner, good ? 9.4 : 9.8));
-        if (first && rows.length) els.push(note(no, pgTitle, good ? 'योग स्रोत' : 'दोष नोट', [L, listTop + listH + 18, W, 68], noteTxt, { size: 13.5, lh: 20, lines: 2, color: good ? undefined : MODEL.colors.badMut }));
-        push(no, pgTitle, good ? 'शुभ योग' : 'अशुभ योग', els, {
-          priority: priority + pi * 0.5, key: pi ? keyBase + '-p' + (pi + 1) : keyBase,
-          flow: {
-            kind: good ? 'goodYoga' : 'badYoga', page: pi + 1, pages: total,
-            rows: rows.map(r => ({ no: r.src.no, name: r.src.name, category: r.src.category, cont: r.cont, lines: r.lines, body: r.body }))
-          }
-        });
+      const groups = { karaka: [], maraka: [], sama: [] };
+      planets.forEach(p => {
+        const k = (p.relationship || '').toLowerCase();
+        if (groups[k]) groups[k].push(pName(p.name));
       });
-    };
 
-    {
-      const no = 6, title = 'शुभ योगहरू';
-      const good = yogaRows(data.parashara_yogas, true);
-      const fallback = '<rect x="' + L + '" y="320" width="' + W + '" height="220" rx="16" fill="#0d1830" stroke="' + MID + '" stroke-opacity=".4"/><text x="360" y="410" text-anchor="middle" font-size="22" font-weight="700" fill="' + MID + '">कुनै शुभ योग भेटिएन</text><text x="360" y="448" text-anchor="middle" font-size="14" fill="' + MUT + '">यो कुण्डलीमा backend ले शुभ योग फेला पारेन।</text>';
-      pushYogaFlow(no, title, good, true, ORDER.goodYoga, 'card-06',
-        'परासर योग · Kundali-Desktop को parashara_yogas बाट; सबै उपस्थित शुभ योग, श्रेणी र फल वास्तविक प्रतिक्रियाबाट।', fallback);
-    }
-
-    /* 07 — inauspicious yogas / doshas use the same measured flow engine.
-       The Lal Kitab signals get their own card (07b). */
-    {
-      const no = 7, title = 'अशुभ योग र दोष';
-      const bad = yogaRows(data.parashara_yogas, false);
-      const fallback = '<rect x="' + L + '" y="320" width="' + W + '" height="220" rx="16" fill="#0d1830" stroke="' + GOOD + '" stroke-opacity=".45"/><text x="360" y="410" text-anchor="middle" font-size="22" font-weight="700" fill="' + GOOD + '">कुनै अशुभ योग भेटिएन</text><text x="360" y="448" text-anchor="middle" font-size="14" fill="' + MUT + '">backend को parashara_yogas मा अशुभ श्रेणीको योग छैन।</text>';
-      pushYogaFlow(no, title, bad, false, ORDER.badYoga, 'card-07',
-        'रातो बाकस = अशुभ संकेत। उपायका लागि Kundali-Desktop को remedies खण्ड हेर्नुहोस्।', fallback);
-    }
-
-    /* 07b — Lal Kitab signals on their own readable card. Long phal text is
-       split at sentence boundaries across continuous numbered pages. */
-    {
-      const no = 7, title = 'लालकिताब संकेत';
-      const lal = ((data.lal_kitab || {}).planet_status || []).slice();
-      const entries = lal.map(p => ({
-        name: p.name,
-        status: p.nek_manda || ((p.is_nek !== false) ? 'शुभ' : 'अशुभ'),
-        good: p.is_nek !== false,
-        body: p.phal || 'विवरण उपलब्ध छैन।'
-      }));
-      const bodyLH = flowLineH(20);
-      const pages = entries.length ? paginateFlowRows(entries, {
-        firstTop: 206, nextTop: 206,
-        firstBottom: 968, nextBottom: 1048,
-        rowGap: 6, bodyChars: Math.max(24, Math.floor((W - 44) / 8.2)),
-        bodyLH: bodyLH, padTop: 10, padBottom: 6,
-        headerHeight: () => 50
-      }) : [[]];
-      const total = pages.length;
-      pages.forEach((rows, pi) => {
-        const first = pi === 0;
-        const pgTitle = flowPageTitle(title, pi + 1, total);
-        let inner = '', y = 206;
-        if (rows.length) {
-          rows.forEach(row => { inner += lalFlowRow(row, L, y, W); y += row.h + 6; });
-        } else {
-          inner = '<rect x="' + L + '" y="206" width="' + W + '" height="150" rx="16" fill="#0d1830" stroke="' + MID + '" stroke-opacity=".4"/><text x="360" y="280" text-anchor="middle" font-size="21" font-weight="700" fill="' + MID + '">लालकिताब विवरण उपलब्ध छैन</text>';
-        }
-        const listH = rows.length ? rows.reduce((a, r) => a + r.h, 0) + (rows.length - 1) * 6 : 150;
-        const els = [
-          header(no, pgTitle, 'लालकिताब · शुभ/अशुभ ग्रह संकेत'),
-          graphEl(no, pgTitle, 'लालकिताब सूची', [L, 200, W, listH + 12], inner, 9.2)
+      const relBox = (() => {
+        let s = '';
+        const rows = [
+          ['कारक ग्रह (शुभ फलदायी)', groups.karaka.join('  ·  ') || 'कुनै छैन', GOOD, '#102a1e', 'उन्नति, प्रतिष्ठा र कार्यसिद्धि दिने सहयोगी ग्रहहरू'],
+          ['मारक ग्रह (सतर्कता चाहिने)', groups.maraka.join('  ·  ') || 'कुनै छैन', BAD, '#2a1018', 'स्वास्थ्य, खर्च र वादविवादमा सचेत रहनुपर्ने ग्रहहरू'],
+          ['सम ग्रह (तटस्थ/सन्तुलित)', groups.sama.join('  ·  ') || 'कुनै छैन', '#60a5fa', '#101e2e', 'सन्तुलित, निष्पक्ष र कर्म अनुसार फल दिने ग्रहहरू']
         ];
-        if (first) els.push(note(no, pgTitle, 'लालकिताब नोट', [L, 206 + listH + 12, W, 68], 'हरियो = शुभ (नेक), रातो = अशुभ (मन्द)। संकेत र फल Kundali-Desktop को lal_kitab.planet_status बाट।', { size: 13.5, lh: 20, lines: 2 }));
-        push(no, pgTitle, 'लालकिताब', els, {
-          priority: ORDER.lalKitab + pi * 0.5, key: pi ? 'card-07b-p' + (pi + 1) : 'card-07b',
-          flow: {
-            kind: 'lalKitab', page: pi + 1, pages: total,
-            rows: rows.map(r => ({ name: r.src.name, status: r.src.status, good: r.src.good, cont: r.cont, lines: r.lines, body: r.body }))
-          }
+        rows.forEach((r, idx) => {
+          const ry = 628 + idx * 114;
+          s += '<rect x="' + L + '" y="' + ry + '" width="' + W + '" height="102" rx="16" fill="' + r[3] + '" stroke="' + r[2] + '" stroke-opacity=".45" stroke-width="1.4"/>';
+          s += '<rect x="' + L + '" y="' + (ry + 14) + '" width="5" height="74" rx="2.5" fill="' + r[2] + '"/>';
+          s += T(L + 24, ry + 32, r[0], 16.5, r[2], 700);
+          s += T(L + 24, ry + 66, r[1], 21, INK, 700);
+          s += T(L + 24, ry + 90, r[4], 12.5, MUT, 500);
         });
-      });
-    }
+        return s;
+      })();
 
-    /* 08 — Navamsha (D9) on its own card */
-    {
-      const no = 8, title = 'नवमांश (D9)';
-      const d9 = (data.vargas || {}).D9 || {};
-      const d9l = +((d9.lagna || {}).sign_number) || 1;
-      const d9p = d9.planets || [];
-      const d9H = d9p.length ? kunHouses(d9p, d9l, 'd9') : {};
-      const d9Moon = d9p.find(p => p.name === 'Moon') || {};
-      let grid = '';
-      d9p.forEach((p, i) => {
-        const col = i % 2, row = Math.floor(i / 2);
-        const x = L + col * 312, y = 570 + row * 68;
-        grid += '<rect x="' + x + '" y="' + y + '" width="292" height="60" rx="10" fill="' + (i % 2 ? '#0d1830' : '#101d36') + '" stroke="#223052"/>';
-        grid += T(x + 14, y + 30, pName(p.name), 15.5, GOLD, 700);
-        grid += T(x + 90, y + 30, sign(p.sign_number) + ' · भाव ' + ne(p.house || '—'), 14, MUT, 500);
-        grid += T(x + 278, y + 30, short(dignity(p), 182), 12.5, DIM, 500, 'end');
-      });
-      push(no, title, 'D9', [
-        header(no, title, 'नवमांश · सूक्ष्म ग्रह · विवाह र भाग्य'),
-        chart(no, title, 'नवमांश चार्ट D9', d9H, d9l, L, 206, 360),
-        card(no, title, 'D9 लग्न', 430, 206, 232, 106, 'D9 लग्न', sign(d9l) + ' · ' + kunDMS((d9.lagna || {}).longitude_in_sign || 0), GOLD2, { fs: 18, chars: 13, lh: 22, lfs: 13.5, vtop: 54, lines: 2 }),
-        card(no, title, 'D9 चन्द्र', 430, 324, 232, 106, 'D9 चन्द्र', sign(d9Moon.sign_number || 1) + ' · भाव ' + ne(d9Moon.house || '—'), '#c4b5fd', { fs: 18, chars: 13, lh: 22, lfs: 13.5, vtop: 54, lines: 2 }),
-        card(no, title, 'D9 चन्द्र नक्षत्र', 430, 442, 232, 106, 'D9 चन्द्र नक्षत्र', (d9Moon.nakshatra_nepali || '—') + (d9Moon.nakshatra_pada ? ' · पद ' + ne(d9Moon.nakshatra_pada) : ''), GOOD, { fs: 17, chars: 14, lh: 22, lfs: 13.5, vtop: 54, lines: 2 }),
-        graphEl(no, title, 'D9 ग्रह सूची', [L, 564, W, Math.max(1, Math.ceil(d9p.length / 2)) * 68 + 12], grid, 9.2),
-        note(no, title, 'D9 व्याख्या', [L, 934, W, 70], 'D9 = विवाह, धर्म, भाग्य र सूक्ष्म ग्रहबल। सबै अंश, राशि र भाव Kundali-Desktop को D9 वर्गबाट लिइएका हुन्।', { size: 14, lh: 21, lines: 2 }),
+      push(no, title, 'ग्रह स्तम्भ', [
+        header(no, title, 'नौ ग्रह ३डी स्तम्भ र कारक, मारक, सम वर्गीकरण'),
+        graphEl(no, title, '३डी स्तम्भ चार्ट', [L, 186, W, 420], cols, 9.8),
+        el(no, title, 'report', 'कारक मारक सम प्यानल', [L, 620, W, 360], relBox, 8.4),
         footer(no, title)
-      ], { priority: ORDER.d9, key: 'card-08' });
+      ], { priority: ORDER.pillars, key: 'card-05' });
     }
 
-    /* 08b — Moon chart and lunar details on their own card */
+    /* ── CARD 06: यो वर्ष (This Year Forecast: Career, Love, Color, Gemstone, Number) ── */
     {
-      const no = 8, title = 'चन्द्र कुण्डली';
-      const moonH = kunHouses(planets, +moon.sign_number || 1, 'chandra');
-      const tithi = pc.tithi || {}, nak = pc.nakshatra || {};
-      const nakName = moon.nakshatra_nepali || nak.nepali || '—';
-      const nakPada = moon.nakshatra_pada || nak.pada;
-      const cw = 192, gap = 14, x0 = L + (W - (cw * 3 + gap * 2)) / 2;
-      const mcard = (i, label, value, accent, fs) => card(no, title, label, x0 + (i % 3) * (cw + gap), 660 + Math.floor(i / 3) * 128, cw, 118, label, value, accent, { fs: fs || 18, chars: 14, lh: 24, lfs: 13.5, vtop: 60, lines: 3 });
-      push(no, title, 'चन्द्र कुण्डली', [
-        header(no, title, 'चन्द्र लग्न · नक्षत्र · पक्ष'),
-        chart(no, title, 'चन्द्र कुण्डली चार्ट', moonH, +moon.sign_number || 1, 140, 206, 440),
-        mcard(0, 'चन्द्र राशि', sign(moon.sign_number || 1), '#6ee7ff'),
-        mcard(1, 'चन्द्र भाव', ne(moon.house || '—'), GOLD2),
-        mcard(2, 'चन्द्र अंश', kunDMS(moon.longitude_in_sign || 0).replace(/″$/, ''), '#c4b5fd', 17),
-        mcard(3, 'जन्म नक्षत्र', (nakName || '—') + (nakPada ? ' · पद ' + ne(nakPada) : ''), GOOD, 16.5),
-        mcard(4, 'नक्षत्र स्वामी', KUN_NE[moon.nakshatra_lord] || moon.nakshatra_lord || '—', '#60a5fa', 17),
-        mcard(5, 'तिथि र पक्ष', (tithi.birth_nepali || tithi.nepali || '—') + (tithi.paksha_nepali ? ' · ' + tithi.paksha_nepali : ''), MID, 15.5),
-        note(no, title, 'चन्द्र व्याख्या', [L, 918, W, 70], 'चन्द्र कुण्डलीमा चन्द्रलाई लग्न मानिएको छ। राशि, भाव, नक्षत्र, पद र स्वामी सबै वास्तविक जन्म विवरणबाट लिइएका हुन्।', { size: 14, lh: 21, lines: 2 }),
+      const no = 6, title = 'यो वर्षको कुण्डली फल';
+      const house10 = (((ls - 1) + 9) % 12) + 1;
+      const lord10 = KUN_SIGN_LORD_ACTIVE[house10 - 1];
+      const p10 = planets.find(x => x.name === lord10) || {};
+      const house7 = (((ls - 1) + 6) % 12) + 1;
+      const lord7 = KUN_SIGN_LORD_ACTIVE[house7 - 1];
+      const p7 = planets.find(x => x.name === lord7) || {};
+
+      const careerPhal = '१०औं भावेश ' + pName(lord10) + ' (' + sign(p10.sign_number || 1) + ' राशि) को प्रभावले कर्मक्षेत्रमा नयाँ अवसर, व्यापार-व्यवसायमा वृद्धि र लगनशीलताले प्रतिष्ठा प्राप्त हुने अनुकूल संकेत गर्दछ।';
+      const lovePhal = '७औं भावेश ' + pName(lord7) + ' र शुक्रको स्थितिले सम्बन्धमा समझदारी, पारिवारिक सामञ्जस्य र प्रियजनको सहयोग मिल्नेछ। बोली र व्यवहारमा नम्रता राख्नु लाभदायक हुन्छ।';
+
+      const lagnaLord = KUN_SIGN_LORD_ACTIVE[ls - 1];
+      const colorMap = {
+        'Sun': ['रातो तथा सुन्तला', '#ef4444'], 'Moon': ['सेतो तथा चम्किलो चाँदी', '#e2e8f0'],
+        'Mars': ['गाढा रातो तथा सिन्दुरे', '#dc2626'], 'Mercury': ['पन्ना हरियो', '#22c55e'],
+        'Jupiter': ['सुनौलो तथा पहेँलो', '#eab308'], 'Venus': ['सेतो, रेशमी तथा गुलाबी', '#f472b6'],
+        'Saturn': ['गाढा नीलो तथा कालो', '#3b82f6'], 'Rahu': ['धुवाँलो तथा नीलो', '#818cf8'], 'Ketu': ['बहुरङ्गी तथा पहेँलो', '#f59e0b']
+      };
+      const gemMap = {
+        'Sun': 'माणिक (Ruby)', 'Moon': 'मोती (Pearl)', 'Mars': 'मूँगा (Red Coral)',
+        'Mercury': 'पन्ना (Emerald)', 'Jupiter': 'पुखराज (Yellow Sapphire)', 'Venus': 'हीरा वा ओपल (Diamond)',
+        'Saturn': 'नीलम वा कटैला (Blue Sapphire)', 'Rahu': 'गोमेद (Hessonite)', 'Ketu': 'लहसुनिया (Cat\'s Eye)'
+      };
+      const numMap = { 'Sun': '१ र ९', 'Moon': '२ र ७', 'Mars': '९ र ३', 'Mercury': '५ र ६', 'Jupiter': '३, १ र ९', 'Venus': '६ र ५', 'Saturn': '८ र ४', 'Rahu': '४ र ८', 'Ketu': '७ र २' };
+
+      const myColor = colorMap[lagnaLord] || colorMap['Sun'];
+      const myGem = gemMap[lagnaLord] || 'माणिक';
+      const myNum = numMap[lagnaLord] || '१, ३, ५';
+
+      const forecastBox = (() => {
+        let s = '';
+        const items = [
+          ['💼 १. पेशा र आम्दानी', careerPhal, GOLD],
+          ['❤️ २. प्रेम सम्बन्ध', lovePhal, '#f472b6'],
+          ['🎨 ३. शुभ रंग', myColor[0] + ' (दैनिक कार्य तथा महत्वपूर्ण भेटघाटमा प्राथमिकता दिनुहोस्)', myColor[1]],
+          ['💎 ४. शुभ रत्न', myGem + ' (विज्ञ ज्योतिषीको सल्लाहमा विधिवत धारण गर्नुहोस्)', '#6ee7ff'],
+          ['🔢 ५. शुभ अंक', myNum + ' (नयाँ कार्य शुभारम्भ र शुभ निर्णयका लागि उत्तम अंक)', '#34d399']
+        ];
+        items.forEach((it, idx) => {
+          const iy = 196 + idx * 148;
+          s += '<rect x="' + L + '" y="' + iy + '" width="' + W + '" height="136" rx="16" fill="#0d1830" stroke="' + it[2] + '" stroke-opacity=".38" stroke-width="1.3"/>';
+          s += '<rect x="' + L + '" y="' + (iy + 14) + '" width="5" height="108" rx="2.5" fill="' + it[2] + '"/>';
+          s += T(L + 24, iy + 34, it[0], 18, it[2], 700);
+          s += P(L + 24, iy + 66, it[1], 52, 15, 22, INK, 3);
+        });
+        return s;
+      })();
+
+      push(no, title, 'यो वर्षको फल', [
+        header(no, title, '⭐ यो वर्ष — पेशा, प्रेम, शुभ रंग, रत्न र अंक'),
+        el(no, title, 'report', 'यो वर्ष फल सूची', [L, 192, W, 760], forecastBox, 9.4),
+        note(no, title, 'यो वर्ष नोट', [L, 956, W, 58], 'यो फल जन्मकालीन कुण्डली, भावेशको स्थिति र सक्रिय गोचरको आधारमा तयार गरिएको हो।', { size: 14, lh: 20, lines: 2 }),
         footer(no, title)
-      ], { priority: ORDER.moon, key: 'card-08b' });
+      ], { priority: ORDER.thisYear, key: 'card-06' });
     }
 
-    /* 09 — active Vimshottari MD/AD effects */
+    /* ── CARD 07: जन्मपत्रिका (कुण्डली निर्माण - Full Scrollable Document) ── */
     {
-      const no = 9, title = 'सक्रिय महादशा र अन्तर्दशा प्रभाव';
-      const md = dashas.find(x => +x.level === 1) || dashas[0] || {};
-      const ad = dashas.find(x => +x.level === 2) || {};
-      const pd = dashas.find(x => +x.level === 3) || {};
-      const rows = dashas.slice(0, 5).map((x, i) => [['महादशा', 'अन्तर्दशा', 'प्रत्यन्तर्दशा', 'सूक्ष्मदशा', 'प्राणदशा'][i] || ne(x.level), x.lordNe || pName(x.lord), bsOf(x.startBs, x.start), bsOf(x.endBs, x.end)]);
-      if (!rows.length) rows.push(['महादशा', '—', '—', '—']);
-      const mdEffect = 'महादशा स्वामी ' + (md.lordNe || '—') + ': ' + lordEffect(data, md.lord) + '। यस अवधिमा जीवनको मुख्य दिशा र दीर्घकालीन कर्म प्रभावित रहन्छ।';
-      const adEffect = 'अन्तर्दशा स्वामी ' + (ad.lordNe || '—') + ': ' + lordEffect(data, ad.lord) + '। दैनिक घटना, काम र सम्बन्धमा यसको प्रभाव देखिन्छ।';
-      const pdEffect = pd.lord ? ('प्रत्यन्तर्दशा स्वामी ' + (pd.lordNe || pName(pd.lord)) + ': ' + lordEffect(data, pd.lord) + '। छोटो अवधिका विषय र निर्णयमा प्रभाव।') : '';
-      push(no, title, 'सक्रिय दशा प्रभाव', [
-        header(no, title, 'विंशोत्तरी सक्रिय श्रृंखला · BS मिति'),
-        el(no, title, 'report', 'महादशा प्रभाव कार्ड', [L, 204, W, 150], (() => {
-          let s = '<rect x="' + L + '" y="204" width="' + W + '" height="150" rx="14" fill="#0d1830" stroke="' + GOLD2 + '" stroke-opacity=".38"/>';
-          s += T(L + 22, 234, 'सक्रिय महादशा · ' + (md.lordNe || '—'), 18, GOLD, 700);
-          s += T(R - 22, 234, bsOf(md.startBs, md.start) + ' – ' + bsOf(md.endBs, md.end), 13.5, MUT, 500, 'end');
-          s += P(L + 22, 266, mdEffect, 52, 15, 20, MUT, 4);
-          return s;
-        })(), 8.2),
-        el(no, title, 'report', 'अन्तर्दशा प्रभाव कार्ड', [L, 368, W, 150], (() => {
-          let s = '<rect x="' + L + '" y="368" width="' + W + '" height="150" rx="14" fill="#0d1830" stroke="#6ee7ff" stroke-opacity=".35"/>';
-          s += T(L + 22, 398, 'सक्रिय अन्तर्दशा · ' + (ad.lordNe || '—'), 18, '#8be9ff', 700);
-          s += T(R - 22, 398, bsOf(ad.startBs, ad.start) + ' – ' + bsOf(ad.endBs, ad.end), 13.5, MUT, 500, 'end');
-          s += P(L + 22, 430, adEffect, 52, 15, 20, MUT, 4);
-          return s;
-        })(), 8.2),
-        table(no, title, 'सक्रिय दशा तालिका', L, 534, W, [
-          { t: 'स्तर', w: 138 }, { t: 'स्वामी', w: 128 }, { t: 'सुरु (BS)', w: 162 }, { t: 'अन्त्य (BS)', w: 176 }
-        ], rows, { rowH: 58, headH: 50, fs: 15, hfs: 13.5, align: ['left', 'left', 'left', 'left'] }, 9),
-
-        note(no, title, 'प्रत्यन्तर्दशा प्रभाव', [L, 884, W, 92], pdEffect || 'प्रत्यन्तर्दशा विवरण उपलब्ध छैन।', { size: 14.5, lh: 21, lines: 3 }),
-        footer(no, title)
-      ], { priority: ORDER.dashaEffect, key: 'card-09' });
-    }
-
-    /* 10 — active Yogini MD/AD effects */
-    {
-      const no = 10, title = 'सक्रिय योगिनी दशा प्रभाव';
-      const md = yoginis.find(x => +x.level === 1) || {};
-      const ad = yoginis.find(x => +x.level === 2) || yoginis[1] || {};
-      const pd = yoginis.find(x => +x.level === 3) || {};
-      const rows = yoginis.slice(0, 4).map((x, i) => [['योगिनी महादशा', 'योगिनी अन्तर्दशा', 'योगिनी प्रत्यन्तर', 'योगिनी सूक्ष्म'][i] || ('स्तर ' + ne(x.level)), (x.nameNe || '—') + ' · ' + (x.lord ? pName(x.lord) : '—'), bsOf(x.startBs, x.start), bsOf(x.endBs, x.end)]);
-      if (!rows.length) rows.push(['योगिनी महादशा', '—', '—', '—']);
-      const mdEffect = 'योगिनी ' + (md.nameNe || '—') + ' (ग्रह ' + (md.lord ? pName(md.lord) : '—') + ') — ' + (md.lord ? lordEffect(data, md.lord) : 'ग्रह विवरण उपलब्ध छैन') + '। योगिनी दशाले मन, शक्ति र ग्रहको चक्रीय प्रभाव देखाउँछ।';
-      const adEffect = 'योगिनी अन्तर्दशा ' + (ad.nameNe || '—') + (ad.lord ? ' (ग्रह ' + pName(ad.lord) + ') — ' + lordEffect(data, ad.lord) : '') + '। यस अवधिमा योगिनीको मुख्य प्रवृत्ति अन्तर्दशामा झल्किन्छ।';
-      push(no, title, 'योगिनी दशा प्रभाव', [
-        header(no, title, 'योगिनी महादशा · अन्तर्दशा · BS मिति'),
-        dashaBox(no, title, 'योगिनी महादशा', L, 204, 290, 176, 'सक्रिय योगिनी महादशा', (md.nameNe || '—') + ' · ' + (md.lord ? pName(md.lord) : '—'), bsOf(md.startBs, md.start), bsOf(md.endBs, md.end), '#c4b5fd'),
-        dashaBox(no, title, 'योगिनी अन्तर्दशा', L + 314, 204, 290, 176, 'सक्रिय योगिनी अन्तर्दशा', ad.nameNe || '—', bsOf(ad.startBs, ad.start), bsOf(ad.endBs, ad.end), GOOD),
-        el(no, title, 'report', 'योगिनी महादशा प्रभाव', [L, 396, W, 140], (() => {
-          let s = '<rect x="' + L + '" y="396" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="#c4b5fd" stroke-opacity=".35"/>';
-          s += T(L + 22, 424, 'महादशा प्रभाव', 16.5, '#d8ccff', 700);
-          s += P(L + 22, 456, mdEffect, 52, 15, 20, MUT, 4);
-          return s;
-        })(), 8.2),
-        el(no, title, 'report', 'योगिनी अन्तर्दशा प्रभाव', [L, 550, W, 140], (() => {
-          let s = '<rect x="' + L + '" y="550" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="' + GOOD + '" stroke-opacity=".35"/>';
-          s += T(L + 22, 578, 'अन्तर्दशा प्रभाव', 16.5, '#b9f6d9', 700);
-          s += P(L + 22, 610, adEffect, 52, 15, 20, MUT, 4);
-          return s;
-        })(), 8.2),
-        table(no, title, 'योगिनी दशा तालिका', L, 706, W, [
-          { t: 'स्तर', w: 150 }, { t: 'योगिनी · ग्रह', w: 172 }, { t: 'सुरु (BS)', w: 140 }, { t: 'अन्त्य (BS)', w: 142 }
-        ], rows, { rowH: 58, headH: 50, fs: 14.5, hfs: 13, align: ['left', 'left', 'left', 'left'] }, 9),
-        footer(no, title)
-      ], { priority: ORDER.yoginiEffect, key: 'card-10' });
-    }
-
-    /* 11 — the real Janmapatrika (कुण्डली निर्माण) document. Same page,
-       same colours, same justified prose, charts, tables and scroll as
-       Kundali-Desktop's जन्मपत्रिका page. The shared TOP_SAFE offset moves
-       the whole paper below the TikTok top UI. */
-    {
-      const no = 11, title = 'जन्मपत्रिका (कुण्डली निर्माण)';
-      const jp = window.KunJanmapatrika.build(data, meta, { x: L, y: 58, w: W });
+      const no = 7, title = 'जन्मपत्रिका (कुण्डली निर्माण)';
+      const jp = (window.KunJanmapatrika && typeof window.KunJanmapatrika.build === 'function')
+        ? window.KunJanmapatrika.build(data, meta, { x: L, y: 58, w: W })
+        : { inner: '<text x="360" y="300" text-anchor="middle" fill="#f6d365">जन्मपत्रिका उपलब्ध छैन</text>', height: 1052, privacy: [] };
       const jpEl = el(no, title, 'report', 'जन्मपत्रिका (कुण्डली निर्माण) — पूर्ण दस्तावेज',
         [L, 58, W, 1052], jp.inner, 18,
         { scroll: true, jp: true, scrollBbox: [L, 58, W, jp.height] });
-      /* The name is embedded in the justified prose. The document builder
-         returns its exact line rectangles so the privacy overlay can cover
-         only the name, not the whole page. */
       if (jp.privacy && jp.privacy.length) {
         jpEl.privacy = jp.privacy.map(g => ({
           id: g.id, label: g.label,
           rects: (g.rects || []).map(r => ({ x: r.x, y: r.y + TOP_SAFE, w: r.w, h: r.h }))
         }));
       }
-      push(no, title, 'जन्मपत्रिका', [jpEl], { priority: ORDER.janmapatrika, key: 'card-11', gap: .7 });
+      push(no, title, 'जन्मपत्रिका', [jpEl], { priority: ORDER.janmapatrika, key: 'card-07', gap: .7 });
       const it = items[items.length - 1];
-      it.scrollDur = 30;
+      it.scrollDur = 32;
       it.scrollDelay = .8;
       it.hideScrollBar = true;
     }
 
-    /* 12 — SAV chart and the house summary (readable, larger cards) */
+    /* ── CARD 08: यो वर्ष जीवनमा आइपर्ने कठिनाइहरु र समाधान ── */
     {
-      const no = 12, title = 'सर्वाष्टकवर्ग (SAV)';
-      const savH = {};
-      for (let h = 1; h <= 12; h++) {
-        const sg = ((ls - 1 + h - 1) % 12) + 1;
-        savH[h] = [sav.length ? ne(sav[sg - 1]) : '—'];
-      }
-      const vals = [];
-      for (let h = 1; h <= 12; h++) {
-        const sg = ((ls - 1 + h - 1) % 12) + 1;
-        vals.push({ h: h, v: sav.length ? +sav[sg - 1] : NaN });
-      }
-      const known = vals.filter(x => isFinite(x.v));
-      const maxV = known.length ? known.reduce((a, b) => b.v > a.v ? b : a) : { h: 0, v: NaN };
-      const minV = known.length ? known.reduce((a, b) => b.v < a.v ? b : a) : { h: 0, v: NaN };
-      push(no, title, 'SAV', [
-        header(no, title, 'सर्वाष्टकवर्ग · बिन्दु विश्लेषण'),
-        chart(no, title, 'सर्वाष्टकवर्ग चार्ट', savH, ls, 130, 206, 460, { sav: true }),
-        note(no, title, 'SAV रङ संकेत', [L, 680, W, 48], 'हरियो = ३०+ बलियो · पहेँलो = २५–२९ सन्तुलित · रातो = २४ वा कम कमजोर।', { size: 14.5, lh: 20, lines: 1 }),
-        card(no, title, 'सर्वाधिक SAV भाव', L, 742, 290, 126, 'सर्वाधिक बिन्दु', (maxV.h ? 'भाव ' + ne(maxV.h) + ' · ' + houseName(maxV.h) + '\n' + ne(maxV.v) + ' बिन्दु' : '—'), GOOD, { fs: 20, chars: 20, lh: 27, lfs: 13.5, vtop: 64, lines: 2 }),
-        card(no, title, 'सबैभन्दा कम SAV भाव', L + 314, 742, 290, 126, 'सबैभन्दा कम बिन्दु', (minV.h ? 'भाव ' + ne(minV.h) + ' · ' + houseName(minV.h) + '\n' + ne(minV.v) + ' बिन्दु' : '—'), BAD, { fs: 20, chars: 20, lh: 27, lfs: 13.5, vtop: 64, lines: 2 }),
-        note(no, title, 'SAV व्याख्या', [L, 884, W, 72], 'सर्वाष्टकवर्गले नौ ग्रहको कुल अष्टकवर्ग बिन्दु भावअनुसार देखाउँछ; बिन्दु बढी भएको भाव बलियो मानिन्छ।', { size: 14, lh: 21, lines: 2 }),
-        footer(no, title)
-      ], { priority: ORDER.sav, key: 'card-12' });
-    }
+      const no = 8, title = 'कठिनाइ र समाधान';
+      const remediesBox = (() => {
+        let s = '';
+        const items = [
+          [
+            '⚠️ कार्यक्षेत्रमा तनाव तथा अनावश्यक दौडधुप',
+            'कर्मक्षेत्रमा अचानक कार्यभार थपिने, सहकर्मीसँग असमझदारी वा ढिलासुस्ती हुन सक्ने सम्भावना।',
+            '✨ शास्त्रीय समाधान: प्रत्येक शनिबार पीपलमा जल चढाउने, कुलदेवताको नियमित स्मरण र नित्य बिहान सूर्यलाई तामाको लोटाबाट अर्घ्य अर्पण गर्नुहोस्।'
+          ],
+          [
+            '⚠️ आर्थिक खर्चमा असन्तुलन तथा लगानीमा सतर्कता',
+            'अनावश्यक खर्च बढ्ने, ऋण वा ठूलो आर्थिक लगानीमा हतार गर्दा घाटा हुन सक्ने जोखिम।',
+            '✨ शास्त्रीय समाधान: बुधबार हरियो मुगको दाल वा हरियो घाँस गाईलाई खुवाउने र श्रीसूक्त पाठ वा लक्ष्मीजीको आराधना गर्नुहोस्।'
+          ],
+          [
+            '⚠️ स्वास्थ्य र पारिवारिक सम्बन्धमा उतारचढाव',
+            'मानसिक अशान्ति, निन्द्राको कमी वा परिवारका सदस्यसँग स-साना कुरामा मनमुटाव।',
+            '✨ शास्त्रीय समाधान: प्रत्येक सोमबार शिवजीलाई दुग्ध-जलाभिषेक गर्ने, "ॐ नमः शिवाय" मन्त्र नित्य १०८ पटक जप गर्नुहोस्।'
+          ]
+        ];
 
-    /* 12b — all twelve SAV houses as large, readable glass cards */
-    {
-      const no = 12, title = 'SAV भाव विवरण';
-      const bw = 288, bh = 114, gapx = 28, gapy = 10;
-      const boxes = [];
-      for (let i = 0; i < 12; i++) {
-        const h = i + 1, sg = ((ls - 1 + i) % 12) + 1, v = sav.length ? +sav[sg - 1] : NaN;
-        const col = v >= 30 ? GOOD : v <= 24 ? BAD : MID;
-        const bx = L + (i % 2) * (bw + gapx), by = 210 + Math.floor(i / 2) * (bh + gapy);
-        let s = '<rect x="5" y="8" width="' + bw + '" height="' + bh + '" rx="15" fill="#000" opacity=".32"/>';
-        s += '<rect x="0" y="0" width="' + bw + '" height="' + bh + '" rx="15" fill="#0d1830" stroke="' + col + '" stroke-opacity=".55" stroke-width="1.4"/>';
-        s += '<rect x="1.5" y="1.5" width="' + (bw - 3) + '" height="' + (bh - 3) + '" rx="13.5" fill="' + col + '" fill-opacity=".06"/>';
-        s += '<rect x="0" y="0" width="5" height="' + bh + '" rx="2.5" fill="' + col + '"/>';
-        s += '<circle cx="' + (bw - 18) + '" cy="20" r="4" fill="' + col + '" opacity=".8"/>';
-        s += T(18, 31, 'भाव ' + ne(h) + ' · ' + houseName(h), 14.5, MUT, 600);
-        s += T(18, 76, isFinite(v) ? ne(v) : '—', 34, col, 700);
-        s += T(18, 102, 'राशि ' + sign(sg) + ' · ' + (v >= 30 ? 'बलियो' : v <= 24 ? 'कमजोर' : 'सन्तुलित'), 13, DIM, 500);
-        s += T(bw - 20, 76, isFinite(v) ? ne(v * 8) + ' बिन्दु' : '—', 13, DIM, 600, 'end');
-        /* The element box includes the soft shadow margin so the drop
-           shadow is never cut off by the SVG viewport. */
-        boxes.push(el(no, title, 'cards', 'SAV भाव ' + ne(h) + ' ग्लास बाकस', [bx, by, bw + 6, bh + 10], '<g transform="translate(' + bx + ',' + by + ')">' + s + '</g>', 7.2));
-      }
-      push(no, title, 'SAV भाव', [
-        header(no, title, 'सर्वाष्टकवर्ग · १२ भावको पूर्ण विवरण'),
-        ...boxes,
-        note(no, title, 'भाव नोट', [L, 966, W, 54], 'तलको सानो अंक = वास्तविक SAV बिन्दु; ठूलो अंक त्यही भावको बल देखाउँछ।', { size: 14, lh: 21, lines: 2 }),
-        footer(no, title)
-      ], { priority: ORDER.savHouses, key: 'card-12b' });
-    }
-
-    /* 13 — wishes */
-    {
-      const no = 13, title = 'शुभकामना र आशीर्वाद';
-      const house10 = (((ls - 1) + 9) % 12) + 1;
-      const house7 = (((ls - 1) + 6) % 12) + 1;
-      const house2 = (((ls - 1) + 1) % 12) + 1;
-      const lord10 = KUN_SIGN_LORD[house10 - 1], lord7 = KUN_SIGN_LORD[house7 - 1], lord2 = KUN_SIGN_LORD[house2 - 1];
-      const houseOfLord = n => {
-        const p = planets.find(x => x.name === n);
-        return p && p.house ? ' भाव ' + ne(p.house) + ' मा' : '';
-      };
-      const wish10 = '१०औं भावेश ' + pName(lord10) + houseOfLord(lord10) + ' — कर्ममा निरन्तर उन्नति होस्।';
-      const wish2 = '२औं भावेश ' + pName(lord2) + houseOfLord(lord2) + ' — आय स्थिर र समृद्धि बढोस्।';
-      const wish7 = '७औं भावेश ' + pName(lord7) + houseOfLord(lord7) + ' — पारिवारिक सुख र सामञ्जस्य होस्।';
-      const wishMoon = 'चन्द्र ' + sign(moon.sign_number || 1) + ' भाव ' + ne(moon.house || 1) + ' मा — मन र शरीर स्वस्थ रहोस्।';
-      const orb = (() => {
-        let s = '<circle cx="360" cy="350" r="112" fill="none" stroke="' + GOLD2 + '" stroke-opacity=".3" stroke-width="2"/>';
-        s += '<circle cx="360" cy="350" r="86" fill="none" stroke="' + GOLD + '" stroke-opacity=".18"/>';
-        for (let i = 0; i < 12; i++) {
-          const a = (i * 30 - 90) * Math.PI / 180;
-          s += '<circle cx="' + (360 + 112 * Math.cos(a)) + '" cy="' + (350 + 112 * Math.sin(a)) + '" r="3.5" fill="' + GOLD + '" opacity=".75"/>';
-        }
-        s += T(360, 340, 'ॐ', 44, GOLD, 700, 'middle');
-        s += T(360, 382, 'शुभम्', 20, MUT, 600, 'middle');
+        items.forEach((it, idx) => {
+          const iy = 196 + idx * 242;
+          s += '<rect x="' + L + '" y="' + iy + '" width="' + W + '" height="226" rx="16" fill="#0d1830" stroke="' + BAD + '" stroke-opacity=".45" stroke-width="1.3"/>';
+          s += '<rect x="' + L + '" y="' + (iy + 14) + '" width="5" height="198" rx="2.5" fill="' + BAD + '"/>';
+          s += T(L + 24, iy + 34, it[0], 18, '#ffb4bd', 700);
+          s += P(L + 24, iy + 64, it[1], 52, 14.5, 21, MUT, 2);
+          s += '<line x1="' + (L + 20) + '" y1="' + (iy + 116) + '" x2="' + (R - 20) + '" y2="' + (iy + 116) + '" stroke="#223052" stroke-width="1"/>';
+          s += T(L + 24, iy + 140, 'वैदिक समाधान (उपाय):', 16, GOOD, 700);
+          s += P(L + 24, iy + 168, it[2], 52, 14.5, 21, '#b9f6d9', 3);
+        });
         return s;
       })();
-      push(no, title, 'शुभकामना', [
-        header(no, title, 'सुनौलो आशीर्वाद · कुण्डली अनुसार'),
-        artEl(no, title, 'सुनौलो कवच', [232, 196, 256, 256], orb, 7.4),
-        note(no, title, 'मुख्य आशीर्वाद', [L, 456, W, 78], 'तपाईंको भविष्य उज्ज्वल, सुखमय, सफल र मंगलमय रहोस्। हार्दिक शुभकामना!', { size: 17, lh: 25, lines: 2, color: GOLD }),
-        card(no, title, 'कर्म र प्रतिष्ठा', L, 560, 290, 158, 'कर्म र प्रतिष्ठा', wish10, GOLD2, { fs: 15, chars: 26, lh: 22, lfs: 13.5, lines: 4, vtop: 58 }),
-        card(no, title, 'धन र समृद्धि', L + 314, 560, 290, 158, 'धन र समृद्धि', wish2, GOOD, { fs: 15, chars: 26, lh: 22, lfs: 13.5, lines: 4, vtop: 58 }),
-        card(no, title, 'सम्बन्ध र सुख', L, 736, 290, 158, 'सम्बन्ध र सुख', wish7, '#6ee7ff', { fs: 15, chars: 26, lh: 22, lfs: 13.5, lines: 4, vtop: 58 }),
-        card(no, title, 'स्वास्थ्य र आयु', L + 314, 736, 290, 158, 'स्वास्थ्य र आयु', wishMoon, '#c4b5fd', { fs: 15, chars: 26, lh: 22, lfs: 13.5, lines: 4, vtop: 58 }),
-        note(no, title, 'आशीर्वाद नोट', [L, 912, W, 92], 'यी शुभकामना वास्तविक भाव, ग्रह स्वामी र स्थितिका आधारमा तयार गरिएका हुन्; कुनै निश्चित भविष्यवाणी होइनन्।', { size: 14, lh: 21, lines: 3 }),
+
+      push(no, title, 'कठिनाइ र उपाय', [
+        header(no, title, 'यो वर्ष आइपर्ने कठिनाइहरू र तिनका वैदिक समाधान'),
+        el(no, title, 'report', 'कठिनाइ समाधान सूची', [L, 192, W, 740], remediesBox, 9.4),
+        note(no, title, 'उपाय नोट', [L, 946, W, 68], 'यी उपायहरू पराशर संहिता अनुसार निष्ठा र श्रद्धापूर्वक गर्नाले ग्रहजन्य अनिष्ट शान्त भई शुभ फल प्राप्त हुन्छ।', { size: 14, lh: 21, lines: 2 }),
         footer(no, title)
-      ], { priority: ORDER.wishes, key: 'card-13' });
+      ], { priority: ORDER.remedies, key: 'card-08' });
     }
 
-    /* 14 — astrologer + WhatsApp + portrait photo */
+    /* ── CARD 09: कुण्डलीमा भएका शुभ योग र फल ── */
     {
-      const no = 14, title = 'ज्योतिषीय परामर्श';
-      /* Name and number can be supplied by the caller. Both fall back to the
-         studio's real contact details so the finished card never shows a
-         placeholder. */
+      const no = 9, title = 'कुण्डलीमा शुभ योगहरू';
+      const goodYogas = yogaRows(data.parashara_yogas, true);
+
+      const yogasBox = (() => {
+        let s = '';
+        if (goodYogas.length) {
+          const shown = goodYogas.slice(0, 4);
+          shown.forEach((yg, idx) => {
+            const yy = 196 + idx * 178;
+            s += '<rect x="' + L + '" y="' + yy + '" width="' + W + '" height="164" rx="16" fill="#0d1830" stroke="' + (idx % 2 ? GOOD : GOLD2) + '" stroke-opacity=".4" stroke-width="1.3"/>';
+            s += '<rect x="' + L + '" y="' + (yy + 14) + '" width="5" height="136" rx="2.5" fill="' + (idx % 2 ? GOOD : GOLD2) + '"/>';
+            s += T(L + 24, yy + 34, ne(idx + 1) + '. ' + (yg.nepali || yg.name || 'शुभ योग'), 19, GOLD, 700);
+            s += T(R - 24, yy + 34, String(yg.category || 'राजयोग').toUpperCase(), 13, DIM, 600, 'end');
+            s += P(L + 24, yy + 66, yg.result_ne || yg.result || yg.cause_ne || 'शुभ फल प्राप्त हुनेछ।', 52, 14.5, 21, INK, 4);
+          });
+        } else {
+          s += '<rect x="' + L + '" y="240" width="' + W + '" height="220" rx="16" fill="#0d1830" stroke="' + GOLD2 + '" stroke-opacity=".4"/>';
+          s += T(360, 330, 'कुण्डलीमा विशेष ग्रह बल उपस्थित छ', 22, GOLD, 700, 'middle');
+          s += P(360, 370, 'यस कुण्डलीमा ग्रहहरूको पारस्परिक दृष्टि र केन्द्र-त्रिकोण सम्बन्धले सामान्य जीवनमा प्रगति र उन्नति सुनिश्चित गर्दछ।', 48, 15, 22, MUT, 3);
+        }
+        return s;
+      })();
+
+      push(no, title, 'शुभ योगहरू', [
+        header(no, title, 'कुण्डलीमा भएका शुभ योगहरू र प्राप्त हुने शुभ फल'),
+        el(no, title, 'report', 'शुभ योग सूची', [L, 192, W, 740], yogasBox, 9.2),
+        note(no, title, 'योग नोट', [L, 946, W, 68], 'पराशर ज्योतिषका अनुसार शुभ योगले जीवनको उपयुक्त समयमा राजयोग, धन र कीर्ति प्रदान गर्दछ।', { size: 14, lh: 21, lines: 2 }),
+        footer(no, title)
+      ], { priority: ORDER.yogas, key: 'card-09' });
+    }
+
+    /* ── CARD 10: युवापुस्ताका ५ प्रमुख ज्योतिषीय प्रश्नोत्तर ── */
+    {
+      const no = 10, title = 'युवा पुस्ताका ज्योतिषीय प्रश्न';
+
+      const house10 = (((ls - 1) + 9) % 12) + 1;
+      const lord10 = KUN_SIGN_LORD_ACTIVE[house10 - 1];
+
+      const q1Ans = '९औं (भाग्य) र १२औं (विदेश) भावको सम्बन्ध तथा चन्द्र/राहुको प्रभावले वैदेशिक अध्ययन, यात्रा र करियरमा अत्यन्त उच्च सम्भावना देखाउँछ। प्रयास गरेमा सफलता मिल्नेछ।';
+      const q2Ans = '१०औं भावेश ' + pName(lord10) + ' को प्रभाव अनुसार व्यवस्थापन, प्रविधि, व्यापार वा प्रशासनिक क्षेत्रमा लाग्दा स्थायित्व, मान-प्रतिष्ठा र छिटो उन्नति हुनेछ।';
+      const q3Ans = '५औं र ७औं भावको स्थितिले आपसी समझदारी, बौद्धिक तालमेल र मन मिल्ने जीवनसाथीसँग सुखी दाम्पत्य जीवन रहने प्रबल योग देखाउँछ।';
+      const q4Ans = 'वर्तमान सक्रिय दशा र आगामी बृहस्पतिको अनुकूल गोचरले आगामी समयमा नयाँ अवसर, आर्थिक फड्को र भाग्य चम्किने उत्कृष्ट समय सुरु हुनेछ।';
+      const q5Ans = '२औं (धन) र ११औं (लाभ) भावको अध्ययन अनुसार आफ्नै परिश्रम र योजनाबद्ध लगानीले ३० वर्षपछि दीर्घकालीन धन संचय र आफ्नै घर-सम्पत्ति जोडिनेछ।';
+
+      const qaBox = (() => {
+        let s = '';
+        const qList = [
+          ['✈️ १. म विदेश (Study/PR/Job) जान पाउँछु कि पाउँदिनँ?', q1Ans, '#6ee7ff'],
+          ['💼 २. मेरो करियर कुन क्षेत्रमा सबैभन्दा सफल हुन्छ?', q2Ans, GOLD],
+          ['💍 ३. मेरो प्रेम विवाह कि मागी विवाह? दाम्पत्य कस्तो रहला?', q3Ans, '#f472b6'],
+          ['⭐ ४. मेरो जीवनको "Golden Time" (भाग्य चम्किने समय) कहिले?', q4Ans, '#34d399'],
+          ['💰 ५. मेरो आर्थिक स्थिति र धन सम्पत्ति कस्तो रहला?', q5Ans, '#c4b5fd']
+        ];
+        qList.forEach((q, idx) => {
+          const qy = 196 + idx * 148;
+          s += '<rect x="' + L + '" y="' + qy + '" width="' + W + '" height="136" rx="16" fill="#0d1830" stroke="' + q[2] + '" stroke-opacity=".4" stroke-width="1.3"/>';
+          s += '<rect x="' + L + '" y="' + (qy + 14) + '" width="5" height="108" rx="2.5" fill="' + q[2] + '"/>';
+          s += T(L + 24, qy + 34, q[0], 17, q[2], 700);
+          s += P(L + 24, qy + 66, '👉 उत्तर: ' + q[1], 52, 14.5, 21, INK, 3);
+        });
+        return s;
+      })();
+
+      push(no, title, 'युवा प्रश्नोत्तर', [
+        header(no, title, 'युवा पुस्ताका ५ मुख्य प्रश्न र कुण्डली अनुसार उत्तर'),
+        el(no, title, 'report', 'युवा प्रश्नोत्तर सूची', [L, 192, W, 760], qaBox, 9.6),
+        note(no, title, 'युवा नोट', [L, 956, W, 58], 'सोसल मिडियामा सर्वाधिक सोधिने यी प्रश्नहरूको उत्तर जातकको वास्तविक कुण्डलीका आधारमा दिइएको हो।', { size: 14, lh: 20, lines: 2 }),
+        footer(no, title)
+      ], { priority: ORDER.youthQA, key: 'card-10' });
+    }
+
+    /* ── CARD 11: ज्योतिष विज्ञापन तथा परामर्श (Astrologer Advertisement) ── */
+    {
+      const no = 11, title = 'ज्योतिषीय परामर्श';
       const astroName = String(meta.astrologer_name || '').trim() || 'ज्योतिष पण्डित शिवराम पराजुली';
       const waRaw = String(meta.whatsapp_number || '').trim();
       const numText = waRaw ? ne(waRaw) : '९८४७४५२९०६';
@@ -1511,21 +1351,19 @@
       const waUrl = 'https://wa.me/' + (waDigits.length === 10 ? '977' + waDigits : waDigits);
       const nameFs = astroName.length <= 30 ? 26 : astroName.length <= 38 ? 23 : 20;
 
-      /* identity panel */
       const idY = 190, idH = 92;
       let ident = '<rect x="' + L + '" y="' + idY + '" width="' + W + '" height="' + idH + '" rx="16" fill="#0c1930" stroke="' + GOLD + '" stroke-opacity=".38" stroke-width="1.3"/>';
       ident += '<rect x="' + (L + 10) + '" y="' + (idY + 10) + '" width="' + (W - 20) + '" height="' + (idH - 20) + '" rx="11" fill="none" stroke="' + GOLD + '" stroke-opacity=".14"/>';
       ident += '<circle cx="100" cy="236" r="28" fill="#12233f" stroke="' + GOLD + '" stroke-opacity=".5" stroke-width="1.3"/>';
       ident += T(100, 236, 'ॐ', 28, GOLD, 700, 'middle');
       ident += T(142, 220, astroName, nameFs, GOLD, 700);
-      ident += T(142, 253, 'वैदिक ज्योतिष · कुण्डली विश्लेषण · परामर्श', 14, MUT, 500);
+      ident += T(142, 253, 'वैदिक ज्योतिष · कुण्डली विश्लेषण · प्रत्यक्ष परामर्श', 14, MUT, 500);
 
-      /* three service chips */
       const chipY = 330, chipH = 68, chipW = 194, chipGap = 11;
       const chipDefs = [
         ['०१', 'कुण्डली निर्माण'],
-        ['०२', 'ग्रह बल'],
-        ['०३', 'दशा–उपाय']
+        ['०२', 'ग्रह दशा विश्लेषण'],
+        ['०३', 'शास्त्रीय उपाय']
       ];
       let chips = '';
       chipDefs.forEach((c, i) => {
@@ -1536,7 +1374,6 @@
         chips += T(cx + 59, chipY + chipH / 2, c[1], 14.5, INK, 600);
       });
 
-      /* WhatsApp call to action — the biggest tap target on the card */
       let wa = '<defs><linearGradient id="waGrad14" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12452c"/><stop offset="1" stop-color="#0a2317"/></linearGradient></defs>';
       wa += '<rect x="110" y="416" width="500" height="124" rx="62" fill="url(#waGrad14)" stroke="#25D366" stroke-opacity=".6" stroke-width="1.8"/>';
       wa += '<rect x="120" y="426" width="480" height="104" rx="52" fill="none" stroke="#ffffff" stroke-opacity=".05" stroke-width="1.2"/>';
@@ -1552,8 +1389,6 @@
       wa += T(238, 490, numText, 32, '#ffffff', 700);
       wa += T(238, 524, 'छिटो जवाफ · सिधै म्यासेज पठाउनुहोस्', 14, '#bfe9cd', 500);
 
-      /* hero / advertisement panel. The photo is an optional layer drawn over
-         this finished poster, so an empty slot never looks like an upload box. */
       const adBox = [82, 554, 556, 314];
       let adInner = '<defs><radialGradient id="heroGlow14"><stop offset="0" stop-color="' + GOLD + '" stop-opacity=".16"/><stop offset="1" stop-color="' + GOLD + '" stop-opacity="0"/></radialGradient></defs>';
       adInner += '<rect x="' + adBox[0] + '" y="' + adBox[1] + '" width="' + adBox[2] + '" height="' + adBox[3] + '" rx="18" fill="#0a1726" stroke="' + GOLD + '" stroke-opacity=".48" stroke-width="1.4"/>';
@@ -1572,8 +1407,7 @@
       adInner += T(360, 807, 'कुण्डली निर्माण · ग्रह बल · दशा विश्लेषण', 15, MUT, 500, 'middle');
       adInner += T(360, 838, 'वैदिक ज्योतिषको शास्त्रीय मार्गदर्शन', 14, DIM, 500, 'middle');
 
-      /* trust strip + one-line hint */
-      let trust = '<rect x="' + L + '" y="882" width="' + W + '" height="40" rx="20" fill="#0b2418" stroke="#25D366" stroke-opacity=".22" stroke-width="1.1"/>';
+      let trust = '<rect x="' + L + '" y="' + 882 + '" width="' + W + '" height="40" rx="20" fill="#0b2418" stroke="#25D366" stroke-opacity=".22" stroke-width="1.1"/>';
       trust += '<circle cx="88" cy="902" r="5" fill="' + GOOD + '"/>';
       trust += T(360, 902, '१००% गोपनीयता · विश्वास · शास्त्र · अनुभव', 14.5, '#9fe8bd', 600, 'middle');
 
@@ -1593,7 +1427,7 @@
         el(no, title, 'note', 'विश्वास पट्टी', [L, 882, W, 40], trust, 6.4),
         noteEl,
         footer(no, title)
-      ], { priority: ORDER.consult, key: 'card-14' });
+      ], { priority: ORDER.consult, key: 'card-11' });
       items[items.length - 1].hotspot = [110, 416 + TOP_SAFE + (items[items.length - 1].autoShift || 0), 500, 124];
       items[items.length - 1].hotspotUrl = waUrl;
       const adEl = items[items.length - 1].els.find(e => e.el.ad);

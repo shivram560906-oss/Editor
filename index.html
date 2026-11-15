@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>शिवराम गोबिन्द टेक्स्ट इडिटर प्रो</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ff3b5c'/%3E%3Cstop offset='1' stop-color='%23ff7a45'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Cpath d='M13 9v14l11-7z' fill='white'/%3E%3C/svg%3E">
   <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5/build/mp4-muxer.js"></script>
@@ -816,7 +816,25 @@ input[type=checkbox] {
 .kun-f input[readonly] { color: var(--mut); cursor: default; }
 .kun-f input[readonly]:focus { border-color: var(--line-2); box-shadow: none; }
 .kun-f select:disabled { opacity: .55; cursor: not-allowed; }
-@media (max-width: 580px) { .kun-grid2, .kun-grid3 { grid-template-columns: 1fr; } .kun-card { max-height: calc(100vh - 16px); } }
+@media (max-width: 580px) {
+  #kun-modal {
+    padding: calc(8px + env(safe-area-inset-top, 0px)) calc(8px + env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) calc(8px + env(safe-area-inset-left, 0px));
+    align-items: flex-end;
+  }
+  .kun-grid2, .kun-grid3 { grid-template-columns: 1fr; }
+  .kun-card {
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    border-radius: 16px;
+  }
+  .kun-head { padding: 14px 14px 10px; }
+  .kun-body { padding: 12px 14px 4px; }
+  .kun-foot {
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+  }
+  .kun-foot .btn { flex: 1 1 auto; }
+}
 .btn-danger { color: #ff8a8a; border-color: rgba(255, 107, 107, .26); background: rgba(255, 107, 107, .08); }
 .btn-danger:hover { background: rgba(255, 107, 107, .15); border-color: rgba(255, 107, 107, .4); }
 .btn-sm { min-height: 30px; padding: 0 10px; border-radius: 9px; font-size: 12px; gap: 5px; }
@@ -1418,7 +1436,11 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
 /* ============================ mobile layout ============================ */
 @media (max-width: 900px) {
   :root { --topbar: 54px; --dock: 64px; }
-  .topbar { padding: 0 10px; gap: 6px; }
+  .topbar {
+    height: calc(var(--topbar) + env(safe-area-inset-top, 0px));
+    padding: env(safe-area-inset-top, 0px) calc(10px + env(safe-area-inset-right, 0px)) 0 calc(10px + env(safe-area-inset-left, 0px));
+    gap: 6px;
+  }
   .brand-logo { width: 32px; height: 32px; border-radius: 10px; }
   .brand-text h1 { font-size: 14px; }
   .brand-text p { display: none; }
@@ -1482,7 +1504,7 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 0;
-    padding: 6px 6px calc(6px + var(--safe-b));
+    padding: 6px calc(6px + env(safe-area-inset-right, 0px)) calc(6px + var(--safe-b)) calc(6px + env(safe-area-inset-left, 0px));
     background: rgba(12, 14, 20, .94);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
@@ -1573,7 +1595,9 @@ body.chat-open #scrim { opacity: 1; pointer-events: auto; }
 
 @media (max-width: 760px) {
   /* home mobile */
-  .home-shell { padding: 12px 12px 40px; }
+  .home-shell {
+    padding: calc(12px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) calc(12px + env(safe-area-inset-left, 0px));
+  }
   .home-header { margin-bottom: 16px; }
   .home-hero { grid-template-columns: 1fr; padding: 20px 18px; gap: 14px; margin-bottom: 18px; border-radius: 20px; }
   .home-hero h1 { font-size: 30px; }

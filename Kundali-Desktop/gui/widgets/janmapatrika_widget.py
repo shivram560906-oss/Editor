@@ -56,10 +56,11 @@ PLANET_NAMES_NE = {
 }
 
 UNAVAILABLE = "उपलब्ध छैन"
+# Correct Vimshottari classical order: Ketu → Venus → Sun → Moon → Mars → Rahu → Jupiter → Saturn → Mercury
 VIMSHOTTARI_ORDER = [
-    ("Sun", "सूर्य", 6), ("Moon", "चन्द्र", 10), ("Mars", "मङ्गल", 7),
-    ("Rahu", "राहु", 18), ("Jupiter", "गुरु", 16), ("Saturn", "शनि", 19),
-    ("Mercury", "बुध", 17), ("Ketu", "केतु", 7), ("Venus", "शुक्र", 20),
+    ("Ketu", "केतु", 7), ("Venus", "शुक्र", 20), ("Sun", "सूर्य", 6),
+    ("Moon", "चन्द्र", 10), ("Mars", "मङ्गल", 7), ("Rahu", "राहु", 18),
+    ("Jupiter", "गुरु", 16), ("Saturn", "शनि", 19), ("Mercury", "बुध", 17),
 ]
 YOGINI_ORDER = [
     ("Mangala", "मङ्गला", 1), ("Pingala", "पिङ्गला", 2),
@@ -789,38 +790,59 @@ class JanmapatrikaPage(QWidget):
             except (TypeError, ValueError):
                 birth_date = None
 
-            # One shared header row and one data row per Mahadasha.  Every
-            # cell is independent: the header always contains all nine
-            # planets (or all eight Yoginis), and the first column contains
-            # labels only.  Each value is looked up by its antardasha lord
-            # and placed under that lord's own column, so no cell spans or
-            # merges columns and no planet/Yogini name enters the label
-            # column.  Values remain cumulative from birth, and the birth
-            # Mahadasha simply leaves its pre-birth cells as ``—``.
-            headers = [(name, nepali) for name, nepali, _ in spec]
+            # Rotate the column headers so they start from the birth Mahadasha
+            # lord and follow the classical cycle from that point.  This way the
+            # first data row's own antardasha always appears in the first
+            # data column, matching the traditional table layout.
+            birth_lord = (
+                JanmapatrikaPage._dasha_lord(timeline[0]) if timeline else None
+            )
+            names_in_spec = [name for name, _, _ in spec]
+            if birth_lord and birth_lord in names_in_spec:
+                rot = names_in_spec.index(birth_lord)
+                rotated_spec = spec[rot:] + spec[:rot]
+            else:
+                rotated_spec = spec
+
+            headers = [(name, nepali) for name, nepali, _ in rotated_spec]
             column_width = max(1, 100 // (len(headers) + 1))
             cell = f"<td width='{column_width}%'>"
             header_cells = "".join(
                 cell + html.escape(nepali) + "</td>" for _, nepali in headers
             )
 
+            # Build lookup: nepali name → English spec name (for Yogini nodes
+            # whose _dasha_lord may return a Nepali string from some backends)
+            nepali_to_spec = {nepali: name for name, nepali, _ in spec}
+
             rows = []
             for period in timeline:
                 nodes = JanmapatrikaPage._dasha_nodes(period, children_key)
                 if not nodes:
                     continue
-                node_by_lord = {}
+
+                # Build a dict keyed by the antardasha lord's canonical name
+                node_by_lord: dict = {}
                 for node in nodes:
-                    if isinstance(node, dict):
-                        node_by_lord.setdefault(
-                            JanmapatrikaPage._dasha_lord(node), node
-                        )
+                    if not isinstance(node, dict):
+                        continue
+                    lord_key = JanmapatrikaPage._dasha_lord(node)
+                    # Normalise Nepali-keyed Yogini nodes to spec English names
+                    lord_key = nepali_to_spec.get(lord_key, lord_key)
+                    node_by_lord.setdefault(lord_key, node)
+
                 values = []
                 has_visible = False
                 for lord, _ in headers:
                     node = node_by_lord.get(lord)
                     value = "—"
                     if node is not None:
+                        # For the birth (partial) Mahadasha: antardashas that
+                        # ended before birth are pre-birth → show "—".
+                        is_before_birth = node.get("is_before_birth", False)
+                        if is_before_birth:
+                            values.append("—")
+                            continue
                         try:
                             end = datetime.date.fromisoformat(
                                 str(node.get("end"))[:10]
@@ -837,6 +859,7 @@ class JanmapatrikaPage(QWidget):
                     values.append(value)
                 if has_visible:
                     rows.append(values)
+
             if not rows:
                 return ""
             shown = rows[:visible_rows] if visible_rows is not None else rows

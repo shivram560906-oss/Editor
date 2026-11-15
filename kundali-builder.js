@@ -4081,6 +4081,10 @@
     g.beginPath(); kbRR(g, card.x + 2, card.y + 2, card.w - 4, card.h - 4, Math.max(0, radius - 2)); g.clip();
 
     if (bgOn && set.bg !== 'none') kbDrawModelInterior(g, scene, card, def, lt, ep);
+    /* The card interior stays inside the rounded frame, but element layers
+       deliberately do not. A dragged caption, frame or panel keeps drawing
+       at the canvas edge instead of vanishing under the card clip. */
+    g.restore();
 
     const els = (scene.els || []).slice().sort((a, b) => (+a.z || 0) - (+b.z || 0));
     const scrollP = scene.scrollDur ? kbScrollProgress(scene, lt, speed) : 1;
@@ -4219,7 +4223,6 @@
       eg.addColorStop(1, 'rgba(138,28,28,.62)');
       g.fillStyle = eg; g.fillRect(card.x + 2, ey - 18, card.w - 4, 26);
     }
-    g.restore();
 
     if (scene.footerOn !== false) kbDrawFooter(g, scene, def, Math.min(1, alpha * 1.25), clamp((lt + .001) / Math.max(.1, scene.dur), 0, 1));
     if (scene.scrollDur && !scene.hideScrollBar) {
@@ -4544,7 +4547,7 @@
   const KB_TYPE_NE = {
     heading: 'शीर्षक', chart: 'चार्ट', table: 'तालिका', report: 'रिपोर्ट',
     graph: 'ग्राफ', banner: 'ब्यानर', cards: 'कार्ड', footer: 'फुटर',
-    art: 'चित्र / कला', list: 'सूची', note: 'नोट'
+    art: 'चित्र / कला', list: 'सूची', note: 'नोट', panel: 'प्यानल / फ्रेम'
   };
   const KB_FONT_LIST = ['Mukta', 'Hind', 'Noto Sans Devanagari', 'Rozha One', 'Tiro Devanagari Hindi', 'Yatra One', 'Laila', 'Baloo 2'];
   const KB_DEF_GAP = .55;
@@ -4558,7 +4561,9 @@
     sortTouch: false, primeT: 0, resolve: null, toastT: 0, key: null,
     auto: false, autoOpts: null, autoFp: '', elSel: -1, undo: [], redo: [],
     mode: 'edit', dirty: false, saveT: 0, adPick: false, baseEls: new Map(), transit: null,
-    privacyStyle: 'soft', model: 'cosmic'
+    privacyStyle: 'soft', model: 'cosmic',
+    layersOpen: true, quickOpen: false, lastTap: null, quickBusy: false, quickEdit: false, quickT: 0,
+    detOpen: false
   };
 
   function kbCur() { return kb.items[kb.cur] || null; }
@@ -4677,6 +4682,15 @@
       manual: { text: false, style: false, box: false, timing: false, visibility: false, photo: !!e.photoTouched || !!e.adSrc },
       textRuns: kbTextRunsOf(el)
     };
+  }
+  function kbCloneElDef(el) {
+    if (!el || typeof el !== 'object') return null;
+    const c = Object.assign({}, el);
+    if (el.bbox) c.bbox = el.bbox.slice();
+    if (el.scrollBbox) c.scrollBbox = el.scrollBbox.slice();
+    if (el.textStyle) c.textStyle = Object.assign({}, el.textStyle);
+    if (el.panelStyle) c.panelStyle = Object.assign({}, el.panelStyle);
+    return c;
   }
   function kbSceneOf(item, i, list, tplOverride) {
     const prev = i > 0 ? list[i - 1] : null;
@@ -4837,6 +4851,13 @@
             <div class="kb-stage-info" id="kb-stage-info">—</div>
           </div>
         </div>
+        <div class="kb-quickbar" id="kb-quickbar">
+          <button class="kb-qbtn strong" data-quick="text" title="नयाँ पाठ थप्नुहोस्">＋ पाठ</button>
+          <button class="kb-qbtn" data-quick="frame" title="छानिएको पाठको पछाडि फ्रेम थप्नुहोस्">▣ फ्रेम</button>
+          <button class="kb-qbtn" data-quick="panel" title="पाठ राख्न प्यानल थप्नुहोस्">▤ प्यानल</button>
+          <button class="kb-qbtn" data-quick="style" title="छानिएको तत्वको स्टाइल, इफेक्ट र समय">✨ स्टाइल</button>
+          <button class="kb-qbtn" data-quick="layers" title="लेयर टाइमलाइन खोल्नुहोस् / बन्द गर्नुहोस्">☰ लेयर</button>
+        </div>
         <div class="kb-transport">
           <input class="kb-scrub" id="kb-scrub" type="range" min="0" max="1000" step="0.5" value="0">
           <div class="kb-tr-row">
@@ -4854,6 +4875,7 @@
           </div>
         </div>
         <div class="kb-scene-strip" id="kb-scenes"></div>
+        <div class="kb-layerbar" id="kb-layerbar"></div>
       </section>
       <aside class="kb-right">
         <div class="kb-right-tabs">
@@ -4863,6 +4885,18 @@
         </div>
         <div class="kb-right-body" id="kb-right-body"></div>
       </aside>
+    </div>
+    <div class="kb-qsheet" id="kb-qsheet" hidden>
+      <div class="kb-qsheet-back" data-q-close="1"></div>
+      <div class="kb-qsheet-card" role="dialog" aria-modal="true" aria-label="तत्व स्टाइल">
+        <div class="kb-qsheet-head">
+          <div><b>तत्व स्टाइल</b><small id="kb-qsheet-sub">पाठ, फ्रेम, इफेक्ट र समय</small></div>
+          <button class="kb-icon-btn" data-q-close="1" title="बन्द" aria-label="बन्द">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="kb-qsheet-body" id="kb-qsheet-body"></div>
+      </div>
     </div>
     <div class="kb-foot">
       <div class="kb-foot-stat" id="kb-stat">—</div>
@@ -5027,6 +5061,27 @@
     if (rTabs) rTabs.addEventListener('click', kbRightClick);
     kbBindOrderDnd();
     kbBindSceneSort();
+    kbBindLayerBar();
+    kbBindLayerSort();
+    const quickbar = q('kb-quickbar');
+    if (quickbar) quickbar.addEventListener('click', ev => {
+      const b = ev.target.closest('[data-quick]');
+      if (b) kbQuickMain(b.dataset.quick);
+    });
+    const qsheet = q('kb-qsheet');
+    if (qsheet) {
+      qsheet.addEventListener('click', ev => {
+        if (ev.target.closest('[data-q-close]')) { kbCloseQuick(); return; }
+        const a = ev.target.closest('[data-qact]');
+        if (a) { kbQuickAct(a.dataset.qact, +a.dataset.j, a.dataset.val); return; }
+      });
+      qsheet.addEventListener('input', ev => { if (ev.target.matches('[data-q]')) kbQuickField(ev.target, false); });
+      qsheet.addEventListener('change', ev => { if (ev.target.matches('[data-q]')) kbQuickField(ev.target, true); });
+    }
+    kb.layersOpen = !kbIsNarrow();
+    q('kb-right-body').addEventListener('toggle', ev => {
+      if (ev.target && ev.target.matches && ev.target.matches('.kb-details')) kb.detOpen = ev.target.open;
+    }, true);
     q('kb-play').onclick = kbPlayToggle;
     q('kb-prev').onclick = () => kbStep(-1);
     q('kb-next').onclick = () => kbStep(1);
@@ -5079,6 +5134,8 @@
     kbRenderTree();
     kbRenderRight();
     kbRenderScenes();
+    kbRenderLayers();
+    if (kb.quickOpen) kbRenderQuickSheet();
     kbUpdateStat();
     kbDrawPreview(kb.play.t);
   }
@@ -5396,6 +5453,7 @@
       }
       if (press.touch) {
         if (far < 9) return;
+        if (!press.handle && spec.touchHold === false) { clearPress(); return; }
         if (press.handle) {
           if (press.hold) { clearTimeout(press.hold); press.hold = 0; }
           begin(ev);
@@ -5431,6 +5489,7 @@
 
     box.addEventListener('pointerdown', ev => {
       if (ev.button != null && ev.button !== 0) return;
+      if (spec.ignore && ev.target.closest(spec.ignore)) return;
       const src = itemAt(ev.target);
       if (!src || src.classList.contains('kb-sort-source')) return;
       const ctrl = ev.target.closest('input,textarea,select,a,button');
@@ -5444,7 +5503,7 @@
         hold: 0, scrolling: false, last: ev, handle: !!handle,
         scroll0: sc ? (axis === 'x' ? sc.scrollLeft : sc.scrollTop) : 0
       };
-      if (press.touch && !press.handle) {
+      if (press.touch && !press.handle && spec.touchHold !== false) {
         press.hold = setTimeout(() => {
           if (press && !drag) begin({ clientX: press.x, clientY: press.y, cancelable: false });
         }, 230);
@@ -5808,18 +5867,23 @@
       '<div class="kb-field" style="margin-top:7px"><label>Card padding <b data-live="pad">' + s.pad + '</b></label><input type="range" min="0" max="52" step="1" data-set="pad" value="' + s.pad + '"></div>' +
       '<div class="kb-actions"><button class="kb-btn sm" data-item-act="all">सबै दृश्यमा लागू</button><button class="kb-btn sm" data-item-act="orig">Reset to Original</button><button class="kb-btn sm danger" data-item-act="default">Reset to Default</button></div>' +
       '</div>';
+    h += '<div class="kb-section kb-qsection"><div class="kb-section-title">द्रुत सम्पादन <span>प्रिभ्युमा तान्नुहोस्</span></div>' + kbQuickHTML() + '</div>';
+    h += '<details class="kb-details"' + (kb.detOpen ? ' open' : '') + '><summary>विस्तृत तत्व सेटिङ · पाठ, आकार, इफेक्ट, 3D</summary><div class="kb-details-body">';
     h += kbElControlsHTML(it);
     h += '<div class="kb-section"><div class="kb-section-title">Multi-element कार्ड</div>' +
       '<div class="kb-hint">एउटै कार्डमा जति पनि तत्व राख्नुहोस् — चार्ट, तालिका, रिपोर्ट वा पाठ। तल खोजेर थप्नुहोस्, त्यसपछि क्यानभासमा सार्न र Resize गर्न सकिन्छ।</div>' +
       '<div class="kb-actions" style="margin-bottom:7px"><button class="kb-btn sm" data-el-add-current="1">+ नयाँ पाठ तत्व</button></div>' +
       '<input class="kb-search" data-mel-search="1" autocomplete="off" placeholder="कार्डमा थप्न तत्व खोज्नुहोस्…">' +
       '<div class="kb-mel-list" id="kb-mel-list">' + kbMelListHTML('') + '</div></div>';
+    h += '</div></details>';
     return h;
   }
 
   function kbRightClick(e) {
     const tab = e.target.closest('[data-tab]');
     if (tab) { kb.tplPreview = null; kb.rightTab = tab.dataset.tab; kbRenderRight(); return; }
+    const qa = e.target.closest('[data-qact]');
+    if (qa) { kbQuickAct(qa.dataset.qact, +qa.dataset.j, qa.dataset.val); return; }
     const elPick = e.target.closest('[data-el-pick]');
     if (elPick) { kb.elSel = +elPick.dataset.elPick; kb.rightTab = 'settings'; kbRenderRight(); kbDrawPreview(kb.play.t); return; }
     const elAct = e.target.closest('[data-el-act]');
@@ -5864,6 +5928,7 @@
   function kbRightField(e, final) {
     const t = e.target;
     if (kb.tplPreview) kb.tplPreview = null;
+    if (t.matches('[data-q]')) { kbQuickField(t, final); return; }
     if (t.matches('[data-mel-search]')) {
       const list = q('kb-mel-list');
       if (list) list.innerHTML = kbMelListHTML(t.value);
@@ -5943,14 +6008,14 @@
       else if (k === 'x' || k === 'y') {
         kbSnap();
         const v = +t.value;
-        if (k === 'x') els.box[0] = clamp(isFinite(v) ? v : els.box[0], 46, Math.max(46, 674 - els.box[2]));
-        else els.box[1] = clamp(isFinite(v) ? v : els.box[1], 112, Math.max(112, 1224 - els.box[3]));
+        if (k === 'x') els.box[0] = clamp(isFinite(v) ? v : els.box[0], 0, Math.max(0, 720 - els.box[2]));
+        else els.box[1] = clamp(isFinite(v) ? v : els.box[1], 0, Math.max(0, 1280 - els.box[3]));
       }
       else if (k === 'w' || k === 'h') {
         kbSnap();
         const v = Math.max(12, +t.value || 12);
-        if (k === 'w') els.box[2] = Math.min(v, 674 - els.box[0]);
-        else els.box[3] = Math.min(v, 1224 - els.box[1]);
+        if (k === 'w') els.box[2] = Math.min(v, 720 - els.box[0]);
+        else els.box[3] = Math.min(v, 1280 - els.box[1]);
       }
       else if (k === 'z') { els.z = +t.value; }
       else if (k === 'aspect') { els.aspectLock = !!t.checked; }
@@ -6046,14 +6111,70 @@
   /* ─────────────────── automatic mode: persistence + actions ─────────────────── */
 
   function kbApplyElText(e) {
-    if (!e || !e.text || !e.el) return;
-    const st = e.el.textStyle || { x: e.box[0] + 14, y: e.box[1] + 30, size: 16, color: '#f2f6ff', single: false };
+    if (!e || !e.el || e.el.editable !== true) return;
+    const text = e.text != null ? String(e.text) : String(e.el.defaultText || '');
+    const st = Object.assign({
+      x: 0, y: 0, size: 26, color: '#f2f6ff', weight: 700, single: true,
+      lineH: 36, chars: 36, lines: 4, anchor: 'start', auto: true
+    }, e.el.textStyle || {});
+    const bb = (e.box || e.el.bbox || [0, 0, 300, 60]).slice();
+    if (e.el.custom) e.el.bbox = bb.slice();
+    const maxChars = Math.max(6, Math.floor((bb[2] - 32) / Math.max(6, (st.size || 26) * .55)));
     if (st.single) {
-      e.el.inner = kunT(st.x, st.y, kunFit(e.text, st.max || 34), st.size || 32, st.color || '#f6d365', st.weight || 700);
+      const anchor = st.anchor || 'start';
+      st.x = anchor === 'middle' ? bb[0] + bb[2] / 2
+        : anchor === 'end' ? bb[0] + bb[2] - 16 : bb[0] + 16;
+      st.y = bb[1] + Math.round((st.size || 26) * 1.45);
+      e.el.inner = kunT(st.x, st.y, kunFit(text || ' ', st.max || maxChars), st.size || 26, st.color || '#f2f6ff', st.weight || 700, anchor);
     } else {
-      const chars = st.chars || Math.max(20, Math.floor(e.box[2] / ((st.size || 15) * .62)));
-      e.el.inner = kunPara(st.x, st.y, e.text, chars, st.size || 15, st.lineH || 22, st.color || '#a9b8d8', st.lines || 4);
+      const chars = st.chars || maxChars;
+      e.el.inner = kunPara(st.x, st.y, text || ' ', chars, st.size || 22, st.lineH || 32, st.color || '#a9b8d8', st.lines || 4);
     }
+    e.el.textStyle = st;
+    if (e.el.custom) e.el.name = kbTextName(text);
+  }
+  function kbTextName(text) {
+    const s = String(text == null ? '' : text).replace(/\s+/g, ' ').trim();
+    return 'पाठ · ' + (s.length > 20 ? s.slice(0, 20) + '…' : (s || 'खाली'));
+  }
+  function kbTextSize(e) {
+    const st = e && e.el && e.el.textStyle;
+    return clamp(+(st && st.size) || 26, 10, 96);
+  }
+  function kbTextStyleSet(e, patch) {
+    if (!e || !e.el) return;
+    if (!e.box && e.el.bbox) e.box = e.el.bbox.slice();
+    if (!e.el.bbox && e.box) e.el.bbox = e.box.slice();
+    const bb = (e.box || e.el.bbox).slice();
+    if (e.el.custom) e.el.bbox = bb.slice();
+    const st = Object.assign({
+      x: bb[0] + 16, y: bb[1] + 42, size: 26, color: '#f2f6ff',
+      weight: 700, single: true, lineH: 36, chars: 36, lines: 4,
+      anchor: 'start', auto: true
+    }, e.el.textStyle || {});
+    Object.assign(st, patch || {});
+    st.size = clamp(+st.size || 26, 10, 96);
+    st.lineH = Math.max(st.size + 4, Math.round(st.size * 1.42));
+    if (st.single) {
+      const anchor = st.anchor || 'start';
+      st.x = anchor === 'middle' ? bb[0] + bb[2] / 2
+        : anchor === 'end' ? bb[0] + bb[2] - 16 : bb[0] + 16;
+      st.y = bb[1] + Math.round(st.size * 1.45);
+    } else {
+      st.lineH = Math.max(st.size + 6, Math.round(st.size * 1.5));
+      st.chars = Math.max(8, Math.floor((bb[2] - 32) / Math.max(6, st.size * .56)));
+    }
+    if (st.auto) {
+      const h = st.single
+        ? Math.max(36, Math.round(st.size * 1.95))
+        : Math.max(64, Math.round(st.lineH * clamp(st.lines || 4, 1, 8)));
+      e.el.bbox[3] = h;
+      e.box[3] = h;
+    }
+    e.el.textStyle = st;
+    e.el.name = kbTextName(e.text != null ? e.text : e.el.defaultText);
+    kbApplyElText(e);
+    kbPrimeSoon([e.el]);
   }
 
   function kbSnapItems() {
@@ -6061,12 +6182,12 @@
       const o = {};
       Object.keys(it).forEach(k => { if (k !== 'el' && k !== 'els') o[k] = it[k]; });
       o.elId = it.el && it.el.id;
-      o.elObj = (it.el && !kb.baseEls.has(it.el.id)) ? it.el : null;
+      o.elObj = (it.el && (it.el.custom || !kb.baseEls.has(it.el.id))) ? kbCloneElDef(it.el) : null;
       if (it.els) o.els = it.els.map(e => {
         const x = {};
         Object.keys(e).forEach(k => { if (k !== 'el') x[k] = e[k]; });
         x.elId = e.el && e.el.id;
-        x.elObj = (e.el && !kb.baseEls.has(e.el.id)) ? e.el : null;
+        x.elObj = (e.el && (e.el.custom || !kb.baseEls.has(e.el.id))) ? kbCloneElDef(e.el) : null;
         return x;
       });
       return o;
@@ -6135,6 +6256,10 @@
         elId: it.el && it.el.id || '',
         els: it.els ? it.els.map(e => ({
           key: e.key || (e.el && e.el.id) || '', elId: e.el && e.el.id || '',
+          /* Hand-made text and frame layers are not in the generated
+             catalog, so their tiny vector definition travels with the
+             layout. Without this they vanished after a reopen. */
+          elObj: e.el && e.el.custom ? kbCloneElDef(e.el) : null,
           box: e.box ? e.box.slice() : null, z: e.z || 1, visible: e.visible !== false,
           group: e.group || '', locked: !!e.locked, text: e.text || '', adSrc: e.adSrc || '',
           photoTouched: !!e.photoTouched,
@@ -6193,11 +6318,12 @@
         c.els.forEach(se => {
           let e = it.els.find(x => (x.key || (x.el && x.el.id)) === se.key);
           if (!e) {
-            /* A catalog element added by hand is not part of the generated
-               base card, so it has to be re-attached from the live catalog
-               when a saved layout is opened again. */
+            /* A hand-made text/frame layer, or a catalog element added by
+               hand, is not part of the generated base card. Re-attach the
+               saved vector definition first, then fall back to the live
+               catalog. */
             const rec = se.elId ? (kb.baseEls.get(se.elId) || kb.byId.get(se.elId)) : null;
-            const baseEl = rec && (rec.el || rec);
+            const baseEl = se.elObj ? kbCloneElDef(se.elObj) : (rec && (rec.el || rec));
             if (!baseEl || !se.box) return;
             const nbox = se.box.slice(); nbox[1] += dy;
             e = {
@@ -6223,7 +6349,8 @@
             kb.baseEls.set(baseEl.id, baseEl);
           } else {
             const base = se.elId ? (kb.baseEls.get(se.elId) || kb.byId.get(se.elId)) : null;
-            if (base) e.el = base.el || base;
+            if (se.elObj) e.el = kbCloneElDef(se.elObj);
+            else if (base) e.el = base.el || base;
             if (se.box) { const nb = se.box.slice(); nb[1] += dy; e.box = nb; }
             if (se.z != null) e.z = +se.z;
             e.visible = se.visible !== false;
@@ -6596,7 +6723,23 @@
       const bb = e.el.bbox || e.box;
       e.box[2] = bb[2]; e.box[3] = bb[3];
     } else if (act === 'dup') {
-      const copy = Object.assign({}, e, { id: 'kbe' + Date.now().toString(36), key: (e.el.id || 'el') + '-copy-' + Date.now().toString(36), box: e.box.slice(), z: (+e.z || 1) + .5, anim: Object.assign({}, e.anim || {}) });
+      const copyId = 'kbe' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+      let copyEl = e.el;
+      if (e.el && e.el.custom) {
+        copyEl = kbCloneElDef(e.el);
+        if (copyEl) copyEl.id = copyId;
+      }
+      const copy = Object.assign({}, e, {
+        id: copyId, key: copyEl ? copyEl.id : ((e.el && e.el.id) || 'el') + '-copy-' + Date.now().toString(36),
+        el: copyEl, box: e.box.slice(), z: (+e.z || 1) + .5,
+        anim: Object.assign({}, e.anim || {})
+      });
+      copy.box[0] = clamp(copy.box[0] + 16, 0, Math.max(0, 720 - copy.box[2]));
+      copy.box[1] = clamp(copy.box[1] + 16, 0, Math.max(0, 1280 - copy.box[3]));
+      if (copyEl && copyEl.custom) {
+        copyEl.bbox = copy.box.slice();
+        kb.baseEls.set(copyEl.id, copyEl);
+      }
       it.els.splice(j + 1, 0, copy);
       kb.elSel = j + 1;
     } else if (act === 'rm') {
@@ -6605,6 +6748,7 @@
       if (kb.elSel >= it.els.length) kb.elSel = it.els.length - 1;
     } else if (act === 'lock') e.locked = !e.locked;
     kbMarkDirty(); kbRenderAll(); kbSyncOverlay();
+    if (kb.quickOpen) kbRenderQuickSheet();
     kbToast(act === 'rm' ? 'तत्व हटाइयो।' : act === 'dup' ? 'तत्व प्रतिलिपि भयो।' : 'तत्व अपडेट भयो।');
   }
 
@@ -6681,21 +6825,477 @@
     kbToast('कार्डमा थपियो: ' + (el.name || 'तत्व'));
   }
 
-  function kbElementAdd() {
-    const it = kbCur(); if (!it) return;
+  function kbNewTextEl(it, box, text) {
+    const def = kbTplDef(it.tpl || kb.tpl);
+    const id = 'kbe' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    const size = 30;
+    const st = {
+      x: box[0] + 16, y: box[1] + 44, size: size,
+      color: def.ink || '#f2f6ff', weight: 700, single: true, auto: true,
+      lineH: 44, chars: 36, lines: 4, anchor: 'start'
+    };
+    const el = {
+      id: id, page: it.autoNo || 0, pageTitle: it.title || '',
+      type: 'note', name: kbTextName(text), bbox: box.slice(),
+      inner: kunT(st.x, st.y, text, size, st.color, st.weight, st.anchor),
+      dur: 6.4, editable: true, defaultText: text,
+      textStyle: st, custom: true
+    };
+    const wrapper = {
+      id: id, key: id, el: el, box: box.slice(), z: 60,
+      visible: true, anim: { entry: 'rise', delay: .12, dur: .7, kind: 'none' },
+      group: '', locked: false, text: text
+    };
+    it.els.push(wrapper);
+    kb.baseEls.set(id, el);
+    kb.elSel = it.els.length - 1;
+    return wrapper;
+  }
+
+  function kbQuickAddText() {
+    const it = kbCur();
+    if (!it) { kbToast('पहिले कुनै कार्ड छान्नुहोस्।', 'err'); return; }
     kbSnap();
     kbEnsureFree(it);
-    let y = 210;
-    it.els.forEach(e => { if (e.visible !== false && e.box) y = Math.max(y, e.box[1] + e.box[3] + 8) });
-    y = Math.min(1136, y);
-    const text = 'नयाँ पाठ';
-    const inner = kunT(72, y + 32, text, 18, '#f2f6ff', 600);
-    const el = { id: 'kbe' + Date.now().toString(36), page: it.autoNo || 0, pageTitle: it.title || '', type: 'note', name: 'नयाँ पाठ तत्व', bbox: [58, y, 604, 60], inner: inner, dur: 6.4, editable: true, textStyle: { x: 72, y: y + 32, size: 18, color: '#f2f6ff', chars: 42, lineH: 24, single: true }, defaultText: text };
-    it.els.push({ id: el.id, key: el.id, el: el, box: [58, y, 604, 60], z: 50, visible: true, anim: { entry: 'fade', delay: .1, dur: .7, kind: 'none' }, group: '', locked: false, text: text });
-    kb.baseEls.set(el.id, el);
-    kb.elSel = it.els.length - 1;
+    const card = it.cardBox || [46, 168, 628, 1056];
+    const w = Math.min(560, Math.max(240, card[2] - 70));
+    const n = it.els.filter(e => e.el && e.el.editable).length;
+    let x = Math.round(card[0] + (card[2] - w) / 2);
+    let y = Math.round(card[1] + card[3] * .38 + n * 54);
+    if (kb.lastTap) {
+      x = Math.round(clamp(kb.lastTap.x - w / 2, 8, 720 - w - 8));
+      y = Math.round(clamp(kb.lastTap.y - 36, 8, 1280 - 90));
+      kb.lastTap = null;
+    }
+    const wrapper = kbNewTextEl(it, [x, y, w, 72], 'नयाँ पाठ');
+    kbTextStyleSet(wrapper, { size: 30 });
+    wrapper.z = Math.max.apply(null, it.els.map(e => +e.z || 0)) + 1;
     kbMarkDirty(); kbRenderAll(); kbSyncOverlay();
-    kbToast('नयाँ तत्व थपियो — सेटिङमा पाठ सम्पादन गर्नुहोस्।');
+    kbOpenQuick();
+    setTimeout(() => {
+      const ta = q('kb-qsheet-body') && q('kb-qsheet-body').querySelector('[data-q="text"]');
+      if (ta) { ta.focus(); ta.select(); }
+    }, 180);
+    kbToast('पाठ थपियो — प्रिभ्युमा तान्नुहोस्, तल स्टाइल मिलाउनुहोस्।');
+  }
+
+  function kbPanelTheme(kind) {
+    const def = kbTplDef(kb.tpl);
+    const light = KB_LIGHT.has(def.motion);
+    return {
+      kind: kind || 'panel',
+      fill: light ? 'rgba(255,255,255,.78)' : 'rgba(8,14,26,.62)',
+      stroke: def.accent || '#f6d365',
+      radius: kind === 'frame' ? 14 : 20,
+      width: kind === 'frame' ? 2 : 1.5
+    };
+  }
+
+  function kbApplyPanelStyle(e) {
+    if (!e || !e.el) return;
+    const bb = (e.box || e.el.bbox || [0, 0, 100, 100]).slice();
+    if (!e.box) e.box = bb.slice();
+    if (e.el.custom) e.el.bbox = bb.slice();
+    const st = Object.assign(kbPanelTheme('panel'), e.el.panelStyle || {});
+    const x = bb[0], y = bb[1], w = Math.max(10, bb[2]), h = Math.max(10, bb[3]);
+    const r = Math.max(0, Math.min(+st.radius || 0, Math.min(w, h) / 2));
+    const fill = st.fill || 'rgba(8,14,26,.62)';
+    const stroke = st.stroke || '#f6d365';
+    const sw = Math.max(1, +st.width || 1.5);
+    let inner = '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + r + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + sw + '"/>';
+    if (st.kind === 'frame') {
+      inner += '<rect x="' + (x + 6) + '" y="' + (y + 6) + '" width="' + Math.max(2, w - 12) + '" height="' + Math.max(2, h - 12) + '" rx="' + Math.max(2, r - 5) + '" fill="none" stroke="' + stroke + '" stroke-opacity=".34" stroke-width="1"/>';
+      inner += '<rect x="' + (x + Math.min(20, w * .18)) + '" y="' + (y - 1.5) + '" width="' + Math.min(74, w * .28) + '" height="3" rx="1.5" fill="' + stroke + '"/>';
+    } else {
+      inner += '<rect x="' + (x + 14) + '" y="' + (y + 14) + '" width="' + Math.min(92, Math.max(18, w * .22)) + '" height="4" rx="2" fill="' + stroke + '"/>';
+      inner += '<rect x="' + (x + 14) + '" y="' + (y + h - 20) + '" width="' + Math.max(10, w - 28) + '" height="1" rx=".5" fill="' + stroke + '" fill-opacity=".22"/>';
+    }
+    e.el.panelStyle = st;
+    e.el.inner = inner;
+    e.el.name = st.kind === 'frame' ? 'फ्रेम' : 'प्यानल';
+  }
+
+  function kbNewPanelEl(it, box, kind, z) {
+    const id = 'kbe' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    const st = kbPanelTheme(kind);
+    const el = {
+      id: id, page: it.autoNo || 0, pageTitle: it.title || '',
+      type: 'panel', name: kind === 'frame' ? 'फ्रेम' : 'प्यानल',
+      bbox: box.slice(), inner: '', dur: 6.4,
+      custom: true, panelStyle: st
+    };
+    const wrapper = {
+      id: id, key: id, el: el, box: box.slice(), z: z,
+      visible: true, anim: { entry: 'fade', delay: .05, dur: .6, kind: 'none' },
+      group: '', locked: false
+    };
+    kbApplyPanelStyle(wrapper);
+    it.els.push(wrapper);
+    kb.baseEls.set(id, el);
+    kb.elSel = it.els.length - 1;
+    return wrapper;
+  }
+
+  function kbTextLayerFor(it, around) {
+    if (!it || !it.els) return null;
+    const texts = it.els.filter(e => e && e.el && e.el.editable && e.visible !== false && e.box);
+    if (!texts.length) return null;
+    const sel = kbSelectedEl();
+    if (sel && sel.el && sel.el.editable) return sel;
+    if (around) {
+      const inside = texts.filter(e => {
+        const cx = e.box[0] + e.box[2] / 2, cy = e.box[1] + e.box[3] / 2;
+        return cx >= around[0] && cx <= around[0] + around[2] && cy >= around[1] && cy <= around[1] + around[3];
+      });
+      if (inside.length) return inside.sort((a, b) => (+b.z || 0) - (+a.z || 0))[0];
+    }
+    return texts.sort((a, b) => (+b.z || 0) - (+a.z || 0))[0];
+  }
+
+  function kbQuickAddFrame() {
+    const it = kbCur();
+    if (!it) { kbToast('पहिले कुनै कार्ड छान्नुहोस्।', 'err'); return; }
+    const text = kbTextLayerFor(it);
+    if (!text) { kbToast('पहिले ＋ पाठ थप्नुहोस्, त्यसपछि फ्रेम स्वतः त्यसैको पछाडि बन्छ।', 'err'); return; }
+    kbSnap(); kbEnsureFree(it);
+    const pad = 18;
+    const box = [
+      clamp(text.box[0] - pad, 0, 720), clamp(text.box[1] - pad, 0, 1280),
+      text.box[2] + pad * 2, text.box[3] + pad * 2
+    ];
+    const w = kbNewPanelEl(it, box, 'frame', (+text.z || 1) - .4);
+    kbMarkDirty(); kbRenderAll(); kbSyncOverlay();
+    if (kb.quickOpen) kbRenderQuickSheet();
+    kbToast('फ्रेम पाठको तल थपियो — रङ र आकार स्टाइलमा मिलाउनुहोस्।');
+  }
+
+  function kbQuickAddPanel() {
+    const it = kbCur();
+    if (!it) { kbToast('पहिले कुनै कार्ड छान्नुहोस्।', 'err'); return; }
+    kbSnap(); kbEnsureFree(it);
+    const text = kbTextLayerFor(it);
+    let box, z;
+    if (text) {
+      const pad = 28;
+      box = [clamp(text.box[0] - pad, 0, 720), clamp(text.box[1] - pad, 0, 1280), text.box[2] + pad * 2, text.box[3] + pad * 2];
+      z = (+text.z || 1) - .5;
+    } else {
+      const card = it.cardBox || [46, 168, 628, 1056];
+      const w = Math.min(560, Math.max(280, card[2] - 80));
+      const h = Math.min(640, Math.max(260, card[3] - 180));
+      box = [Math.round(card[0] + (card[2] - w) / 2), Math.round(card[1] + (card[3] - h) / 2), w, h];
+      z = Math.min.apply(null, it.els.map(e => +e.z || 1)) - .5;
+    }
+    kbNewPanelEl(it, box, 'panel', z);
+    kbMarkDirty(); kbRenderAll(); kbSyncOverlay();
+    if (kb.quickOpen) kbRenderQuickSheet();
+    kbToast('प्यानल थपियो — अक्षर त्यसको माथिको लेयरमा राख्नुहोस्।');
+  }
+
+  function kbQuickFitPanel() {
+    const it = kbCur(), e = kbSelectedEl();
+    if (!it || !e || !e.el || e.el.type !== 'panel') { kbToast('पहिले फ्रेम वा प्यानल छान्नुहोस्।', 'err'); return; }
+    const text = kbTextLayerFor(it, e.box);
+    if (!text) { kbToast('यो फ्रेमभित्र कुनै पाठ भेटिएन।', 'err'); return; }
+    kbSnap();
+    const pad = e.el.panelStyle && e.el.panelStyle.kind === 'frame' ? 18 : 26;
+    const box = [clamp(text.box[0] - pad, 0, 720), clamp(text.box[1] - pad, 0, 1280), text.box[2] + pad * 2, text.box[3] + pad * 2];
+    e.box = box;
+    e.el.bbox = box.slice();
+    kbApplyPanelStyle(e);
+    kbMarkDirty(); kbRenderAll(); kbSyncOverlay();
+    if (kb.quickOpen) kbRenderQuickSheet();
+    kbToast('फ्रेम पाठसँग मिलाइयो।');
+  }
+
+  /* ─────────────────── quick style sheet ───────────────────
+     One small card for the 90% moves: text, size, colour, frame,
+     effect and in/out timing. The dense controls stay available
+     in the collapsible section below it. */
+  const KB_QCOLORS = ['#f2f6ff', '#f6d365', '#ffffff', '#34d399', '#22d3ee', '#fb7185', '#a78bfa', '#fbbf24'];
+
+  function kbHexColor(c, fallback) {
+    c = String(c == null ? '' : c).trim();
+    if (/^#[0-9a-f]{6}$/i.test(c)) return c;
+    if (/^#[0-9a-f]{3}$/i.test(c)) return '#' + c.charAt(1) + c.charAt(1) + c.charAt(2) + c.charAt(2) + c.charAt(3) + c.charAt(3);
+    const m = /^rgba?\(([^)]+)\)/i.exec(c);
+    if (m) {
+      const n = m[1].split(',').slice(0, 3).map(x => clamp(Math.round(+x || 0), 0, 255));
+      if (n.length === 3) return '#' + n.map(x => (x < 16 ? '0' : '') + x.toString(16)).join('');
+    }
+    return fallback || '#f2f6ff';
+  }
+  function kbSameColor(a, b) {
+    return kbHexColor(a, '').toLowerCase() === kbHexColor(b, '').toLowerCase();
+  }
+
+  function kbQuickHTML() {
+    const it = kbCur();
+    if (!it) return '<div class="kb-qempty">पहिले क्रम सूचीबाट एउटा कार्ड छान्नुहोस्।</div>';
+    const els = it.els || [];
+    const e = kbSelectedEl() || els[0] || null;
+    if (!e) {
+      return '<div class="kb-qempty"><b>यो कार्डमा अझै तत्व छैन।</b>' +
+        '<div class="kb-qaddonly">' +
+        '<button data-qact="add-text" class="strong">＋ पाठ</button>' +
+        '<button data-qact="add-panel">▤ प्यानल</button>' +
+        '<button data-qact="add-frame">▣ फ्रेम</button>' +
+        '</div><small>पाठ थपेपछि प्रिभ्युमा औंलाले तान्नुहोस्।</small></div>';
+    }
+    const j = els.indexOf(e);
+    const tag = kbLayerTag(e);
+    const st = (e.el && e.el.textStyle) || {};
+    const size = kbTextSize(e);
+    let h = '<div class="kb-qhero"><span class="kb-qkind">' + kbEsc(tag) + '</span>' +
+      '<b data-qhero-name="' + j + '">' + kbEsc((e.el && e.el.name) || 'तत्व') + '</b>' +
+      '<span class="kb-qz">z ' + (Math.round((+e.z || 1) * 10) / 10) + '</span></div>';
+
+    if (e.el && e.el.editable) {
+      h += '<div class="kb-qblock">' +
+        '<div class="kb-qrow kb-qtextrow"><textarea class="kb-qtext" data-q="text" data-j="' + j + '" rows="2" placeholder="पाठ लेख्नुहोस्…">' + kbEsc(e.text != null ? e.text : (e.el.defaultText || '')) + '</textarea></div>' +
+        '<div class="kb-qrow kb-qsize">' +
+        '<button data-qact="size-down" data-j="' + j + '" aria-label="अक्षर सानो">A−</button>' +
+        '<input type="range" min="10" max="96" step="1" data-q="size" data-j="' + j + '" value="' + size + '" aria-label="अक्षर आकार">' +
+        '<button data-qact="size-up" data-j="' + j + '" aria-label="अक्षर ठूलो">A+</button>' +
+        '<b class="kb-qval" data-qsize-val="' + j + '">' + size + '</b></div>' +
+        '<div class="kb-qrow kb-qswatches">' +
+        KB_QCOLORS.map(c => '<button class="kb-qsw' + (kbSameColor(st.color, c) ? ' on' : '') + '" data-qact="swatch" data-val="' + c + '" data-j="' + j + '" style="background:' + c + '" aria-label="रङ ' + c + '"></button>').join('') +
+        '<label class="kb-qcolor" title="अरू रङ"><input type="color" data-q="color" data-j="' + j + '" value="' + kbHexColor(st.color) + '"></label></div>' +
+        '<div class="kb-qrow kb-qminirow">' +
+        '<button data-qact="align" data-val="start" data-j="' + j + '" class="' + ((st.anchor || 'start') === 'start' ? 'on' : '') + '" title="बायाँ">⬅</button>' +
+        '<button data-qact="align" data-val="middle" data-j="' + j + '" class="' + (st.anchor === 'middle' ? 'on' : '') + '" title="बीच">↔</button>' +
+        '<button data-qact="weight" data-j="' + j + '" class="' + ((+st.weight || 700) >= 600 ? 'on' : '') + '" title="बोल्ड">ब</button>' +
+        '<button data-qact="line" data-j="' + j + '" class="' + (st.single ? 'on' : '') + '" title="एक / अनेक लाइन">' + (st.single ? 'एक लाइन' : 'अनेक लाइन') + '</button>' +
+        '</div></div>';
+    }
+
+    if (e.el && e.el.type === 'panel') {
+      const ps = e.el.panelStyle || {};
+      const kind = ps.kind === 'frame' ? 'frame' : 'panel';
+      h += '<div class="kb-qblock"><div class="kb-qlabel">प्यानल / फ्रेम</div>' +
+        '<div class="kb-qseg">' +
+        '<button data-qact="pkind" data-val="panel" data-j="' + j + '" class="' + (kind === 'panel' ? 'on' : '') + '">▤ प्यानल</button>' +
+        '<button data-qact="pkind" data-val="frame" data-j="' + j + '" class="' + (kind === 'frame' ? 'on' : '') + '">▣ फ्रेम</button>' +
+        '</div>' +
+        '<div class="kb-qrow kb-qminirow">' +
+        '<label class="kb-qmini">भित्री रङ<input type="color" data-q="pfill" data-j="' + j + '" value="' + kbHexColor(ps.fill, '#08101a') + '"></label>' +
+        '<label class="kb-qmini">किनारा<input type="color" data-q="pstroke" data-j="' + j + '" value="' + kbHexColor(ps.stroke, '#f6d365') + '"></label>' +
+        '<label class="kb-qmini">गोलाइ <b class="kb-qval" data-qrad-val="' + j + '">' + Math.round(+ps.radius || 0) + '</b><input type="range" min="0" max="40" step="1" data-q="pradius" data-j="' + j + '" value="' + Math.round(+ps.radius || 0) + '"></label>' +
+        '</div>' +
+        '<div class="kb-qrow kb-qminirow"><button data-qact="fit" data-j="' + j + '">पाठसँग मिलाउने</button>' +
+        '<button data-qact="behind" data-j="' + j + '">पाठको पछाडि</button></div></div>';
+    }
+
+    const anim = e.anim || {};
+    const chip = (val, label, on) => '<button data-qact="entry" data-val="' + val + '" data-j="' + j + '" class="' + (on ? 'on' : '') + '">' + label + '</button>';
+    const exitChip = (val, label, on) => '<button data-qact="exit" data-val="' + val + '" data-j="' + j + '" class="' + (on ? 'on' : '') + '">' + label + '</button>';
+    h += '<div class="kb-qblock"><div class="kb-qlabel">इफेक्ट</div>' +
+      '<div class="kb-qrow kb-qchips">' +
+      chip('fade', 'फेड', (anim.entry || 'fade') === 'fade') +
+      chip('rise', 'माथि', anim.entry === 'rise') +
+      chip('slide', 'स्लाइड', anim.entry === 'slide') +
+      chip('zoom', 'जुम', anim.entry === 'zoom') +
+      chip('none', 'कुनै नहुने', anim.entry === 'none') +
+      '</div>' +
+      '<div class="kb-qrow kb-qchips">' +
+      exitChip('fade', 'फेड आउट', (anim.exit || 'fade') === 'fade') +
+      exitChip('none', 'अचानक', anim.exit === 'none') +
+      '</div>' +
+      '<div class="kb-qrow kb-qminirow">' +
+      '<label class="kb-qmini">गति (से)<input type="number" min="0.2" max="4" step="0.05" data-q="animdur" data-j="' + j + '" value="' + (anim.dur == null ? .72 : anim.dur) + '"></label>' +
+      '<label class="kb-qmini">ढिलाइ<input type="number" min="0" max="8" step="0.05" data-q="delay" data-j="' + j + '" value="' + (+anim.delay || 0) + '"></label>' +
+      '<label class="kb-qmini">अपारदर्शी<input type="number" min="0" max="1" step="0.05" data-q="opacity" data-j="' + j + '" value="' + (anim.opacity == null ? 1 : anim.opacity) + '"></label>' +
+      '</div></div>';
+
+    const win = kbElWindow(it, e, j);
+    const dur = Math.max(.4, +it.dur || .4);
+    h += '<div class="kb-qblock"><div class="kb-qlabel">यो कार्डभित्रको समय</div>' +
+      '<div class="kb-qrow kb-qtime">' +
+      '<label>इन <input type="number" min="0" max="' + Math.max(0, dur - .2).toFixed(2) + '" step="0.1" data-q="in" data-j="' + j + '" value="' + win[0].toFixed(2) + '"></label>' +
+      '<label>आउट <input type="number" min="0.2" max="' + dur.toFixed(2) + '" step="0.1" data-q="out" data-j="' + j + '" value="' + win[1].toFixed(2) + '"></label>' +
+      '<button data-qact="cardtime" data-j="' + j + '" title="पूरा कार्ड">पूरा</button>' +
+      '<button data-qact="halftime" data-j="' + j + '" title="पछि आधा">आधा</button>' +
+      '<button data-qact="preview" data-j="' + j + '" class="strong">▶ हेर्नुहोस्</button>' +
+      '</div></div>';
+
+    h += '<div class="kb-qrow kb-qactions">' +
+      '<button data-qact="front" data-j="' + j + '" title="सबैभन्दा माथि">⬆ अगाडि</button>' +
+      '<button data-qact="back" data-j="' + j + '" title="सबैभन्दा पछाडि">⬇ पछाडि</button>' +
+      '<button data-qact="lock" data-j="' + j + '">' + (e.locked ? '🔓 खोल्ने' : '🔒 लक') + '</button>' +
+      '<button data-qact="vis" data-j="' + j + '">' + (e.visible === false ? '◉ देखाउने' : '◌ लुकाउने') + '</button>' +
+      '<button data-qact="dup" data-j="' + j + '">⧉ प्रतिलिपि</button>' +
+      '<button data-qact="rm" data-j="' + j + '" class="danger">✕ हटाउने</button>' +
+      '</div>';
+    h += '<div class="kb-qaddonly kb-qaddmore">' +
+      '<button data-qact="add-text" class="strong">＋ पाठ</button>' +
+      '<button data-qact="add-panel">▤ प्यानल</button>' +
+      '<button data-qact="add-frame">▣ फ्रेम</button>' +
+      '</div>';
+    return h;
+  }
+
+  function kbRenderQuickSheet() {
+    const body = q('kb-qsheet-body');
+    if (!body) return;
+    body.innerHTML = kbQuickHTML();
+    const sub = q('kb-qsheet-sub'), it = kbCur(), e = kbSelectedEl();
+    if (sub) sub.textContent = it ? ((e && e.el && e.el.name) || it.title || 'तत्व') + ' · ' + kbLayerTag(e || { el: it.el || {} }) : 'पाठ, फ्रेम, इफेक्ट र समय';
+  }
+  function kbOpenQuick() {
+    const it = kbCur();
+    if (!it) { kbToast('पहिले कुनै कार्ड छान्नुहोस्।', 'err'); return; }
+    if (kb.play.on) kbStop();
+    kb.quickOpen = true;
+    const sheet = q('kb-qsheet');
+    if (sheet) sheet.hidden = false;
+    kbRenderQuickSheet();
+  }
+  function kbCloseQuick() {
+    kb.quickOpen = false;
+    const sheet = q('kb-qsheet');
+    if (sheet) sheet.hidden = true;
+  }
+
+  function kbQuickMain(kind) {
+    if (kind === 'text') { kbQuickAddText(); return; }
+    if (kind === 'frame') { kbQuickAddFrame(); return; }
+    if (kind === 'panel') { kbQuickAddPanel(); return; }
+    if (kind === 'style') { kbOpenQuick(); return; }
+    if (kind === 'layers') {
+      kb.layersOpen = !kb.layersOpen;
+      kbRenderLayers();
+      setTimeout(() => { if (kb.open) kbDrawPreview(kb.play.t); }, 30);
+    }
+  }
+
+  function kbQuickField(t, final) {
+    if (!t.matches('[data-q]')) return false;
+    const it = kbCur();
+    if (!it || !it.els) return true;
+    const j = +t.dataset.j;
+    const e = it.els[j];
+    if (!e) return true;
+    const key = t.dataset.q;
+    if (key === 'text') {
+      e.text = t.value;
+      kbApplyElText(e);
+      const hd = document.querySelector('[data-qhero-name="' + j + '"]');
+      if (hd) hd.textContent = (e.el && e.el.name) || 'तत्व';
+      const row = document.querySelector('#kb-layerbar [data-lay-row="' + j + '"] .kb-lay-name b');
+      if (row) row.textContent = (e.el && e.el.name) || 'तत्व';
+    } else if (key === 'size') {
+      const v = clamp(Math.round(+t.value || 30), 10, 96);
+      kbTextStyleSet(e, { size: v });
+      const lbl = document.querySelector('[data-qsize-val="' + j + '"]');
+      if (lbl) lbl.textContent = v;
+      const slider = document.querySelector('#kb-qsheet-body [data-q="size"][data-j="' + j + '"]');
+      if (slider && slider !== t && +slider.value !== v) slider.value = v;
+    } else if (key === 'color') {
+      kbTextStyleSet(e, { color: t.value });
+      document.querySelectorAll('.kb-qsw').forEach(b => b.classList.toggle('on', kbSameColor(b.dataset.val, t.value)));
+    } else if (key === 'align') {
+      kbTextStyleSet(e, { anchor: t.value });
+    } else if (key === 'in' || key === 'out') {
+      const dur = Math.max(.4, +it.dur || .4);
+      const win = kbElWindow(it, e, j);
+      const v = clamp(+t.value || 0, 0, dur);
+      if (key === 'in') e.in = clamp(v, 0, win[1] - .2);
+      else e.out = clamp(v, win[0] + .2, dur);
+      kbPaintLayerBar(it, e, j);
+    } else if (key === 'animdur' || key === 'delay' || key === 'opacity') {
+      e.anim = e.anim || {};
+      if (key === 'opacity') e.anim.opacity = clamp(+t.value, 0, 1);
+      else if (key === 'delay') e.anim.delay = Math.max(0, +t.value || 0);
+      else e.anim.dur = clamp(+t.value || .72, .2, 4);
+    } else if (key === 'pfill' || key === 'pstroke' || key === 'pradius') {
+      e.el.panelStyle = Object.assign(kbPanelTheme('panel'), e.el.panelStyle || {});
+      if (key === 'pfill') e.el.panelStyle.fill = kbRgba(t.value, .74);
+      else if (key === 'pstroke') e.el.panelStyle.stroke = t.value;
+      else e.el.panelStyle.radius = clamp(+t.value || 0, 0, 40);
+      kbApplyPanelStyle(e);
+      const rv = document.querySelector('[data-qrad-val="' + j + '"]');
+      if (rv) rv.textContent = Math.round(+e.el.panelStyle.radius || 0);
+    } else if (key === 'visible') {
+      e.visible = !!t.checked;
+    } else if (key === 'lock') {
+      e.locked = !!t.checked;
+    }
+    kbMarkDirty();
+    if (final) kbRenderLayers();
+    kbDrawPreview(kb.play.t);
+    kbSyncOverlay();
+    return true;
+  }
+
+  function kbQuickAct(act, j, val) {
+    const it = kbCur();
+    if (!it) return;
+    if (act === 'close') { kbCloseQuick(); return; }
+    if (act === 'add-text') { kbQuickAddText(); return; }
+    if (act === 'add-panel') { kbQuickAddPanel(); return; }
+    if (act === 'add-frame') { kbQuickAddFrame(); return; }
+    const e = it.els && it.els[j] ? it.els[j] : kbSelectedEl();
+    if (!e) { kbToast('पहिले कुनै तत्व छान्नुहोस्।', 'err'); return; }
+    if (!it.els || it.els.indexOf(e) < 0) return;
+    const idx = it.els.indexOf(e);
+    if (act === 'preview') {
+      const items = kbPreviewItems(), at = items.indexOf(it);
+      const win = kbElWindow(it, e, idx);
+      if (at >= 0) {
+        kbStop();
+        kbSeek(kbSceneStart(items, at) + win[0]);
+        kbPlayToggle();
+      }
+      return;
+    }
+    if (act === 'front' || act === 'back' || act === 'forward' || act === 'backward' || act === 'dup' || act === 'rm' || act === 'vis' || act === 'lock') {
+      kbElementAct(act, idx);
+      if (kb.quickOpen) kbRenderQuickSheet();
+      return;
+    }
+    if (act === 'fit') { kbQuickFitPanel(); return; }
+    kbSnap();
+    if (act === 'size-down' || act === 'size-up') {
+      kbTextStyleSet(e, { size: kbTextSize(e) + (act === 'size-up' ? 2 : -2) });
+    } else if (act === 'swatch') {
+      kbTextStyleSet(e, { color: val || '#f2f6ff' });
+    } else if (act === 'align') {
+      kbTextStyleSet(e, { anchor: val || 'start' });
+    } else if (act === 'weight') {
+      const st = e.el.textStyle || {};
+      kbTextStyleSet(e, { weight: (+st.weight || 700) >= 600 ? 400 : 700 });
+    } else if (act === 'line') {
+      const st = e.el.textStyle || {};
+      kbTextStyleSet(e, { single: !st.single });
+    } else if (act === 'entry' || act === 'exit') {
+      e.anim = e.anim || {};
+      e.anim[act] = val || (act === 'exit' ? 'fade' : 'fade');
+      if (act === 'entry') { e.anim.delay = Math.max(0, +e.anim.delay || 0); if (e.in == null) { const w = kbElWindow(it, e, idx); e.in = w[0]; } }
+    } else if (act === 'pkind') {
+      e.el.panelStyle = Object.assign(kbPanelTheme('panel'), e.el.panelStyle || {});
+      e.el.panelStyle.kind = val === 'frame' ? 'frame' : 'panel';
+      e.el.panelStyle.radius = e.el.panelStyle.kind === 'frame' ? 14 : 20;
+      e.el.custom = true;
+      kbApplyPanelStyle(e);
+    } else if (act === 'behind') {
+      const text = kbTextLayerFor(it, e.box);
+      const minZ = Math.min.apply(null, it.els.map(x => +x.z || 0));
+      e.z = text && text !== e ? (+text.z || 1) - .2 : minZ - .5;
+    } else if (act === 'cardtime') {
+      e.in = 0; e.out = Math.max(.4, +it.dur || .4);
+    } else if (act === 'halftime') {
+      e.in = Math.round((+it.dur || .4) * .5 * 100) / 100;
+      e.out = Math.max(e.in + .2, +it.dur || .4);
+    }
+    kbMarkDirty();
+    kbRenderAll();
+    kbSyncOverlay();
+    if (kb.quickOpen) kbRenderQuickSheet();
+    kbToast('अपडेट भयो।');
+  }
+
+  function kbElementAdd() {
+    kbQuickAddText();
   }
 
   function kbElementGroup() {
@@ -6778,7 +7378,7 @@
       return best;
     };
     const guides = (it, e, cand) => {
-      const vs = [46, 360, 674], hs = [112, 640, 1224];
+      const vs = [0, 360, 720], hs = [0, 640, 1280];
       it.els.forEach(x => {
         if (x === e || !x.box || x.visible === false) return;
         vs.push(x.box[0], x.box[0] + x.box[2] / 2, x.box[0] + x.box[2]);
@@ -6798,29 +7398,56 @@
       if (gh) { if (gy != null) { gh.style.display = 'block'; gh.style.top = (gy / 1280 * 100) + '%'; } else gh.style.display = 'none' }
       return [gx != null ? gx : cand[0], gy != null ? gy : cand[1]];
     };
-    const start = (ev, handle) => {
-      const it = kbCur(), e = kbSelectedEl();
+    const hideGuides = () => {
+      const gv = q('kb-guide-v'), gh = q('kb-guide-h');
+      if (gv) gv.style.display = 'none';
+      if (gh) gh.style.display = 'none';
+    };
+    const hitAt = (it, p, pointerType) => {
+      const pad = pointerType === 'touch' || pointerType === 'pen' ? 16 : 5;
+      return it.els.map((e, j) => ({ e: e, j: j }))
+        .filter(x => x.e && x.e.visible !== false && x.e.box)
+        .filter(x => {
+          const b = x.e.box;
+          return p.x >= b[0] - pad && p.x <= b[0] + b[2] + pad && p.y >= b[1] - pad && p.y <= b[1] + b[3] + pad;
+        })
+        .sort((a, b) => (+b.e.z || 0) - (+a.e.z || 0))[0] || null;
+    };
+    const startDrag = (ev, e, j, handle) => {
+      const it = kbCur();
       if (!it || !e || kb.mode === 'present' || e.locked) return;
       ev.preventDefault(); ev.stopPropagation();
-      kbSnap();
+      if (kb.play.on) kbStop();
       const p = pt(ev), b = e.box.slice(), aspect = b[2] / Math.max(1, b[3]);
-      const others = e.group ? it.els.filter(x => x.group === e.group) : [e];
-      const startBoxes = others.map(x => ({ x: x.box.slice(), e: x }));
+      const others = e.group ? it.els.filter(x => x.group === e.group && x.box) : [e];
+      const starts = others.map(x => ({ e: x, x: x.box.slice() }));
+      let moved = false, snapped = false;
       const move = mv => {
         const q2 = pt(mv), dx = q2.x - p.x, dy = q2.y - p.y;
+        if (!moved) {
+          const sc = stage.getBoundingClientRect().width / 720 || 1;
+          if (Math.hypot(dx, dy) * sc < 2.5) return;
+          moved = true;
+          if (!snapped) { kbSnap(); snapped = true; }
+          document.body.classList.add('kb-dragging');
+        }
+        if (mv.cancelable) mv.preventDefault();
         let nb = b.slice();
         if (!handle) {
-          nb[0] += dx; nb[1] += dy;
-          // group movement
-          let gx = 0, gy = 0;
-          const snapped = guides(it, e, nb);
-          gx = snapped[0] - nb[0]; gy = snapped[1] - nb[1];
-          nb[0] += gx; nb[1] += gy;
-          nb[0] = Math.round(nb[0] / 8) * 8; nb[1] = Math.round(nb[1] / 8) * 8;
-          nb[0] = clamp(nb[0], 46, Math.max(46, 674 - b[2]));
-          nb[1] = clamp(nb[1], 112, Math.max(112, 1224 - b[3]));
-          const ddx = nb[0] - b[0], ddy = nb[1] - b[1];
-          startBoxes.forEach(sb => { sb.e.box[0] = Math.round(sb.x[0] + ddx); sb.e.box[1] = Math.round(sb.x[1] + ddy); });
+          const g = guides(it, e, [b[0] + dx, b[1] + dy, b[2], b[3]]);
+          let ddx = Math.round((g[0] - b[0]) / 2) * 2;
+          let ddy = Math.round((g[1] - b[1]) / 2) * 2;
+          const gx0 = Math.min.apply(null, starts.map(s => s.x[0]));
+          const gy0 = Math.min.apply(null, starts.map(s => s.x[1]));
+          const gx1 = Math.max.apply(null, starts.map(s => s.x[0] + s.x[2]));
+          const gy1 = Math.max.apply(null, starts.map(s => s.x[1] + s.x[3]));
+          ddx = clamp(ddx, -gx0, Math.max(-gx0, 720 - gx1));
+          ddy = clamp(ddy, -gy0, Math.max(-gy0, 1280 - gy1));
+          starts.forEach(s => {
+            s.e.box[0] = Math.round(s.x[0] + ddx);
+            s.e.box[1] = Math.round(s.x[1] + ddy);
+          });
+          nb[0] = Math.round(b[0] + ddx); nb[1] = Math.round(b[1] + ddy);
           e.box = nb;
         } else {
           const minW = 24, minH = 20;
@@ -6829,18 +7456,16 @@
           if (handle.indexOf('s') >= 0) nb[3] = Math.max(minH, b[3] + dy);
           if (handle.indexOf('n') >= 0) { nb[3] = Math.max(minH, b[3] - dy); nb[1] = b[1] + (b[3] - nb[3]); }
           if ((handle.length === 2) && e.aspectLock !== false) {
-            if (handle === 'nw' || handle === 'se') nb[3] = nb[2] / aspect;
-            else nb[3] = nb[2] / aspect;
+            nb[3] = nb[2] / aspect;
             if (handle.indexOf('n') >= 0) nb[1] = b[1] + (b[3] - nb[3]);
             if (handle.indexOf('w') >= 0) nb[0] = b[0] + (b[2] - nb[2]);
           }
           nb[2] = Math.round(nb[2] / 2) * 2; nb[3] = Math.round(nb[3] / 2) * 2;
-          nb[0] = clamp(nb[0], 46, 674 - 24); nb[1] = clamp(nb[1], 112, 1224 - 20);
-          nb[2] = Math.min(nb[2], 674 - nb[0]);
-          /* Width may hit the safe edge after the aspect step; recompute the
-             height from the final width so the locked ratio is never broken. */
+          nb[0] = clamp(nb[0], 0, Math.max(0, 720 - 24));
+          nb[1] = clamp(nb[1], 0, Math.max(0, 1280 - 20));
+          nb[2] = Math.min(nb[2], 720 - nb[0]);
           if ((handle.length === 2) && e.aspectLock !== false) nb[3] = Math.round((nb[2] / aspect) / 2) * 2;
-          nb[3] = Math.min(nb[3], 1224 - nb[1]);
+          nb[3] = Math.min(nb[3], 1280 - nb[1]);
           e.box = nb;
         }
         kbSyncOverlay(); kbDrawPreview(kb.play.t);
@@ -6849,28 +7474,73 @@
         document.removeEventListener('pointermove', move);
         document.removeEventListener('pointerup', up);
         document.removeEventListener('pointercancel', up);
-        const gv = q('kb-guide-v'), gh = q('kb-guide-h');
-        if (gv) gv.style.display = 'none';
-        if (gh) gh.style.display = 'none';
-        kbMarkDirty(); kbRenderRight(); kbPrimeSoon(kbSelectedEl() ? [kbSelectedEl().el] : []);
+        document.body.classList.remove('kb-dragging');
+        hideGuides();
+        if (!moved) return;
+        kbMarkDirty();
+        starts.forEach(s => {
+          const x = s.e;
+          if (x.el && x.el.custom) {
+            x.el.bbox = x.box.slice();
+            if (x.el.editable) kbApplyElText(x);
+            else if (x.el.type === 'panel') kbApplyPanelStyle(x);
+          }
+        });
+        kbPrimeSoon(starts.map(s => s.e.el).filter(Boolean));
+        kbRenderLayers();
+        if (kb.rightTab === 'settings') kbRenderRight();
+        if (kb.quickOpen) kbRenderQuickSheet();
+        kbPrimeSoon(e.el ? [e.el] : []);
       };
-      document.addEventListener('pointermove', move);
+      document.addEventListener('pointermove', move, { passive: false });
       document.addEventListener('pointerup', up);
       document.addEventListener('pointercancel', up);
     };
-    box.addEventListener('pointerdown', ev => { if (ev.target.closest('.kb-h')) return; start(ev, null) });
-    box.querySelectorAll('.kb-h').forEach(h => h.addEventListener('pointerdown', ev => start(ev, h.dataset.h)));
+
     let press = null;
     stage.addEventListener('pointerdown', ev => {
-      press = { x: ev.clientX, y: ev.clientY };
       if (kb.mode === 'present') return;
-      if (ev.target.closest('#kb-selbox')) return;
-      if (ev.target.closest('.kb-overlay') && ev.target !== q('kb-overlay')) return;
-      const it = kbCur(); if (!it || !it.els) return;
+      if (ev.button != null && ev.button !== 0) return;
+      if (ev.target.closest('.kb-h')) {
+        const handle = ev.target.closest('.kb-h').dataset.h;
+        const e = kbSelectedEl(), it = kbCur();
+        if (e && it) { press = { x: ev.clientX, y: ev.clientY }; startDrag(ev, e, it.els.indexOf(e), handle); }
+        return;
+      }
+      if (ev.target.closest('#kb-selbox')) {
+        const e = kbSelectedEl(), it = kbCur();
+        if (e && it) { press = { x: ev.clientX, y: ev.clientY }; startDrag(ev, e, it.els.indexOf(e), null); }
+        return;
+      }
+      const it = kbCur();
+      if (!it || !it.els) return;
       const p = pt(ev);
-      const hit = it.els.map((e, j) => ({ e, j })).filter(x => x.e.visible !== false && x.e.box && p.x >= x.e.box[0] && p.x <= x.e.box[0] + x.e.box[2] && p.y >= x.e.box[1] && p.y <= x.e.box[1] + x.e.box[3]).sort((a, b) => (+b.e.z || 0) - (+a.e.z || 0))[0];
-      if (hit) { kb.elSel = hit.j; kb.rightTab = 'settings'; kbRenderRight(); kbDrawPreview(kb.play.t); kbSyncOverlay(); }
-      else { kb.elSel = -1; kbSyncOverlay(); kbRenderRight(); }
+      press = { x: ev.clientX, y: ev.clientY };
+      const hit = hitAt(it, p, ev.pointerType);
+      if (hit) {
+        const now = Date.now();
+        if (kb.play.on) kbStop();
+        kb.elSel = hit.j;
+        kb.rightTab = 'settings';
+        kbRenderRight();
+        kbRenderLayers();
+        kbDrawPreview(kb.play.t);
+        kbSyncOverlay();
+        if (kb.lastTap && kb.lastTap.j === hit.j && now - kb.lastTap.t < 380) {
+          kb.lastTap = null;
+          kbOpenQuick();
+          return;
+        }
+        kb.lastTap = { x: p.x, y: p.y, t: now, j: hit.j };
+        startDrag(ev, hit.e, hit.j, null);
+      } else {
+        kb.lastTap = { x: p.x, y: p.y, t: Date.now(), j: -1 };
+        kb.elSel = -1;
+        kbDrawPreview(kb.play.t);
+        kbSyncOverlay();
+        kbRenderRight();
+        kbRenderLayers();
+      }
     });
     stage.addEventListener('pointerup', ev => {
       if (!press) return;
@@ -6881,6 +7551,199 @@
       if (it && kbHotspotHit(it, pt(ev))) kbOpenHotspot(it);
     });
     window.addEventListener('resize', () => setTimeout(kbSyncOverlay, 40));
+    setTimeout(kbSyncOverlay, 60);
+  }
+
+  /* ─────────────────── layer timeline (current card) ───────────────────
+     One row per real card element. The bar is the element's own in/out
+     window, so trimming here is exactly what the renderer reads. */
+  function kbElWindow(it, e, j) {
+    const dur = Math.max(.4, +(it && it.dur) || .4);
+    const anim = (e && e.anim) || {};
+    const defIn = Math.max(0, (+anim.delay || 0) + .07 * j);
+    let a = e && e.in != null ? +e.in : defIn;
+    let b = e && e.out != null ? +e.out : dur;
+    a = clamp(isFinite(a) ? a : 0, 0, dur);
+    b = clamp(isFinite(b) ? b : dur, Math.min(dur, a + .2), dur);
+    return [Math.round(a * 100) / 100, Math.round(b * 100) / 100];
+  }
+  function kbLayerOrder(it) {
+    return (it && it.els ? it.els : []).map((e, j) => ({ e: e, j: j }))
+      .filter(x => x.e)
+      .sort((a, b) => (+b.e.z || 0) - (+a.e.z || 0));
+  }
+  function kbLayerTag(e) {
+    if (!e || !e.el) return '';
+    if (e.el.type === 'panel') return e.el.panelStyle && e.el.panelStyle.kind === 'frame' ? 'फ्रेम' : 'प्यानल';
+    if (e.el.editable) return 'पाठ';
+    return KB_TYPE_NE[e.el.type] || e.el.type || '';
+  }
+  function kbRenderLayers() {
+    const box = q('kb-layerbar'); if (!box) return;
+    const it = kbCur();
+    const els = it && it.els ? it.els : [];
+    const rowsEl = q('kb-lay-rows');
+    const keep = rowsEl ? rowsEl.scrollTop : 0;
+    const open = !!kb.layersOpen && !!els.length;
+    box.classList.toggle('open', open);
+    let h = '<div class="kb-lay-head">' +
+      '<button class="kb-lay-toggle" data-lay-toggle="1" aria-expanded="' + (open ? 'true' : 'false') + '">' +
+      '<span class="kb-lay-chev">' + (open ? '▾' : '▸') + '</span><b>लेयर टाइमलाइन</b>' +
+      '<span class="kb-lay-count">' + els.length + '</span></button>' +
+      '<div class="kb-lay-head-actions">' +
+      '<button data-quick="text" title="नयाँ पाठ">＋ पाठ</button>' +
+      '<button data-quick="style" title="छानिएको तत्व स्टाइल">✨ स्टाइल</button>' +
+      '</div></div>';
+    if (open) {
+      const dur = Math.max(.4, +it.dur || .4);
+      h += '<div class="kb-lay-body"><div class="kb-lay-ruler"><span>0s</span><span>' + dur.toFixed(1) + 's</span></div><div class="kb-lay-rows" id="kb-lay-rows">';
+      kbLayerOrder(it).forEach(x => {
+        const e = x.e, j = x.j;
+        const [a, b] = kbElWindow(it, e, j);
+        const left = clamp(a / dur * 100, 0, 100);
+        const width = clamp((b - a) / dur * 100, 1.2, 100 - left);
+        const sel = kb.elSel === j;
+        const vis = e.visible !== false;
+        h += '<div class="kb-lay-row' + (sel ? ' on' : '') + (vis ? '' : ' off') + (e.locked ? ' locked' : '') + '" data-lay-row="' + j + '">' +
+          '<span class="kb-lay-grip" title="तानेर लेयर क्रम बदल्नुहोस्">⠿</span>' +
+          '<button class="kb-lay-eye" data-lay-act="vis" data-j="' + j + '" title="देखाउने / लुकाउने">' + (vis ? '◉' : '◌') + '</button>' +
+          '<div class="kb-lay-main" data-lay-pick="' + j + '">' +
+          '<div class="kb-lay-name"><b>' + kbEsc((e.el && e.el.name) || 'तत्व') + '</b>' +
+          '<span class="kb-lay-z">z' + Math.round((+e.z || 1) * 10) / 10 + '</span>' +
+          '<span class="kb-lay-tag">' + kbEsc(kbLayerTag(e)) + '</span></div>' +
+          '<div class="kb-lay-track" data-lay-track="' + j + '">' +
+          '<span class="kb-lay-bar" data-lay-bar="' + j + '" style="left:' + left.toFixed(2) + '%;width:' + width.toFixed(2) + '%">' +
+          '<i class="kb-lay-trim in" data-lay-trim="in" data-j="' + j + '"></i>' +
+          '<span class="kb-lay-t">' + a.toFixed(1) + '–' + b.toFixed(1) + 's</span>' +
+          '<i class="kb-lay-trim out" data-lay-trim="out" data-j="' + j + '"></i>' +
+          '</span></div></div>' +
+          '<button class="kb-lay-lock" data-lay-act="lock" data-j="' + j + '" title="लक / अनलक">' + (e.locked ? '🔒' : '🔓') + '</button>' +
+          '</div>';
+      });
+      h += '</div><div class="kb-lay-hint">⠿ तान्नुहोस् = लेयर क्रम · बार तान्नुहोस् = समय सार्नुहोस् · छेउ तान्नुहोस् = इन/आउट</div></div>';
+    }
+    box.innerHTML = h;
+    const rows = q('kb-lay-rows'); if (rows) rows.scrollTop = keep;
+    document.querySelectorAll('#kb-quickbar [data-quick="layers"]').forEach(b => b.classList.toggle('on', open));
+  }
+  function kbSelectLayer(j) {
+    const it = kbCur();
+    if (!it || !it.els || !it.els[j]) return;
+    if (kb.play.on) kbStop();
+    kb.elSel = j;
+    kb.rightTab = 'settings';
+    kbRenderRight();
+    kbRenderLayers();
+    kbDrawPreview(kb.play.t);
+    kbSyncOverlay();
+    if (kb.quickOpen) kbRenderQuickSheet();
+  }
+  function kbLayerReorder(from, to) {
+    const it = kbCur();
+    if (!it || !it.els || from === to) return;
+    const order = kbLayerOrder(it);
+    const moved = order[from];
+    if (!moved) return;
+    kbSnap();
+    order.splice(from, 1);
+    order.splice(clamp(to, 0, order.length), 0, moved);
+    order.forEach((x, pos) => { x.e.z = order.length - pos; });
+    kb.elSel = moved.j;
+    kbMarkDirty();
+    kbRenderLayers();
+    kbRenderRight();
+    kbDrawPreview(kb.play.t);
+    kbSyncOverlay();
+    kbToast('लेयर क्रम बदलियो।');
+  }
+  function kbPaintLayerBar(it, e, j) {
+    const bar = document.querySelector('#kb-layerbar [data-lay-bar="' + j + '"]');
+    if (!bar) return;
+    const dur = Math.max(.4, +it.dur || .4);
+    const [a, b] = kbElWindow(it, e, j);
+    bar.style.left = clamp(a / dur * 100, 0, 100).toFixed(2) + '%';
+    bar.style.width = clamp((b - a) / dur * 100, 1.2, 100 - a / dur * 100).toFixed(2) + '%';
+    const t = bar.querySelector('.kb-lay-t');
+    if (t) t.textContent = a.toFixed(1) + '–' + b.toFixed(1) + 's';
+    document.querySelectorAll('#kb-qsheet-body [data-q="in"], #kb-right-body [data-q="in"]').forEach(x => { if (x !== document.activeElement) x.value = a.toFixed(2); });
+    document.querySelectorAll('#kb-qsheet-body [data-q="out"], #kb-right-body [data-q="out"]').forEach(x => { if (x !== document.activeElement) x.value = b.toFixed(2); });
+  }
+  function kbBindLayerBar() {
+    const box = q('kb-layerbar'); if (!box) return;
+    box.addEventListener('click', ev => {
+      if (ev.target.closest('[data-lay-toggle]')) {
+        kb.layersOpen = !kb.layersOpen;
+        kbRenderLayers();
+        setTimeout(() => { if (kb.open) kbDrawPreview(kb.play.t); }, 30);
+        return;
+      }
+      const qb = ev.target.closest('[data-quick]');
+      if (qb) { kbQuickMain(qb.dataset.quick); return; }
+      const act = ev.target.closest('[data-lay-act]');
+      if (act) { kbElementAct(act.dataset.layAct, +act.dataset.j); return; }
+      const row = ev.target.closest('[data-lay-pick]');
+      if (row) { kbSelectLayer(+row.dataset.layPick); return; }
+    });
+    box.addEventListener('pointerdown', ev => {
+      if (ev.button != null && ev.button !== 0) return;
+      const trim = ev.target.closest('[data-lay-trim]');
+      const bar = ev.target.closest('[data-lay-bar]');
+      if (!trim && !bar) return;
+      const it = kbCur();
+      const j = +((trim || bar).dataset.j);
+      const e = it && it.els ? it.els[j] : null;
+      if (!e || e.locked) return;
+      const track = (trim || bar).closest('.kb-lay-track');
+      if (!track) return;
+      const w = track.getBoundingClientRect().width;
+      if (!w) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (ev.target.closest('[data-lay-trim]')) ev.stopImmediatePropagation();
+      const dur = Math.max(.4, +it.dur || .4);
+      const startX = ev.clientX;
+      const [a0, b0] = kbElWindow(it, e, j);
+      if (e.in == null) e.in = a0;
+      if (e.out == null) e.out = b0;
+      let changed = false;
+      const snap = v => Math.round(v / .05) * .05;
+      const move = mv => {
+        const dt = (mv.clientX - startX) / w * dur;
+        if (Math.abs(mv.clientX - startX) < 1) return;
+        if (!changed) { changed = true; kbSnap(); }
+        if (trim) {
+          if (trim.dataset.layTrim === 'in') e.in = clamp(snap(a0 + dt), 0, b0 - .2);
+          else e.out = clamp(snap(b0 + dt), a0 + .2, dur);
+        } else {
+          const len = b0 - a0;
+          const na = clamp(snap(a0 + dt), 0, Math.max(0, dur - len));
+          e.in = na; e.out = Math.min(dur, na + len);
+        }
+        kbPaintLayerBar(it, e, j);
+        kbDrawPreview(kb.play.t);
+      };
+      const up = () => {
+        document.removeEventListener('pointermove', move);
+        document.removeEventListener('pointerup', up);
+        document.removeEventListener('pointercancel', up);
+        if (!changed) return;
+        kbMarkDirty();
+        kbRenderLayers();
+        if (kb.rightTab === 'settings') kbRenderRight();
+      };
+      document.addEventListener('pointermove', move, { passive: false });
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', up);
+    }, { passive: false });
+  }
+  function kbBindLayerSort() {
+    const box = q('kb-layerbar'); if (!box) return;
+    kbBindSortable(box, {
+      item: '.kb-lay-row', axis: 'y', scroller: () => q('kb-lay-rows'),
+      handle: '.kb-lay-grip', touchHold: false, ignore: '[data-lay-track]',
+      canDrag: () => !!(kbCur() && kbCur().els && kbCur().els.length > 1),
+      onDrop: (from, to) => kbLayerReorder(from, to)
+    });
   }
 
   function kbRenderScenes() {

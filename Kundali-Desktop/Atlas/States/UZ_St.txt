@@ -1,0 +1,15 @@
+00 UZ UZBEKISTAN (General)
+01 UZ Andijon
+02 UZ Bukhoro
+03 UZ Farghona
+04 UZ Jizzakh
+05 UZ Khorazm
+06 UZ Namangan
+07 UZ Nawoiy
+08 UZ Qashqadaryo
+09 UZ Qoraqalpoghiston**
+10 UZ Samarqand
+11 UZ Sirdaryo
+12 UZ Surkhondaryo
+13 UZ Toshkent*
+14 UZ Toshkent

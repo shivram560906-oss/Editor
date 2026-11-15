@@ -1,0 +1,4 @@
+00 TN TONGA (General)
+01 TN Haapai
+02 TN Tongatapu
+03 TN Vavau

@@ -1,0 +1,11 @@
+00 CM CAMEROON (General)
+04 CM Est
+05 CM Littoral
+07 CM Nord-Ouest
+08 CM Ouest
+09 CM Sud-Ouest
+10 CM Adamaoua
+11 CM Centre
+12 CM Extreme-Nord
+13 CM Nord
+14 CM Sud

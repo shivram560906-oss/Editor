@@ -1,0 +1,8 @@
+00 EK EQUATORIAL GUINEA (General)
+03 EK Annobon
+04 EK Bioko Norte
+05 EK Bioko Sur
+06 EK Centro Sur
+07 EK Kie-Ntem
+08 EK Litoral
+09 EK Wele-Nzas

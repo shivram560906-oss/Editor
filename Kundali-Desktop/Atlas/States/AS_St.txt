@@ -1,0 +1,9 @@
+00 AS AUSTRALIA (General)
+01 AS Australian Capital Territory
+02 AS New South Wales
+04 AS Queensland
+05 AS South Australia
+08 AS Western Australia
+03 AS Northern Territory
+06 AS Tasmania
+07 AS Victoria

@@ -1,0 +1,21 @@
+00 EC ECUADOR (General)
+01 EC Galapagos
+02 EC Azuay
+03 EC Bolivar
+04 EC Canar
+05 EC Carchi
+06 EC Chimborazo
+07 EC Cotopaxi
+08 EC El Oro
+09 EC Esmeraldas
+10 EC Guayas
+11 EC Imbabura
+12 EC Loja
+13 EC Los Rios
+14 EC Manabi
+15 EC Morona-Santiago
+16 EC Napo
+17 EC Pastaza
+18 EC Pichincha
+19 EC Tungurahua
+20 EC Zamora-Chinchipe

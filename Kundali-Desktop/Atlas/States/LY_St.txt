@@ -1,0 +1,51 @@
+00 LY LIBYA (General)
+02 LY LY02
+04 LY LY04
+06 LY LY06
+10 LY LY10
+11 LY LY11
+12 LY LY12
+15 LY LY15
+18 LY LY18
+19 LY LY19
+23 LY LY23
+24 LY LY24
+25 LY LY25
+26 LY LY26
+27 LY LY27
+29 LY LY29
+31 LY LY31
+32 LY LY32
+33 LY LY33
+35 LY LY35
+36 LY LY36
+37 LY LY37
+39 LY LY39
+43 LY LY43
+46 LY LY46
+47 LY Ajdabiya
+03 LY Al Aziziyah
+05 LY Al Jufrah
+50 LY Al Khums
+08 LY Al Kufrah
+09 LY LY09
+13 LY Ash Shati'
+53 LY Az Zawiyah
+55 LY Darnah
+56 LY Ghadamis
+57 LY Gharyan
+58 LY Misratah
+30 LY Murzuq
+34 LY Sabha
+60 LY Surt
+61 LY Tarabulus
+41 LY Tarhunah
+42 LY Tubruq
+62 LY Yafran
+45 LY Zlitan
+48 LY Al Fatih
+49 LY Al Jabal al Akhdar
+51 LY An Nuqat al Khams
+59 LY Sawfajjin
+52 LY Awbari
+54 LY Banghazi

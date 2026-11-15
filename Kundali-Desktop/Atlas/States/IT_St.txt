@@ -1,0 +1,21 @@
+00 IT ITALY (General)
+01 IT Abruzzi
+02 IT Basilicata
+03 IT Calabria
+04 IT Campania
+05 IT Emilia-Romagna
+06 IT Friuli-Venezia Giulia
+07 IT Lazio
+08 IT Liguria
+09 IT Lombardia
+10 IT Marche
+11 IT Molise
+12 IT Piemonte
+13 IT Puglia
+14 IT Sardegna
+15 IT Sicilia
+16 IT Toscana
+17 IT Trentino-Alto Adige
+18 IT Umbria
+19 IT Valle d'Aosta
+20 IT Veneto

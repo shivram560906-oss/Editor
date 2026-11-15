@@ -1,0 +1,8 @@
+00 TC UNITED ARAB EMIRATES (General)
+01 TC Abu Zaby
+02 TC Ajman
+03 TC Dubayy
+04 TC Al Fujayrah
+05 TC Ra's al Khaymah
+06 TC Ash Shariqah
+07 TC Umm al Qaywayn

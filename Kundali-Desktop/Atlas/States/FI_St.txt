@@ -1,0 +1,13 @@
+00 FI FINLAND (General)
+01 FI Ahvenanmaa
+02 FI Hame
+03 FI Keski-Suomi
+04 FI Kuopio
+05 FI Kymi
+06 FI Lappi
+07 FI Mikkeli
+08 FI Oulu
+09 FI Pohjois-Karjala
+10 FI Turku ja Pori
+11 FI Uusimaa
+12 FI Vaasa

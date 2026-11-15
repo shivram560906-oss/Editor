@@ -1,0 +1,17 @@
+00 MY MALAYSIA (General)
+01 MY Johor
+02 MY Kedah
+03 MY Kelantan
+04 MY Melaka
+05 MY Negeri Sembilan
+06 MY Pahang
+07 MY Perak
+08 MY Perlis
+09 MY Pulau Pinang
+10 MY MY10
+11 MY Sarawak
+12 MY Selangor
+13 MY Terengganu
+14 MY Wilayah Persekutuan
+15 MY Labuan
+16 MY Sabah

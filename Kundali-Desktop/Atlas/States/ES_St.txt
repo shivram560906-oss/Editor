@@ -1,0 +1,15 @@
+00 ES EL SALVADOR (General)
+01 ES Ahuachapan
+02 ES Cabanas
+03 ES Chalatenango
+04 ES Cuscatlan
+05 ES La Libertad
+06 ES La Paz
+07 ES La Union
+08 ES Morazan
+09 ES San Miguel
+10 ES San Salvador
+11 ES Santa Ana
+12 ES San Vicente
+13 ES Sonsonate
+14 ES Usulutan

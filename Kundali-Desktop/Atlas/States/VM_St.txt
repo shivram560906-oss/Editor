@@ -1,0 +1,41 @@
+00 VM VIETNAM (General)
+01 VM An Giang
+02 VM Bac Thai
+03 VM Ben Tre
+04 VM Binh Tri Thien
+05 VM Cao Bang
+06 VM Cuu Long
+07 VM Dac Lac
+09 VM Dong Thap
+10 VM Gia Lai-Kon Tum
+11 VM Ha Bac
+12 VM Hai Hung
+13 VM Hai Phong
+14 VM Ha Nam Ninh
+15 VM Ha Noi
+16 VM Ha Son Binh
+17 VM Ha Tuyen
+19 VM Hoang Lien Son
+20 VM Ho Chi Minh
+21 VM Kien Giang
+22 VM Lai Chau
+23 VM Lam Dong
+24 VM Long An
+25 VM Minh Hai
+26 VM Nghe Tinh
+27 VM Nghia Binh
+28 VM Phu Khanh
+29 VM Quang Nam-Da Nang
+30 VM Quang Ninh
+31 VM Song Be
+32 VM Son La
+33 VM Tay Ninh
+34 VM Thanh Hoa
+35 VM Thai Binh
+36 VM Thuan Hai
+37 VM Tien Giang
+38 VM Vinh Phu
+39 VM Lang Son
+40 VM Dong Nai
+41 VM Hau Giang
+42 VM Vung Tau-Con Dao

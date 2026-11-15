@@ -1,0 +1,148 @@
+00 SI SLOVENIA (General)
+01 SI Ajdovscina
+02 SI Beltinci
+03 SI Bled
+04 SI Bohinj
+05 SI Borovnica
+06 SI Bovec
+07 SI Brda
+08 SI Brezice
+09 SI Brezovica
+10 SI Cankova-Tisina
+11 SI Celje
+12 SI Cerklje na Gorenjskem
+13 SI Cerknica
+14 SI Cerkno
+15 SI Crensovci
+16 SI Crna na Koroskem
+17 SI Crnomelj
+18 SI Destrnik-Trnovska Vas
+19 SI Divaca
+20 SI Dobrepolje
+21 SI Dobrova-Horjul-Polhov Gradec
+22 SI Dol pri Ljubljani
+23 SI Domzale
+24 SI Dornava
+25 SI Dravograd
+26 SI Duplek
+27 SI Gorenja Vas-Poljane
+28 SI Gorisnica
+29 SI Gornja Radgona
+30 SI Gornji Grad
+31 SI Gornji Petrovci
+32 SI Grosuplje
+33 SI HodosSalovci
+34 SI Hrastnik
+35 SI Hrpelje-Kozina
+36 SI Idrija
+37 SI Ig
+38 SI Ilirska Bistrica
+39 SI Ivancna Gorica
+40 SI Izola
+41 SI Jesenice
+42 SI Jursinci
+43 SI Kamnik
+44 SI Kanal
+45 SI Kidricevo
+46 SI Kobarid
+47 SI Kobilje
+48 SI Kocevje
+49 SI Komen
+50 SI Koper*
+51 SI Kozje
+52 SI Kranj*
+53 SI Kranjska Gora
+54 SI Krsko
+55 SI Kungota
+56 SI Kuzma
+57 SI Lasko
+58 SI Lenart
+59 SI Lendava
+60 SI Litija
+61 SI Ljubljana*
+62 SI Ljubno
+63 SI Ljutomer
+64 SI Logatec
+65 SI Loska Dolina
+66 SI Loski Potok
+67 SI Luce
+68 SI Lukovica
+69 SI Majsperk
+70 SI Maribor*
+71 SI Medvode
+72 SI Menges
+73 SI Metlika
+74 SI Mezica
+75 SI Miren-Kostanjevica
+76 SI Mislinja
+77 SI Moravce
+78 SI Moravske Toplice
+79 SI Mozirje
+80 SI Murska Sobota*
+81 SI Muta
+82 SI Naklo
+83 SI Nazarje
+84 SI Nova Gorica*
+85 SI Novo Mesto*
+86 SI Odranci
+87 SI Ormoz
+88 SI Osilnica
+89 SI Pesnica
+90 SI Piran
+91 SI Pivka
+92 SI Podcetrtek
+93 SI Podvelka-Ribnica
+94 SI Postojna
+95 SI Preddvor
+96 SI Ptuj*
+97 SI Puconci
+98 SI Race-Fram
+99 SI Radece
+A1 SI Radenci
+A2 SI Radlje ob Dravi
+A3 SI Radovljica
+A4 SI Ravne-Prevalje
+A5 SI Ribnica
+A6 SI Rogasevci
+A7 SI Rogaska Slatina
+A8 SI Rogatec
+A9 SI Ruse
+B1 SI Semic
+B2 SI Sencur
+B3 SI Sentilj
+B4 SI Sentjernej
+B5 SI Sentjur pri Celju
+B6 SI Sevnica
+B7 SI Sezana
+B8 SI Skocjan
+B9 SI Skofja Loka
+C1 SI Skofljica
+C2 SI Slovenj Gradec*
+C3 SI Slovenska Bistrica
+C4 SI Slovenske Konjice
+C5 SI Smarje pri Jelsah
+C6 SI Smartno ob Paki
+C7 SI Sostanj
+C8 SI Starse
+C9 SI Store
+D1 SI Sveti Jurij
+D2 SI Tolmin
+D3 SI Trbovlje
+D4 SI Trebnje
+D5 SI Trzic
+D6 SI Turnisce
+D7 SI Velenje*
+D8 SI Velike Lasce*
+D9 SI Videm
+E1 SI Vipava
+E2 SI Vitanje
+E3 SI Vodice
+E4 SI Vojnik
+E5 SI Vrhnika
+E6 SI Vuzenica
+E7 SI Zagorje ob Savi
+E8 SI Zalec
+E9 SI Zavrc
+F1 SI Zelezniki
+F2 SI Ziri
+F3 SI Zrece

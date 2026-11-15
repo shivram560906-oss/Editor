@@ -1,0 +1,8 @@
+00 AC ANTIGUA AND BARBUDA (General)
+01 AC Barbuda
+03 AC Saint George
+04 AC Saint John
+05 AC Saint Mary
+06 AC Saint Paul
+07 AC Saint Peter
+08 AC Saint Philip

@@ -1,0 +1,10 @@
+00 SM SAN MARINO (General)
+02 SM Chiesanuova
+09 SM Serravalle
+07 SM San Marino
+06 SM Borgo Maaggiore
+08 SM Monte Giardino
+05 SM Fiorentino
+04 SM Faetano
+03 SM Domagnano
+01 SM Acquaviva

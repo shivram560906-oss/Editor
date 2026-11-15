@@ -1,0 +1,24 @@
+00 BF BAHAMAS, THE (General)
+12 BF BF12
+05 BF Bimini
+06 BF Cat Island
+10 BF Exuma
+11 BF BF11
+13 BF Inagua
+15 BF Long Island
+16 BF Mayaguana
+18 BF Ragged Island
+22 BF Harbour Island
+23 BF New Providence
+24 BF Acklins and Crooked Islands
+25 BF Freeport
+26 BF Fresh Creek
+27 BF Governor's Harbour
+28 BF Green Turtle Cay
+29 BF High Rock
+30 BF Kemps Bay
+31 BF Marsh Harbour
+32 BF Nichollstown and Berry Islands
+33 BF Rock Sound
+34 BF Sandy Point
+35 BF San Salvador and Rum Cay

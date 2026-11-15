@@ -1,0 +1,7 @@
+00 BN BENIN (General)
+01 BN Atakora
+02 BN Atlantique
+03 BN Borgou
+04 BN Mono
+05 BN Oueme
+06 BN Zou

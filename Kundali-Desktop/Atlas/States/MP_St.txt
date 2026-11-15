@@ -1,0 +1,12 @@
+00 MP MAURITIUS (General)
+12 MP Black River
+13 MP Flacq
+14 MP Grand Port
+15 MP Moka
+16 MP Pamplemousses
+17 MP Plaines Wilhems
+18 MP Port Louis
+19 MP Riviere du Rempart
+20 MP Savanne
+21 MP Cargados Carajos
+22 MP Rodrigues

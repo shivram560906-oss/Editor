@@ -1,0 +1,28 @@
+00 BR BRAZIL (General)
+02 BR Alagoas
+05 BR Bahia
+07 BR Distrito Federal
+08 BR Espirito Santo
+09 BR Fernando de Noronha
+10 BR Goias
+11 BR Mato Grosso do Sul
+13 BR Maranhao
+14 BR Mato Grosso
+01 BR Acre
+03 BR Amapa
+04 BR Amazonas
+06 BR Ceara
+15 BR Minas Gerais
+16 BR Para
+17 BR Paraiba
+18 BR Parana
+19 BR Pernambuco
+20 BR Piaui
+21 BR Rio de Janeiro
+22 BR Rio Grande do Norte
+23 BR Rio Grande do Sul
+24 BR Rondonia
+25 BR Roraima
+26 BR Santa Catarina
+27 BR Sao Paulo
+28 BR Sergipe

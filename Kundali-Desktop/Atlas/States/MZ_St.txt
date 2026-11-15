@@ -1,0 +1,11 @@
+00 MZ MOZAMBIQUE (General)
+01 MZ Cabo Delgado
+02 MZ Gaza
+03 MZ Inhambane
+10 MZ Manica
+04 MZ Maputo
+05 MZ Sofala
+06 MZ Nampula
+07 MZ Niassa
+08 MZ Tete
+09 MZ Zambezia

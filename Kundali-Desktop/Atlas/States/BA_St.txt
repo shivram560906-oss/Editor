@@ -1,0 +1,14 @@
+00 BA BAHRAIN (General)
+01 BA Al Hadd
+02 BA Al Manamah
+03 BA Al Muharraq
+05 BA Jidd Hafs
+06 BA Sitrah
+07 BA BA07
+08 BA Al Mintaqah al Gharbiyah
+09 BA Mintaqat Juzur Hawar
+10 BA Al Mintaqah ash Shamaliyah
+11 BA Al Mintaqah al Wusta
+12 BA Madinat Isa
+13 BA Ar Rifa wa al Mintaqah al Janubiyah
+14 BA Madinat Hamad

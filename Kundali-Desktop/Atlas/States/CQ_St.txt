@@ -1,0 +1,27 @@
+00 CQ IRELAND NORTHERN (General)
+52 CQ Antrim
+53 CQ Ards
+54 CQ Armagh
+55 CQ Ballymena
+56 CQ Ballymoney
+57 CQ Banbridge
+58 CQ Belfast
+59 CQ Carrickfergus
+60 CQ Castlereagh
+61 CQ Coleraine
+62 CQ Cookstown
+63 CQ Craigavon
+64 CQ Down
+65 CQ Dungannon
+66 CQ Fermanagh
+67 CQ Larne
+68 CQ Limavady
+69 CQ Lisburn
+70 CQ Londonderry
+71 CQ Magherafelt
+72 CQ Moyle
+73 CQ Newry and Mourne
+74 CQ Newtownabbey
+75 CQ North Down
+76 CQ Omagh
+77 CQ Strabane

@@ -1,0 +1,10 @@
+00 BL BOLIVIA (General)
+01 BL Chuquisaca
+02 BL Cochabamba
+03 BL El Beni
+04 BL La Paz
+05 BL Oruro
+06 BL Pando
+07 BL Potosi
+08 BL Santa Cruz
+09 BL Tarija

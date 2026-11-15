@@ -1,0 +1,27 @@
+00 WA NAMIBIA (General)
+01 WA Bethanien
+02 WA Caprivi Oos
+03 WA Boesmanland
+04 WA Gobabis
+05 WA Grootfontein
+06 WA Kaokoland
+07 WA Karibib
+08 WA Keetmanshoop
+09 WA Luderitz
+10 WA Maltahohe
+11 WA Okahandja
+12 WA Omaruru
+13 WA Otjiwarongo
+14 WA Outjo
+15 WA Owambo
+16 WA Rehoboth
+17 WA Swakopmund
+18 WA Tsumeb
+20 WA Karasburg
+21 WA Windhoek
+22 WA Damaraland
+23 WA Hereroland Oos
+24 WA Hereroland Wes
+25 WA Kavango
+26 WA Mariental
+27 WA Namaland

@@ -1,0 +1,7 @@
+00 YO YUGOSLAVIA (General)
+01 YO Bosna i Hercegovina
+02 YO Crna Gora
+03 YO Hrvatska
+05 YO Makedonija
+06 YO Slovenija
+07 YO Srbija

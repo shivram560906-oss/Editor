@@ -1,0 +1,10 @@
+00 SU SUDAN (General)
+26 SU Aali an Nil
+27 SU Al Wusta
+28 SU Al Istiw'a'iyah
+29 SU Al Kartum
+30 SU Ash Shamaliyah
+31 SU Ash Sharqiyah
+32 SU Bahr al Ghazal
+33 SU Darfur
+34 SU Kurdufan

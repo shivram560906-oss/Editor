@@ -1,0 +1,23 @@
+00 BT BHUTAN (General)
+01 BT Central Bhutan
+02 BT Eastern Bhutan
+03 BT Southern Bhutan
+04 BT Western Bhutan
+05 BT Bumthang
+06 BT Chhukha
+07 BT Chirang
+08 BT Daga
+09 BT Geylegphug
+10 BT Ha
+11 BT Lhuntshi
+12 BT Mongar
+13 BT Paro
+14 BT Pemagatsel
+15 BT Punakha
+16 BT Samchi
+17 BT Samdrup
+18 BT Shemgang
+19 BT Tashigang
+20 BT Thimphu
+21 BT Tongsa
+22 BT Wangdi Phodrang

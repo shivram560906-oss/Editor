@@ -1,0 +1,11 @@
+00 PM PANAMA (General)
+01 PM Bocas del Toro
+02 PM Chiriqui
+03 PM Cocle
+04 PM Colon
+05 PM Darien
+06 PM Herrera
+07 PM Los Santos
+08 PM Panama
+09 PM San Blas
+10 PM Veraguas

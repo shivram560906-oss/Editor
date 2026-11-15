@@ -1,0 +1,25 @@
+00 AR ARGENTINA (General)
+01 AR Buenos Aires
+02 AR Catamarca
+03 AR Chaco
+04 AR Chubut
+05 AR Cordoba
+06 AR Corrientes
+07 AR Distrito Federal
+08 AR Entre Rios
+09 AR Formosa
+10 AR Jujuy
+11 AR La Pampa
+12 AR La Rioja
+13 AR Mendoza
+14 AR Misiones
+15 AR Neuquen
+16 AR Rio Negro
+17 AR Salta
+18 AR San Juan
+19 AR San Luis
+20 AR Santa Cruz
+21 AR Santa Fe
+22 AR Santiago del Estero
+23 AR Tierra del Fuego, Antartida e Islas del Atlantico Sur
+24 AR Tucuman

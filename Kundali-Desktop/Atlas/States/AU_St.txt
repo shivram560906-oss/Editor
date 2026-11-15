@@ -1,0 +1,10 @@
+00 AU AUSTRIA (General)
+01 AU Burgenland
+02 AU Karnten
+03 AU Niederosterreich
+04 AU Oberosterreich
+05 AU Salzburg
+06 AU Steiermark
+07 AU Tirol
+08 AU Vorarlberg
+09 AU Wien

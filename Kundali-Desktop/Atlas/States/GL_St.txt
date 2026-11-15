@@ -1,0 +1,4 @@
+00 GL GREENLAND (General)
+01 GL Nordgronland
+02 GL Ostgronland
+03 GL Vestgronland

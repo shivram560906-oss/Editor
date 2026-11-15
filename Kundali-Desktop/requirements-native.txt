@@ -1,0 +1,42 @@
+# Native desktop (PySide6) runtime dependencies — Shivram Jyotish
+# Entry point:  python desktop_main.py
+# Install:      pip install -r requirements-native.txt
+#
+# NOTE: gui/backend_bridge.py calls backend/api/endpoints.py in-process
+# (no HTTP server is started), so fastapi / pydantic / sqlalchemy are hard
+# runtime requirements of the desktop app.  Pins mirror backend/requirements.txt
+# so the calculation engine behaves identically in both test suites.
+
+# ── Desktop UI ───────────────────────────────────────────────────────────────
+PySide6==6.11.1
+PyMuPDF==1.28.2                 # classical-text reader + PDF export/print
+matplotlib==3.10.0             # visual_graphs page (Shadbala / SAV charts)
+numpy==2.2.6                   # required by matplotlib
+
+# ── Astrology engine (identical pins to backend/requirements.txt) ────────────
+nepali-datetime==1.0.8.5        # Bikram Sambat <-> Gregorian conversion
+pysweph==2.10.3.6               # Swiss Ephemeris (imported as `swisseph`)
+skyfield==1.55                  # JPL de421 sunrise/sunset
+tzdata==2025.3                  # IANA zoneinfo (historical DST)
+
+# ── In-process API + data layer ───────────────────────────────────────────────
+fastapi==0.138.0
+sqlalchemy==2.0.43
+alembic==1.18.5                 # schema migrations for the desktop DB
+pydantic==2.13.3
+pydantic-settings==2.14.2
+python-multipart==0.0.32
+uvicorn==0.40.0                 # only for the optional local API server
+slowapi==0.1.10                 # only for the optional local API server
+
+# ── Legacy compatibility ──────────────────────────────────────────────────────
+# Account tables remain in the schema so older databases keep upgrading, but
+# the desktop application no longer uses login, passwords or tokens.
+
+# ── Network + helpers ─────────────────────────────────────────────────────────
+requests==2.34.2                # nepalicalendar / nepalipatro services
+cryptography==49.0.0
+packaging==26.2                 # update-checker version comparison
+
+# ── Tests ─────────────────────────────────────────────────────────────────────
+pytest==9.1.1

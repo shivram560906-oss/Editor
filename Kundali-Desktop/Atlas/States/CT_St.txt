@@ -1,0 +1,18 @@
+00 CT CENTRAL AFRICAN REPUBLIC (General)
+01 CT Bamingui-Bangoran
+02 CT Basse-Kotto
+03 CT Haute-Kotto
+04 CT Haute-Sangha
+05 CT Haut-Mbomou
+07 CT Lobaye
+06 CT Kemo-Gribingui
+08 CT Mbomou
+11 CT Ouaka
+09 CT Nana-Mambere
+12 CT Ouham
+13 CT Ouham-Pende
+14 CT Vakaga
+15 CT Gribingui
+16 CT Sangha
+17 CT Ombella-Mpoko
+18 CT Bangui

@@ -1,0 +1,5 @@
+00 TW TAIWAN (General)
+01 TW Fu-chien
+02 TW Kao-hsiung
+03 TW T'ai-pei
+04 TW T'ai-wan

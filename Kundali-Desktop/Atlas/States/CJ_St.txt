@@ -1,0 +1,9 @@
+00 CJ CAYMAN ISLANDS (General)
+01 CJ Creek
+02 CJ Eastern
+03 CJ Midland
+04 CJ South Town
+05 CJ Spot Bay
+06 CJ Stake Bay
+07 CJ West End
+08 CJ Western

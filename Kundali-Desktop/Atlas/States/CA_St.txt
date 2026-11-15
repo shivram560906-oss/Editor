@@ -1,0 +1,14 @@
+00 CA CANADA (General)
+01 CA Alberta
+02 CA British Columbia
+03 CA Manitoba
+04 CA New Brunswick
+05 CA Newfoundland
+06 CA Northwest Territories
+07 CA Nova Scotia
+08 CA Nunavut
+09 CA Ontario
+10 CA Prince Edward Island
+11 CA Quebec
+12 CA Saskatchewan
+13 CA Yukon

@@ -1,0 +1,11 @@
+00 GY GUYANA (General)
+10 GY Barima-Waini
+11 GY Cuyuni-Mazaruni
+12 GY Demerara-Mahaica
+13 GY East Berbice-Corentyne
+14 GY Essequibo Islands-West Demerara
+15 GY Mahaica-Berbice
+16 GY Pomeroon-Supenaam
+17 GY Potaro-Siparuni
+18 GY Upper Demerara-Berbice
+19 GY Upper Takutu-Upper Essequibo

@@ -1,0 +1,24 @@
+00 TS TUNISIA (General)
+17 TS Bajah
+18 TS Banzart
+19 TS Nabul
+29 TS Qabis
+31 TS Qibili
+30 TS Qafsah
+32 TS Safaqis
+33 TS Sidi Bu Zayd
+34 TS Tatawin
+35 TS Tawzar
+36 TS Tunis
+37 TS Zaghwan
+28 TS Madanin
+26 TS Aryanah
+27 TS Bin Arus
+22 TS Silyanah
+23 TS Susah
+16 TS Al Munastir
+15 TS Al Mahdiyah
+14 TS Al Kaf
+06 TS Jundubah
+02 TS Al Qasrayn
+03 TS Al Qayrawan

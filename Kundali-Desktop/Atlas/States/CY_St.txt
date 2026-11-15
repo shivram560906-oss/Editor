@@ -1,0 +1,7 @@
+00 CY CYPRUS (General)
+01 CY Famagusta
+02 CY Kyrenia
+03 CY Larnaca
+04 CY Nicosia
+05 CY Limassol
+06 CY Paphos

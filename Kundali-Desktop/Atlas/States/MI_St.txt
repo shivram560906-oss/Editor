@@ -1,0 +1,25 @@
+00 MI MALAWI (General)
+03 MI Chiradzulu
+02 MI Chikwawa
+04 MI Chitipa
+05 MI Thyolo
+06 MI Dedza
+07 MI Dowa
+08 MI Karonga
+09 MI Kasungu
+10 MI Machinga
+11 MI Lilongwe
+12 MI Mangochi
+13 MI Mchinji
+14 MI Mulanje
+15 MI Mzimba
+16 MI Ntcheu
+17 MI Nkhata Bay
+18 MI Nkhotakota
+19 MI Nsanje
+20 MI Ntchisi
+21 MI Rumphi
+22 MI Salima
+23 MI Zomba
+25 MI Mwanza
+24 MI Blantyre

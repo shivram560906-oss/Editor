@@ -1,0 +1,13 @@
+00 SCO SCOTLAND (General)
+78 SCO Borders
+79 SCO Central
+80 SCO Dumfries and Galloway
+81 SCO Fife
+82 SCO Grampian
+83 SCO Highland
+84 SCO Lothian
+85 SCO Orkney*
+86 SCO Shetland*
+87 SCO Strathclyde
+88 SCO Tayside
+89 SCO Western Isles*

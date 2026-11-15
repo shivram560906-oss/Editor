@@ -1,0 +1,31 @@
+00 IR IRAN (General)
+36 IR IR36
+01 IR Azarbayjan-e Bakhtari
+02 IR Azarbayjan-e Khavari
+03 IR Chahar Mahall va Bakhtiari
+04 IR Sistan va Baluchestan
+05 IR Kohkiluyeh va Buyer Ahmadi
+06 IR IR06
+07 IR Fars
+08 IR Gilan
+09 IR Hamadan
+10 IR Ilam
+11 IR Hormozgan
+15 IR Khuzestan
+16 IR Kordestan
+17 IR Mazandaran
+22 IR Bushehr
+23 IR Lorestan
+28 IR Esfahan
+30 IR Khorasan
+31 IR Yazd
+24 IR Markazi
+19 IR IR19
+29 IR Kerman
+25 IR Semnan
+18 IR IR18
+27 IR Zanjan
+21 IR IR21
+26 IR Tehran
+12 IR IR12
+13 IR Bakhtaran

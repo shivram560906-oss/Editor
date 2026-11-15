@@ -1,0 +1,26 @@
+00 PE PERU (General)
+01 PE Amazonas
+02 PE Ancash
+03 PE Apurimac
+04 PE Arequipa
+05 PE Ayacucho
+06 PE Cajamarca
+07 PE Callao
+08 PE Cusco
+09 PE Huancavelica
+10 PE Huanuco
+11 PE Ica
+12 PE Junin
+13 PE La Libertad
+14 PE Lambayeque
+15 PE Lima
+16 PE Loreto
+17 PE Madre de Dios
+18 PE Moquegua
+19 PE Pasco
+20 PE Piura
+21 PE Puno
+22 PE San Martin
+23 PE Tacna
+24 PE Tumbes
+25 PE Ucayali

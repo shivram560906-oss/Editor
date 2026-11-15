@@ -1,0 +1,21 @@
+00 KZ KAZAKHSTAN (General)
+01 KZ Almaty
+02 KZ Almaty*
+03 KZ Aqmola
+04 KZ Aqtobe
+05 KZ Atyrau
+06 KZ Batys Qazaqstan
+07 KZ Kokshetau
+08 KZ Mangghystau
+09 KZ Ongtustik Qazaqstan
+10 KZ Pavlodar
+11 KZ Qaraghandy
+12 KZ Qostanay
+13 KZ Qyzylorda
+14 KZ Semey
+15 KZ Shyghys Qazaqstan
+16 KZ Soltustik Qazaqstan
+17 KZ Taldyqorghan
+18 KZ Torghay
+19 KZ Zhambyl
+20 KZ Zhezqazghan

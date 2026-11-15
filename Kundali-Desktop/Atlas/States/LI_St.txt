@@ -1,0 +1,11 @@
+00 LI LIBERIA (General)
+04 LI Grand Cape Mount
+03 LI Grand Bassa
+02 LI Grand Jide
+05 LI Lofa
+06 LI Maryland
+07 LI Monrovia
+08 LI Montserrado
+09 LI Nimba
+10 LI Sino
+01 LI Bong

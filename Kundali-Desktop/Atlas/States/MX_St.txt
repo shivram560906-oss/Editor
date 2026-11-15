@@ -1,0 +1,33 @@
+00 MX MEXICO (General)
+01 MX Aguascalientes
+02 MX Baja California
+03 MX Baja California Sur
+04 MX Campeche
+05 MX Chiapas
+06 MX Chihuahua
+07 MX Coahuila de Zaragoza
+08 MX Colima
+09 MX Distrito Federal
+10 MX Durango
+11 MX Guanajuato
+12 MX Guerrero
+13 MX Hidalgo
+14 MX Jalisco
+15 MX Mexico
+16 MX Michoacan de Ocampo
+17 MX Morelos
+18 MX Nayarit
+19 MX Nuevo Leon
+20 MX Oaxaca
+21 MX Puebla
+22 MX Queretaro de Arteaga
+23 MX Quintana Roo
+24 MX San Luis Potosi
+25 MX Sinaloa
+26 MX Sonora
+27 MX Tabasco
+28 MX Tamaulipas
+29 MX Tlaxcala
+30 MX Veracruz-Llave
+31 MX Yucatan
+32 MX Zacatecas

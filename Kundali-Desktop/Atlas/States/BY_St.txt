@@ -1,0 +1,16 @@
+00 BY BURUNDI (General)
+02 BY Bujumbura
+05 BY Muramvya
+09 BY Bubanza
+10 BY Bururi
+11 BY Cankuzo
+12 BY Cibitoke
+13 BY Gitega
+14 BY Karuzi
+15 BY Kayanza
+16 BY Kirundo
+17 BY Makamba
+18 BY Muyinga
+19 BY Ngozi
+20 BY Rutana
+21 BY Ruyigi

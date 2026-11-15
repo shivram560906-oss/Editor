@@ -1,0 +1,16 @@
+00 DA DENMARK (general)
+01 DA Arhus
+02 DA Bornholms
+03 DA Frederiksborg
+04 DA Fyn
+05 DA Kobenhavn
+06 DA DA06
+07 DA Nordjylland
+08 DA Ribe
+09 DA Ringkobing
+10 DA Roskilde
+11 DA Sonderjylland
+12 DA Storstrom
+13 DA Vejle
+14 DA Vestsjælland
+15 DA Viborg

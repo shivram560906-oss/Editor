@@ -1,0 +1,20 @@
+00 UY URUGUAY (General)
+01 UY Artigas
+02 UY Canelones
+03 UY Cerro Largo
+04 UY Colonia
+05 UY Durazno
+06 UY Flores
+07 UY Florida
+08 UY Lavalleja
+09 UY Maldonado
+10 UY Montevideo
+11 UY Paysandu
+12 UY Rio Negro
+13 UY Rivera
+14 UY Rocha
+15 UY Salto
+16 UY San Jose
+17 UY Soriano
+18 UY Tacuarembo
+19 UY Treinta y Tres

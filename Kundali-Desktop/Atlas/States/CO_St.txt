@@ -1,0 +1,35 @@
+00 CO COLOMBIA (General)
+01 CO Amazonas
+08 CO Caqueta
+14 CO Guaviare
+09 CO Cauca
+02 CO Antioquia
+03 CO Arauca
+04 CO Atlantico
+05 CO Bolivar
+06 CO Boyaca
+07 CO Caldas
+10 CO Cesar
+11 CO Choco
+12 CO Cordoba
+13 CO CO13
+15 CO Guainia
+16 CO Huila
+17 CO La Guajira
+18 CO Magdalena
+19 CO Meta
+20 CO Narino
+21 CO Norte de Santander
+22 CO Putumayo
+23 CO Quindio
+24 CO Risaralda
+25 CO San Andres y Providencia
+26 CO Santander
+27 CO Sucre
+28 CO Tolima
+29 CO Valle del Cauca
+30 CO Vaupes
+31 CO Vichada
+32 CO Casanare
+33 CO Cundinamarca
+34 CO Distrito Especial

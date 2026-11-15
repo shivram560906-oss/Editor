@@ -1,0 +1,10 @@
+00 CG ZAIRE (General)
+01 CG Bandundu
+02 CG Equateur
+03 CG Kasai-Occidental
+04 CG Kasai-Oriental
+05 CG Shaba
+06 CG Kinshasa
+07 CG Kivu
+08 CG Bas-Zaire
+09 CG Haut-Zaire

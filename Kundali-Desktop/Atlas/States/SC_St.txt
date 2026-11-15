@@ -1,0 +1,16 @@
+00 SC ST. KITTS AND NEVIS (General)
+01 SC Christ Chkurch Nichola Town
+02 SC Saint Anne Sandy Point
+04 SC Saint George Gingerland
+05 SC Saint James Windwa
+06 SC Saint John Capesterre
+07 SC Saint John Figtree
+08 SC Saint Mary Cayon
+09 SC Saint Paul Capesterre
+10 SC Saint Paul Charlestown
+11 SC Saint Peter Basseterre
+12 SC Saint Thomas Lowland
+13 SC Saint Thomas Middle Island
+15 SC Trinity Palmetto Point
+03 SC Saint George Basseterre
+03 SC Saint George Basseterre

@@ -1,0 +1,9 @@
+00 ZI ZIMBABWE (General)
+01 ZI Manicaland
+05 ZI Mashonaland West
+04 ZI Mashonaland East
+03 ZI Mashonaland Central
+06 ZI Matabeleland North
+07 ZI Matabeleland South
+02 ZI Midlands
+08 ZI Masvingo

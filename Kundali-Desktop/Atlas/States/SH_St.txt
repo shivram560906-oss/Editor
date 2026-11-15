@@ -1,0 +1,4 @@
+00 SH ST. HELENA (General)
+01 SH Ascension
+02 SH Saint Helena
+03 SH Tristan da Cunha

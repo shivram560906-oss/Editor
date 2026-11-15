@@ -1,0 +1,9 @@
+00 WAL WALES (General)
+90 WAL Clwyd
+91 WAL Dyfed
+92 WAL Gwent
+93 WAL Gwynedd
+94 WAL Mid Glamorgan
+95 WAL Powys
+96 WAL South Glamorgan
+97 WAL West Glamorgan

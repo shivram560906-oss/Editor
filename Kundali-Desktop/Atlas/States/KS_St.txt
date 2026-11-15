@@ -1,0 +1,16 @@
+00 KS KOREA, REPUBLIC OF (General)
+01 KS Cheju-do
+03 KS Cholla-bukto
+05 KS Ch'ungch'ong-bukto
+06 KS Kangwon-do
+08 KS Kyongsang-namdo
+11 KS Soul-t'ukpyolsi
+13 KS Kyonggi-do
+14 KS Kyongsang-bukto
+16 KS Cholla-namdo
+17 KS Ch'ungch'ong-namdo
+12 KS Inch'on-jikhalsi*
+10 KS Pusan-jikhalsi*
+15 KS Taegu-jikhalsi*
+18 KS Kwangju-jikhalsi
+19 KS Taejon-jikhalsi

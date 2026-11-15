@@ -1,0 +1,24 @@
+00 SE SEYCHELLES (General)
+01 SE Anse aux Pins
+02 SE Anse Boileau
+03 SE Anse Etoile
+04 SE Anse Louis
+05 SE Anse Royale
+06 SE Baie Lazare
+07 SE Baie Sainte Anne
+08 SE Beau Vallon
+09 SE Bel Air
+10 SE Bel Ombre
+11 SE Cascade
+12 SE Glacis
+13 SE Grand' Anse
+14 SE Grand' Anse
+15 SE La Digue
+16 SE La Riviere Anglaise
+17 SE Mont Buxton
+18 SE Mont Fleuri
+19 SE Plaisance
+20 SE Pointe La Rue
+21 SE Port Glaud
+22 SE Saint Louis
+23 SE Takamaka

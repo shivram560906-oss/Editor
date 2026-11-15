@@ -1,0 +1,10 @@
+00 BU BULGARIA (General)
+29 BU Burgas
+30 BU Grad Sofiya
+31 BU Khaskovo
+33 BU Mikhaylovgrad
+32 BU Lovech
+34 BU Plovdiv
+35 BU Razgrad
+36 BU Sofiya
+37 BU Varna

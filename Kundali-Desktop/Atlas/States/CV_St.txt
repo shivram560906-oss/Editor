@@ -1,0 +1,13 @@
+00 CV CAPE VERDE (General)
+01 CV Boa Vista
+02 CV Brava
+03 CV Fogo
+04 CV Maio
+05 CV Paul
+06 CV Praia
+07 CV Ribeira Grande
+08 CV Sal
+09 CV Santa Catarina
+10 CV Sao Nicolau
+11 CV Sao Vicente
+12 CV Tarrafal

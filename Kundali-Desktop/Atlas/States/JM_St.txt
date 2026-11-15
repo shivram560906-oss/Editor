@@ -1,0 +1,15 @@
+00 JM JAMAICA (General)
+01 JM Clarendon
+02 JM Hanover
+04 JM Manchester
+07 JM Portland
+08 JM Saint Andrew
+09 JM Saint Ann
+10 JM Saint Catherine
+11 JM Saint Elizabeth
+12 JM Saint James
+13 JM Saint Mary
+14 JM Saint Thomas
+15 JM Trelawny
+16 JM Westmoreland
+17 JM Kingston-Saint John

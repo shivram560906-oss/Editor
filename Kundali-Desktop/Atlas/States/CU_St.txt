@@ -1,0 +1,16 @@
+00 CU CUBA (General)
+01 CU Pinar del Rio
+02 CU Ciudad de La Habana
+03 CU Matanzas
+04 CU Isla de la Juventud
+05 CU Camaguey
+07 CU Ciego de Avila
+08 CU Cienfuegos
+09 CU Granma
+10 CU Guantanamo
+11 CU La Habana
+12 CU Holguin
+13 CU Las Tunas
+14 CU Sancti Spiritus
+15 CU Santiago de Cuba
+16 CU Villa Clara

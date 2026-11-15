@@ -1,0 +1,27 @@
+00 SZ SWITZERLAND (General)
+01 SZ Aargau
+02 SZ Ausser-Rhoden
+03 SZ Basel-Landschaft
+04 SZ Basel-Stadt
+05 SZ Bern
+06 SZ Fribourg
+07 SZ Geneve
+08 SZ Glarus
+09 SZ Graubunden
+10 SZ Inner-Rhoden
+11 SZ Luzern
+12 SZ Neuchatel
+13 SZ Nidwalden
+14 SZ Obwalden
+15 SZ Sankt Gallen
+16 SZ Schaffhausen
+17 SZ Schwyz
+18 SZ Solothurn
+19 SZ Thurgau
+20 SZ Ticino
+21 SZ Uri
+22 SZ Valais
+23 SZ Vaud
+24 SZ Zug
+25 SZ Zurich
+26 SZ Jura

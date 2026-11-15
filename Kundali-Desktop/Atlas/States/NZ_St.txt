@@ -1,0 +1,105 @@
+00 NZ NEW ZEALAND (General)
+01 NZ Akaroa
+03 NZ Amuri
+04 NZ Ashburton
+07 NZ Bay of Islands
+08 NZ Bruce
+09 NZ Buller
+10 NZ Chatham Islands
+11 NZ Cheviot
+12 NZ Clifton
+13 NZ Clutha
+14 NZ Cook
+16 NZ Dannevirke
+17 NZ Egmont
+18 NZ Eketahuna
+19 NZ Ellesmere
+20 NZ Eltham
+21 NZ Eyre
+22 NZ Featherston
+24 NZ Franklin
+26 NZ Golden Bay
+27 NZ Great Barrier Island
+28 NZ Grey
+29 NZ Hauraki Plains
+30 NZ Hawera
+31 NZ Hawke's Bay
+32 NZ Heathcote
+33 NZ Hobson
+34 NZ Hokianga
+35 NZ Horowhenua
+36 NZ Hutt
+37 NZ Inangahua
+38 NZ Inglewood
+39 NZ Kaikoura
+40 NZ Kairanga
+41 NZ Kiwitea
+43 NZ Lake
+45 NZ Mackenzie
+46 NZ Malvern
+47 NZ Manawatu
+48 NZ Mangonui
+49 NZ Maniototo
+50 NZ Marlborough
+51 NZ Masterton
+52 NZ Matamata
+53 NZ Mount Herbert
+54 NZ Ohinemuri
+55 NZ Opotiki
+56 NZ Oroua
+57 NZ Otamatea
+58 NZ Otorohanga
+59 NZ Oxford
+60 NZ Pahiatua
+61 NZ Paparua
+63 NZ Patea
+65 NZ Piako
+66 NZ Pohangina
+67 NZ Raglan
+68 NZ Rangiora
+69 NZ Rangitikei
+70 NZ Rodney
+71 NZ Rotorua
+72 NZ Southland
+73 NZ Stewart Island
+74 NZ Stratford
+76 NZ Taranaki
+77 NZ Taumarunui
+78 NZ Taupo
+79 NZ Tauranga
+82 NZ Vincent
+81 NZ Tuapeka
+83 NZ Waiapu
+84 NZ Waihemo
+85 NZ Waikato
+86 NZ Waikohu
+88 NZ Waimairi
+89 NZ Waimarino
+90 NZ Waimate
+91 NZ Waimate West
+92 NZ Waimea
+93 NZ Waipa
+95 NZ Waipawa
+96 NZ Waipukurau
+97 NZ Wairarapa South
+99 NZ Wairoa
+98 NZ Wairewa
+A1 NZ Whangarei
+A2 NZ Whangaroa
+A3 NZ Woodville
+A4 NZ Waitaki
+A6 NZ Waitomo
+A8 NZ Waitotara
+B2 NZ Wanganui
+B3 NZ Westland
+B4 NZ Whakatane
+D4 NZ Hurunui
+D9 NZ Hikurangi
+E1 NZ Manaia
+E2 NZ Runanga
+E3 NZ Saint Kilda
+D6 NZ Strathallan
+E4 NZ Thames-Coromandel
+D8 NZ Waiheke
+D5 NZ Silverpeaks
+E5 NZ Waverley

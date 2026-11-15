@@ -1,0 +1,35 @@
+00 NI NIGERIA (General)
+12 NI NI12
+18 NI NI18
+20 NI NI20
+06 NI Bauchi
+11 NI Abuja Capital Territory
+05 NI Lagos
+16 NI Ogun
+17 NI Ondo
+19 NI Plateau
+10 NI Rivers
+21 NI Akwa Ibom
+24 NI Katsina
+22 NI Cross River
+23 NI Kaduna
+25 NI Anambra
+26 NI Benue
+27 NI Borno
+28 NI Imo
+29 NI Kano
+30 NI Kwara
+31 NI Niger
+32 NI Oyo
+33 NI Sokoto
+34 NI Abia
+35 NI Adamawa
+36 NI Delta
+37 NI Edo
+38 NI Enugu
+39 NI Jigawa
+40 NI Kebbi
+41 NI Kogi
+42 NI Osun
+43 NI Taraba
+44 NI Yobe

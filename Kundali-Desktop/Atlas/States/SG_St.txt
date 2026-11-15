@@ -1,0 +1,11 @@
+00 SG SENEGAL (General)
+01 SG Dakar
+03 SG Diourbel
+04 SG Saint-Louis
+05 SG Tambacounda
+07 SG Thies
+08 SG Louga
+09 SG Fatick
+10 SG Kaolack
+11 SG Kolda
+12 SG Ziguinchor

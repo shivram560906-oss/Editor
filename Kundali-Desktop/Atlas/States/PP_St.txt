@@ -1,0 +1,21 @@
+00 PP PAPUA NEW GUINEA (General)
+01 PP Central
+02 PP Gulf
+03 PP Milne Bay
+04 PP Northern
+09 PP Eastern Highlands
+10 PP East New Britain
+11 PP East Sepik
+06 PP Western
+19 PP Enga
+12 PP Madang
+13 PP Manus
+14 PP Morobe
+15 PP New Ireland
+07 PP North Solomons
+08 PP Chimbu
+16 PP Western Highlands
+17 PP West New Britain
+18 PP Sandaun
+20 PP National Capital
+05 PP Southern Highlands

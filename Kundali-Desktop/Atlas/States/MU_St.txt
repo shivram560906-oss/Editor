@@ -1,0 +1,9 @@
+00 MU OMAN (General)
+01 MU Ad Dakhiliyah
+02 MU Al Batinah
+03 MU Al Wusta
+04 MU Ash Sharqiyah
+05 MU Az Zahirah
+06 MU Masqat
+07 MU sandam
+08 MU Zufar

@@ -1,0 +1,12 @@
+00 BD BERMUDA (General)
+01 BD Devonshire
+02 BD Hamilton
+03 BD Hamilton
+04 BD Paget
+05 BD Pembroke
+06 BD Saint George
+07 BD Saint George's
+08 BD Sandys
+09 BD Smith's
+10 BD Southampton
+11 BD Warwick

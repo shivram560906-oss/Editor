@@ -1,0 +1,11 @@
+00 GH GHANA (General)
+01 GH Greater
+02 GH Ashanti
+03 GH Brong-Ahafo
+04 GH Central
+05 GH Eastern
+06 GH Northern
+08 GH Volta
+09 GH Western
+10 GH Upper
+11 GH Upper

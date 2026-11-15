@@ -1,0 +1,20 @@
+00 CB CAMBODIA (General)
+01 CB Batdambang
+02 CB Kampong Cham
+03 CB Kampong Chhnang
+04 CB Kampong Spoe
+05 CB Kampong Thum
+06 CB Kampot
+07 CB Kandal
+08 CB Kaoh Kong
+09 CB Krachen
+10 CB Mondol Kiri
+11 CB Phnum Penh
+12 CB Pouthisat
+13 CB Preah Vihear
+14 CB Prey Veng
+15 CB Rotanokiri
+16 CB Siemreab-Otdar Meanchey
+17 CB St©ng Treng
+18 CB Svay Rieng
+19 CB Takev

@@ -1,0 +1,23 @@
+00 MG MONGOLIA (General)
+01 MG Arhangay
+02 MG Bayanhongor
+03 MG Bayan-Olgiy
+21 MG Bulgan
+04 MG MG04
+05 MG Darhan
+06 MG Dornod
+07 MG Dornogovi
+08 MG Dundgovi
+09 MG Dzavhan
+10 MG Govi-Altay
+11 MG Hentiy
+12 MG Hovd
+13 MG Hovsgol
+14 MG Omnogov
+15 MG Ovorhangay
+16 MG Selenge
+17 MG Suhbaatar
+18 MG Tov
+19 MG Uvs
+20 MG MG20
+22 MG Erdenet*

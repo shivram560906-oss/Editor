@@ -1,0 +1,9 @@
+00 ML MALI (General)
+01 ML Bamako
+02 ML Gao
+03 ML Kayes
+04 ML Mopti
+05 ML Segou
+06 ML Sikasso
+07 ML Koulikoro
+08 ML Tombouctou

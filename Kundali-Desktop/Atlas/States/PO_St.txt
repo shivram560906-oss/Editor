@@ -1,0 +1,23 @@
+00 PO PORTUGAL (General)
+02 PO Aveiro
+03 PO Beja
+04 PO Braga
+05 PO Braganca
+06 PO Castelo Branco
+07 PO Coimbra
+08 PO Evora
+09 PO Faro
+10 PO Funchai
+11 PO Guarda
+12 PO Horta
+13 PO Leiria
+14 PO Lisboa
+15 PO Ponta Delgrada
+16 PO Portalegre
+17 PO Porto
+18 PO Santarem
+19 PO Setubal
+20 PO Viana do Castelo
+21 PO Vila Real
+22 PO Viseu
+01 PO Angra do Heroismo

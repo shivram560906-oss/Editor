@@ -1,0 +1,17 @@
+00 NU NICARAGUA (General)
+01 NU Boaco
+02 NU Carazo
+03 NU Chinandega
+04 NU Chontales
+05 NU Esteli
+06 NU Granada
+07 NU Jinotega
+08 NU Leon
+09 NU Madriz
+10 NU Managua
+11 NU Masaya
+12 NU Matagalpa
+13 NU Nueva Segovia
+14 NU Rio San Juan
+15 NU Rivas
+16 NU Zelaya

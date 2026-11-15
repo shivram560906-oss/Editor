@@ -1,0 +1,23 @@
+00 GT GUATEMALA (General)
+01 GT Alta Verapaz
+02 GT Baja Verapaz
+03 GT Chimaltenango
+04 GT Chiquimula
+05 GT El Progreso
+06 GT Escuintla
+07 GT Guatemala
+08 GT Huehuetenango
+09 GT Izabal
+10 GT Jalapa
+11 GT Jutiapa
+12 GT Peten
+13 GT Quetzaltenango
+14 GT Quiche
+15 GT Retalhuleu
+16 GT Sacatepequez
+17 GT San Marcos
+18 GT Santa Rosa
+19 GT Solola
+20 GT Suchitepequez
+21 GT Totonicapan
+22 GT Zacapa

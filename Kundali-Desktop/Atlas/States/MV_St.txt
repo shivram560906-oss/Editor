@@ -1,0 +1,20 @@
+00 MV MALDIVES (General)
+20 MV Baa
+02 MV Aliff
+01 MV Seenu
+03 MV Laviyani
+04 MV Waavu
+05 MV Laamu
+07 MV Haa Aliff
+08 MV Thaa
+12 MV Meemu
+13 MV Raa
+14 MV Faafu
+17 MV Daalu
+23 MV Haa Daalu
+24 MV Shaviyani
+25 MV Noonu
+26 MV Kaafu
+27 MV Gaafu Aliff
+28 MV Gaafu Daalu
+29 MV Naviyani

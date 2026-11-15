@@ -1,0 +1,15 @@
+00 SY SYRIA (General)
+01 SY Al Hasakah
+02 SY Al Ladhiqiyah
+03 SY Al Qunaytirah
+04 SY Ar Raqqah
+05 SY As Suwayda'
+06 SY Dara
+07 SY Dayr az Zawr
+08 SY Rif Dimashq
+09 SY Halab
+10 SY Hamah
+11 SY Hims
+12 SY Idlib
+13 SY Dimashq
+14 SY Tartus

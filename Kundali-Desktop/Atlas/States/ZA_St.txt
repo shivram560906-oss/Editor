@@ -1,0 +1,10 @@
+00 ZA ZAMBIA (General)
+01 ZA North-Western
+02 ZA Copperbelt
+03 ZA Western
+04 ZA Southern
+05 ZA Central
+06 ZA Eastern
+07 ZA Northern
+08 ZA Luapula
+09 ZA Lusaka

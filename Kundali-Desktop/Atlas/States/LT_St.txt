@@ -1,0 +1,17 @@
+00 LT LESOTHO (General)
+02 LT LT02
+03 LT LT03
+04 LT LT04
+05 LT LT05
+06 LT LT06
+01 LT LT01
+10 LT Berea
+11 LT Butha-Buthe
+12 LT Leribe
+13 LT Mafeteng
+14 LT Maseru
+15 LT Mohale's Hoek
+16 LT Mokhotlong
+17 LT Qacha's Hoek
+18 LT Quthing
+19 LT Thaba-Tseka

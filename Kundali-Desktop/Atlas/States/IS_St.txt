@@ -1,0 +1,7 @@
+00 IS ISRAEL (General)
+01 IS HaDarom
+02 IS HaMerkaz
+04 IS Hefa
+03 IS HaZafon
+05 IS Tel Aviv
+06 IS Yerushalayim

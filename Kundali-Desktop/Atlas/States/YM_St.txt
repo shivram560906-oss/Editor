@@ -1,0 +1,18 @@
+00 YM YEMEN (General)
+01 YM Abyan
+02 YM Adan
+03 YM Al Mahrah
+04 YM Hadramawt
+05 YM Shabwah
+07 YM Al Bayda'
+08 YM Al Hudaydah
+09 YM Al Jawf
+10 YM Al Mahwit
+13 YM Ibb
+17 YM Taizz
+16 YM Sana'
+15 YM Sadah
+14 YM Ma'rib
+12 YM Hajjah
+11 YM Dhamar
+06 YM Lahij

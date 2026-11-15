@@ -1,0 +1,11 @@
+00 CF CONGO (General)
+01 CF Bouenza
+03 CF Cuvette
+04 CF Kouilou
+05 CF Lekoumou
+06 CF Likouala
+07 CF Niari
+08 CF Plateaux
+10 CF Sangha
+11 CF Pool
+12 CF Brazzaville

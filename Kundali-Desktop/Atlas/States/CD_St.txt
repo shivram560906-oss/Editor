@@ -1,0 +1,15 @@
+00 CD CHAD (General)
+01 CD Batha
+02 CD Biltine
+03 CD Borkou-Ennedi-Tibesti
+04 CD Chari-Baguirmi
+05 CD Guera
+06 CD Kanem
+07 CD Lac
+08 CD Logone Occidental
+09 CD Logone Oriental
+10 CD Mayo-Kebbi
+11 CD Moyen-Chari
+12 CD Ouaddai
+13 CD Salamat
+14 CD Tandjile

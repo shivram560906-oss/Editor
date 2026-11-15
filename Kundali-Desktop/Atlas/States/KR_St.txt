@@ -1,0 +1,4 @@
+00 KR KIRIBATI (General)
+01 KR Gilbert Islands
+02 KR Line Islands
+03 KR Phoenix Islands

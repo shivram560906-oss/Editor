@@ -1,0 +1,20 @@
+00 NO NORWAY (General)
+01 NO Akershus
+02 NO Aust-Agder
+04 NO Buskerud
+05 NO Finnmark
+06 NO Hedmark
+07 NO Hordaland Fylke
+08 NO More og Romsdal
+09 NO Nordland
+10 NO Nord-Trondelag
+11 NO Oppland
+12 NO Oslo
+13 NO Ostfold
+14 NO Rogaland
+15 NO Sogn og Fjordane
+16 NO Sor-Trondelag
+17 NO Telemark
+18 NO Troms
+19 NO Vest-Agder
+20 NO Vestfold

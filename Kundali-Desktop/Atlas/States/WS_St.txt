@@ -1,0 +1,12 @@
+00 WS WESTERN SAMOA (General)
+01 WS Aana
+02 WS Aiga-i-le-Tai
+03 WS Atua
+04 WS Faasaleleaga
+05 WS Gagaemauga
+06 WS Vaa-o-Fonoti
+11 WS Vaisigano
+10 WS Tuamasaga
+09 WS Satupaitea
+08 WS Palauli
+07 WS Gagaifomauga

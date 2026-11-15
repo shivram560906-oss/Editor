@@ -1,0 +1,14 @@
+00 LA LAOS (General)
+01 LA Attapu
+02 LA Champasak
+03 LA Houaphan
+04 LA Khammouan
+05 LA Loung Namtha
+06 LA Louangphrabang
+07 LA Oudomxai
+08 LA Phongsali
+09 LA Saravan
+10 LA Savannakhet
+11 LA Vientiane
+13 LA Xaignabouri
+14 LA Xiangkhoang

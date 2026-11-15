@@ -1,0 +1,18 @@
+00 SO SOMALIA (General)
+17 SO SO17
+01 SO Bakool
+02 SO Banaadir
+03 SO Bari
+04 SO Bay
+05 SO Galguduud
+06 SO Gedo
+07 SO Hiiraan
+08 SO Jubbada Dhexe
+09 SO Jubbada Hoose
+10 SO Mudug
+11 SO Nugaal
+12 SO Sanaag
+13 SO Shabeellaha Dhexe
+14 SO Shabeellaha Hoose
+15 SO Togdheer
+16 SO Woqooyi Galbeed

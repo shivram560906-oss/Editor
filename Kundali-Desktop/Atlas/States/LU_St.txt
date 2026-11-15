@@ -1,0 +1,4 @@
+00 LU LUXEMBOURG (General)
+01 LU Diekirch
+02 LU Grevenmacher
+03 LU Luxembourg

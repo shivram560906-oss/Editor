@@ -1,0 +1,9 @@
+00 JO JORDAN (General)
+02 JO Al Balqa'
+07 JO Maan
+09 JO Al Karak
+10 JO Al Mafraq
+11 JO Amman
+12 JO At Tafilah
+13 JO Az Zarqa'
+14 JO Irbid

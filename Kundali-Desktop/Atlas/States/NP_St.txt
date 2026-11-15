@@ -1,0 +1,15 @@
+00 NP NEPAL (General)
+01 NP Bagmati
+02 NP Bheri
+03 NP Dhawalagiri
+04 NP Gandaki
+05 NP Janakpur
+06 NP Karnali
+07 NP Kosi
+08 NP Lumbini
+09 NP Mahakali
+10 NP Mechi
+11 NP Narayani
+12 NP Rapti
+13 NP Sagarmatha
+14 NP Seti

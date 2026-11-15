@@ -1,0 +1,8 @@
+00 NG NIGER (General)
+01 NG Agadez
+02 NG Diffa
+03 NG Dosso
+04 NG Maradi
+05 NG Niamey
+06 NG Tahoua
+07 NG Zinder

@@ -1,0 +1,11 @@
+00 UG UGANDA (General)
+05 UG Busoga
+08 UG Karamoja
+12 UG South Buganda
+18 UG Central
+20 UG Eastern
+21 UG Nile
+22 UG North Buganda
+23 UG Northern
+24 UG Southern
+25 UG Western

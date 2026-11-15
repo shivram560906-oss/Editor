@@ -1,0 +1,11 @@
+00 BC BOTSWANA (General)
+01 BC Central
+02 BC Chobe
+03 BC Ghanzi
+04 BC Kgalagadi
+05 BC Kgatleng
+06 BC Kweneng
+07 BC Ngamiland
+08 BC North-East
+09 BC South-East
+10 BC Southern

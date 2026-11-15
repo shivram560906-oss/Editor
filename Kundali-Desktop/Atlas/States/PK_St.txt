@@ -1,0 +1,10 @@
+00 PK PAKISTAN (General)
+99 PK PK99
+AK PK PKAK
+NA PK PKNA
+01 PK Federally Administered Tribal Areas
+03 PK North-West Frontier
+04 PK Punjab
+05 PK Sindh
+08 PK Islamabad
+02 PK Balochistan

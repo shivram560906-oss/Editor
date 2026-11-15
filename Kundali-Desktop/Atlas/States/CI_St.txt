@@ -1,0 +1,14 @@
+00 CI CHILE (General)
+01 CI Valparaiso
+02 CI Aisen del General Carlos Ibanez del Campo
+03 CI Antofagasta
+04 CI Araucania
+05 CI Atacama
+06 CI Bio-Bio
+07 CI Coquimbo
+08 CI Libertador General Bernardo O'Higgins
+09 CI Los Lagos
+10 CI Magallanes y Antartica Chilena
+11 CI Maule
+12 CI Region Metropolitana
+13 CI Tarapaca

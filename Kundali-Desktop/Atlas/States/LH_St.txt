@@ -1,0 +1,56 @@
+00 LH LITHUANIA (General)
+01 LH Akmenes Rajonas
+02 LH Alytaus Rajonas
+03 LH Alytus
+05 LH Birstonas
+07 LH Druskininkai
+08 LH Ignalinos Rajonas
+09 LH Jonavos Rajonas
+10 LH Joniskio Rajonas
+11 LH Jurbarko Rajonas
+13 LH Kaunas
+14 LH Kauno Rajonas
+19 LH Kretingos Rajonas
+20 LH Kupiskio Rajonas
+26 LH Neringa
+27 LH Pakruojo Rajonas
+28 LH Palanga
+29 LH Panevezio Rajonas
+30 LH Panevezys
+31 LH Pasvalio Rajonas
+32 LH Plunges Rajonas
+33 LH Prienu Rajonas
+34 LH Radviliskio Rajonas
+35 LH Raseiniu Rajonas
+36 LH Rokiskio Rajonas
+37 LH Sakiu Rajonas
+38 LH Salcininku Rajonas
+39 LH Siauliai
+40 LH Siauliu Rajonas
+41 LH Silales Rajonas
+42 LH Silutes Rajonas
+43 LH Sirvintu Rajonas
+44 LH Skuodo Rajonas
+45 LH Svencioniu Rajonas
+46 LH Taurages Rajonas
+47 LH Telsiu Rajonas
+48 LH Traku Rajonas
+49 LH Ukmerges Rajonas
+50 LH Utenos Rajonas
+51 LH Varenos Rajonas
+52 LH Vilkaviskio Rajonas
+53 LH Vilniaus Rajonas
+54 LH Vilnius
+55 LH Zarasu Rajonas
+04 LH Anyksciu Rajonas
+06 LH Birzu Rajonas
+12 LH Kaisiadoriu Rajonas
+15 LH Kedainiu Rajonas
+16 LH Kelmes Rajonas
+17 LH Klaipeda
+18 LH Klaipedos Rajonas
+21 LH Lazdiju Rajonas
+22 LH Marijampole
+23 LH Marijampoles Rajonas
+24 LH Mazeikiu Rajonas
+25 LH Moletu Rajonas

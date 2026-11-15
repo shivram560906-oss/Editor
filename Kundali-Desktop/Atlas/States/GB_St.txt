@@ -1,0 +1,10 @@
+00 GB GABON (General)
+01 GB Estuaire
+02 GB Haut-Ogooue
+03 GB Moyen-Ogooue
+04 GB Ngounie
+05 GB Nyanga
+06 GB Ogooue-Ivindo
+07 GB Ogooue-Lolo
+08 GB Ogooue-Maritime
+09 GB Woleu-Ntem

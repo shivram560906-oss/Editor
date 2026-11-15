@@ -1,0 +1,7 @@
+00 GA GAMBIA, THE (General)
+01 GA Banjul
+02 GA Lower River
+03 GA MacCarthy Island
+04 GA Upper River
+05 GA Western
+07 GA North Bank

@@ -1,0 +1,22 @@
+00 TO TOGO (General)
+01 TO Amlame
+02 TO Aneho
+03 TO Atakpame
+04 TO Bafilo
+05 TO Bassar
+06 TO Dapaong
+07 TO Kante
+08 TO Klouto
+09 TO Lama-Kara
+10 TO Lome
+11 TO Mango
+12 TO Niamtougou
+13 TO Notse
+14 TO Kpagouda
+15 TO Badou
+16 TO Sotouboua
+17 TO Tabligbo
+18 TO Tsevie
+19 TO Tchamba
+20 TO Tchaoudjo
+21 TO Vogan

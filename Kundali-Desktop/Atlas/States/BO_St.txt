@@ -1,0 +1,8 @@
+00 BO BELARUS (General)
+01 BO Brestskaya Voblasts'
+02 BO Homyel'skaya Voblasts'
+03 BO Hrodzyenskaya Voblasts'
+04 BO Mahilyowskaya Voblasts'
+05 BO Minsk*
+06 BO Minskaya Voblasts'
+07 BO Vitsyebskaya Voblasts'

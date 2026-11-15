@@ -2,6 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const { spawn } = require("child_process");
 
 /* Local development: load .env if it exists. On a host, set the variables in
    the dashboard instead. Never commit real credentials. */
@@ -18,6 +19,206 @@ function loadEnv() {
   }
 }
 loadEnv();
+
+/* ── Kundali-Desktop Python backend proxy ──────────────────────────────
+   The FastAPI engine is started lazily on the first Kundali request, then
+   kept warm. If it is already running on the port we simply reuse it. */
+const KUNDALI_BACKEND_DIR = path.join(__dirname, "Kundali-Desktop", "backend");
+const KUNDALI_BACKEND_PORT = Number(process.env.KUNDALI_BACKEND_PORT || 8000);
+const KUNDALI_BASE = `http://127.0.0.1:${KUNDALI_BACKEND_PORT}`;
+const KUNDALI_DROP_KEYS = ["comprehensive_book", "yogini_dasha_five_level", "tribhagi_dasha"];
+let kundaliProc = null;
+let kundaliStarting = null;
+
+async function kundaliAlive() {
+  try {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 1500);
+    const resp = await fetch(KUNDALI_BASE + "/health/live", { signal: ctl.signal });
+    clearTimeout(timer);
+    return resp.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+function spawnKundaliBackend() {
+  return new Promise(resolve => {
+    const cmds = process.platform === "win32" ? ["python", "python3"] : ["python3", "python"];
+    const tryNext = i => {
+      if (i >= cmds.length) return resolve(false);
+      let proc;
+      try {
+        proc = spawn(cmds[i], ["main.py"], {
+          cwd: KUNDALI_BACKEND_DIR,
+          env: { ...process.env, PYTHONUNBUFFERED: "1", PORT: String(KUNDALI_BACKEND_PORT), RELOAD: "false" },
+          stdio: ["ignore", "pipe", "pipe"]
+        });
+      } catch (e) {
+        return tryNext(i + 1);
+      }
+      proc.once("error", () => tryNext(i + 1));
+      proc.once("spawn", () => {
+        kundaliProc = proc;
+        console.log("[kundali] backend starting with", cmds[i], "on port", KUNDALI_BACKEND_PORT);
+        resolve(true);
+      });
+      proc.stdout.on("data", d => process.stdout.write("[kundali] " + d));
+      proc.stderr.on("data", d => process.stderr.write("[kundali] " + d));
+      proc.on("close", code => {
+        console.log("[kundali] backend exited with code", code);
+        if (kundaliProc === proc) kundaliProc = null;
+      });
+    };
+    tryNext(0);
+  });
+}
+
+async function ensureKundaliBackend() {
+  if (await kundaliAlive()) return true;
+  if (!kundaliStarting) {
+    kundaliStarting = (async () => {
+      if (!(await spawnKundaliBackend())) return false;
+      const deadline = Date.now() + 40000;
+      while (Date.now() < deadline) {
+        await new Promise(r => setTimeout(r, 700));
+        if (await kundaliAlive()) return true;
+      }
+      return false;
+    })().finally(() => { kundaliStarting = null; });
+  }
+  return kundaliStarting;
+}
+
+function slimKundali(data) {
+  if (!data || typeof data !== "object") return data;
+  for (const key of KUNDALI_DROP_KEYS) delete data[key];
+  return data;
+}
+
+function kundaliJson(res, status, payload) {
+  const text = JSON.stringify(payload);
+  res.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    "Content-Length": Buffer.byteLength(text)
+  });
+  res.end(text);
+}
+
+function proxyKundaliCalculate(req, res) {
+  const MAX_BODY = 2 * 1024 * 1024;
+  let size = 0, chunks = [], tooLarge = false;
+  req.on("data", chunk => {
+    if (tooLarge) return;
+    size += chunk.length;
+    if (size > MAX_BODY) {
+      tooLarge = true;
+      kundaliJson(res, 413, { error: "Request body too large" });
+      req.destroy();
+      return;
+    }
+    chunks.push(chunk);
+  });
+  req.on("error", () => { if (!res.headersSent) kundaliJson(res, 400, { error: "Request failed" }); });
+  req.on("end", async () => {
+    if (tooLarge) return;
+    const ok = await ensureKundaliBackend();
+    if (!ok) return kundaliJson(res, 502, { error: "Kundali backend could not be started. Check that Python dependencies are installed in Kundali-Desktop/backend." });
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 180000);
+    try {
+      const resp = await fetch(KUNDALI_BASE + "/api/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: Buffer.concat(chunks),
+        signal: ctl.signal
+      });
+      clearTimeout(timer);
+      const text = await resp.text();
+      let data;
+      try { data = JSON.parse(text); }
+      catch (e) { data = { error: (text || "Invalid response from Kundali backend").slice(0, 800) }; }
+      if (resp.ok) slimKundali(data);
+      kundaliJson(res, resp.ok ? 200 : resp.status, data);
+    } catch (e) {
+      clearTimeout(timer);
+      kundaliJson(res, 502, {
+        error: e && e.name === "AbortError"
+          ? "Kundali calculation timed out after 3 minutes."
+          : "Kundali backend unavailable: " + (e && e.message ? e.message : e)
+      });
+    }
+  });
+}
+
+async function proxyKundaliCities(req, res, url) {
+  const ok = await ensureKundaliBackend();
+  if (!ok) return kundaliJson(res, 502, { error: "Kundali backend could not be started." });
+  const q = url.searchParams.get("q") || "";
+  const limit = Math.max(1, Math.min(20, parseInt(url.searchParams.get("limit") || "8", 10) || 8));
+  try {
+    const resp = await fetch(KUNDALI_BASE + "/api/cities/search?q=" + encodeURIComponent(q) + "&limit=" + limit);
+    const text = await resp.text();
+    res.writeHead(resp.ok ? 200 : resp.status, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "Content-Length": Buffer.byteLength(text)
+    });
+    res.end(text);
+  } catch (e) {
+    kundaliJson(res, 502, { error: "Kundali backend unavailable: " + (e && e.message ? e.message : e) });
+  }
+}
+
+async function proxyKundaliPlaces(req, res) {
+  const ok = await ensureKundaliBackend();
+  if (!ok) return kundaliJson(res, 502, { error: "Kundali backend could not be started." });
+  try {
+    const resp = await fetch(KUNDALI_BASE + "/api/cities/hierarchy");
+    const text = await resp.text();
+    res.writeHead(resp.ok ? 200 : resp.status, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "Content-Length": Buffer.byteLength(text)
+    });
+    res.end(text);
+  } catch (e) {
+    kundaliJson(res, 502, { error: "Kundali places unavailable: " + (e && e.message ? e.message : e) });
+  }
+}
+
+async function proxyKundaliTransit(req, res, url) {
+  const ok = await ensureKundaliBackend();
+  if (!ok) return kundaliJson(res, 502, { error: "Kundali backend could not be started." });
+  const planet = (url.searchParams.get("planet") || "Saturn").replace(/[^A-Za-z]/g, "").slice(0, 20) || "Saturn";
+  const date = (url.searchParams.get("date") || new Date().toISOString().slice(0, 10)).replace(/[^0-9-]/g, "").slice(0, 10);
+  const ayanamsha = (url.searchParams.get("ayanamsha") || "LAHIRI").replace(/[^A-Z_]/gi, "").slice(0, 20) || "LAHIRI";
+  const node = (url.searchParams.get("node") || "MEAN").replace(/[^A-Z_]/gi, "").slice(0, 8) || "MEAN";
+  const target = KUNDALI_BASE + "/api/transits/planetary-transition-window?planet=" + encodeURIComponent(planet) +
+    "&reference_date=" + encodeURIComponent(date) + "&before=1&after=1" +
+    "&ayanamsha_type=" + encodeURIComponent(ayanamsha) + "&node_type=" + encodeURIComponent(node);
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 60000);
+  try {
+    const resp = await fetch(target, { signal: ctl.signal });
+    clearTimeout(timer);
+    const text = await resp.text();
+    res.writeHead(resp.ok ? 200 : resp.status, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "Content-Length": Buffer.byteLength(text)
+    });
+    res.end(text);
+  } catch (e) {
+    clearTimeout(timer);
+    kundaliJson(res, 502, { error: "Kundali transit unavailable: " + (e && e.message ? e.message : e) });
+  }
+}
+
+process.on("exit", () => {
+  try { if (kundaliProc) kundaliProc.kill(); } catch (e) { }
+});
 
 const PORT = process.env.PORT || 10000;
 const ACCOUNT_ID = (process.env.CLOUDFLARE_ACCOUNT_ID || "").trim();
@@ -479,6 +680,57 @@ const RASHI_MIME = {
   ".svg": "image/svg+xml",
 };
 
+/* Serve the editor's own static assets (the Kundali timeline builder and
+   future local styles/scripts). A strict extension allow-list keeps source
+   files, .env and server-side data out of reach. */
+const STATIC_MIME = {
+  ".js": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".woff2": "font/woff2",
+  ".mp3": "audio/mpeg",
+  ".wav": "audio/wav",
+};
+function serveStaticAsset(req, res, pathname) {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    res.writeHead(405, { "Content-Type": "text/plain; charset=utf-8", Allow: "GET, HEAD" });
+    return res.end("Method not allowed");
+  }
+  let name = pathname.replace(/^\/+/, "");
+  try {
+    name = decodeURIComponent(name);
+  } catch (e) {
+    name = "";
+  }
+  name = path.basename(name);
+  const ext = path.extname(name).toLowerCase();
+  if (!name || name === "." || name === ".." || !/^[A-Za-z0-9._-]+$/.test(name) || !STATIC_MIME[ext]) {
+    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    return res.end("Not found");
+  }
+  const file = path.join(__dirname, name);
+  if (!file.startsWith(__dirname + path.sep)) {
+    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    return res.end("Not found");
+  }
+  fs.readFile(file, (err, data) => {
+    if (err) {
+      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      return res.end("Not found");
+    }
+    res.writeHead(200, {
+      "Content-Type": STATIC_MIME[ext],
+      "Cache-Control": "no-cache",
+      "X-Content-Type-Options": "nosniff",
+    });
+    res.end(req.method === "HEAD" ? undefined : data);
+  });
+}
+
 /* Serve the local rashi pictures. The template asks for "0.png"; older
    copies may only have "0.jpg", so a missing .png falls back to the same name
    with a .jpg extension. Only plain file names inside Rashi/ are allowed.
@@ -635,8 +887,59 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (url.pathname === "/api/kundali/calculate" && req.method === "POST") {
+    proxyKundaliCalculate(req, res);
+    return;
+  }
+
+  if (url.pathname === "/api/kundali/cities" && req.method === "GET") {
+    proxyKundaliCities(req, res, url);
+    return;
+  }
+
+  if (url.pathname === "/api/kundali/places" && req.method === "GET") {
+    proxyKundaliPlaces(req, res);
+    return;
+  }
+
+  if (url.pathname === "/api/kundali/transit" && req.method === "GET") {
+    proxyKundaliTransit(req, res, url);
+    return;
+  }
+
   if (/^\/[Rr]ashi\//.test(url.pathname)) {
     serveRashi(req, res, url.pathname);
+    return;
+  }
+
+  if (url.pathname === "/__kb-shot" && req.method === "POST") {
+    const chunks = [];
+    let size = 0;
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > 8 * 1024 * 1024) { req.destroy(); return; }
+      chunks.push(chunk);
+    });
+    req.on("end", () => {
+      try {
+        const raw = Buffer.concat(chunks).toString("utf8");
+        const m = /^data:image\/png;base64,(.*)$/s.exec(raw);
+        if (!m) { res.writeHead(400, { "Content-Type": "text/plain" }); return res.end("bad image"); }
+        const out = path.join(process.env.TEMP || "C:\\Users\\DELL\\AppData\\Local\\Temp", "opencode", "kb-shot-" + (url.searchParams.get("name") || "preview") + ".png");
+        fs.writeFileSync(out, Buffer.from(m[1], "base64"));
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: true, file: out, bytes: m[1].length }));
+      } catch (e) {
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.end(String(e));
+      }
+    });
+    req.on("error", () => { try { res.writeHead(500); res.end(); } catch (e) { } });
+    return;
+  }
+
+  if (/\.(js|css|svg|png|jpe?g|webp|woff2|mp3|wav)$/i.test(url.pathname)) {
+    serveStaticAsset(req, res, url.pathname);
     return;
   }
 

@@ -1,0 +1,10 @@
+00 QA QATAR (General)
+01 QA Ad Dawhad
+02 QA Al Ghuwayriyah
+03 QA Al Jumayliyah
+04 QA Al Khawr
+05 QA Al Wakrah
+06 QA Ar Rayyan
+07 QA Jarayan al Batinah
+08 QA Madinat ash Shamal
+09 QA Umm Salal

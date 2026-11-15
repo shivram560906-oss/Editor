@@ -1,0 +1,17 @@
+00 GM GERMANY (General)
+01 GM Baden-Wurttemberg
+02 GM Bayern
+03 GM Bremen
+04 GM Hamburg
+05 GM Hessen
+06 GM Niedersachsen
+07 GM Nordrhein-Westfalen
+08 GM Rheinland-Pfalz
+09 GM Saarland
+10 GM Schleswig-Holstein
+11 GM Brandenburg
+12 GM Mecklenburg-Vorpommern
+13 GM Sachsen
+14 GM Sachsen-Anhalt
+15 GM Thuringen
+16 GM Berlin

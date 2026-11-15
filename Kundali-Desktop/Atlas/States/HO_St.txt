@@ -1,0 +1,19 @@
+00 HO HONDURAS (General)
+01 HO Atlantida
+02 HO Choluteca
+03 HO Colon
+04 HO Comayagua
+05 HO Copan
+06 HO Cortes
+07 HO El Paraiso
+08 HO Francisco Morazan
+09 HO Gracias a Dios
+10 HO Intibuca
+11 HO Islas de la Bahia
+12 HO La Paz
+13 HO Lempira
+14 HO Ocotepeque
+15 HO Olancho
+16 HO Santa Barbara
+17 HO Valle
+18 HO Yoro

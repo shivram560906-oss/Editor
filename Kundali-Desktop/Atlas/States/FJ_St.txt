@@ -1,0 +1,6 @@
+00 FJ FIJI (General)
+02 FJ Eastern
+01 FJ Central
+03 FJ Northern
+04 FJ Rotuma
+05 FJ Western

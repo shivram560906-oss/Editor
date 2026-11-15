@@ -1,0 +1,26 @@
+00 VE VENEZUELA (General)
+99 VE VE99
+01 VE Amazonas
+02 VE Anzoategui
+03 VE Apure
+04 VE Aragua
+05 VE Barinas
+06 VE Bolivar
+07 VE Carabobo
+08 VE Cojedes
+09 VE Delta Amacuro
+10 VE Distrito Federal
+11 VE Falcon
+12 VE Guarico
+13 VE Lara
+14 VE Merida
+15 VE Miranda
+16 VE Monagas
+17 VE Nueva Esparta
+18 VE Portuguesa
+19 VE Sucre
+20 VE Tachira
+21 VE Trujillo
+22 VE Yaracuy
+23 VE Zulia
+24 VE Dependencias Federales

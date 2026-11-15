@@ -1,0 +1,23 @@
+# Runtime dependencies are pinned for reproducible local, CI, and Docker builds.
+fastapi==0.138.0
+uvicorn==0.40.0
+sqlalchemy==2.0.43
+pydantic==2.13.3
+pydantic-settings==2.14.2
+nepali-datetime==1.0.8.5
+pysweph==2.10.3.6
+skyfield==1.55
+tzdata==2025.3
+
+# Legacy account tables remain in the schema for existing installations, but
+# the application no longer uses authentication, so bcrypt/JWT are not needed.
+
+# Rate limiting
+slowapi==0.1.10
+
+# Database migrations
+alembic==1.18.5
+
+# Test and API client tooling
+pytest==9.1.1
+httpx==0.28.1

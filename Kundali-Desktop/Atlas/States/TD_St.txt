@@ -1,0 +1,13 @@
+00 TD TRINIDAD AND TOBAGO (General)
+01 TD Arima
+02 TD Caroni
+03 TD Mayaro
+04 TD Nariva
+05 TD Port-of-Spain
+06 TD Saint Andrew
+07 TD Saint David
+08 TD Saint George
+09 TD Saint Patrick
+10 TD San Fernando
+11 TD Tobago
+12 TD Victoria

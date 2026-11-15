@@ -1,0 +1,7 @@
+00 MA MADAGASCAR (General)
+01 MA Antsiranana
+05 MA Antananarivo
+06 MA Toliara
+04 MA Toamasina
+03 MA Mahajanga
+02 MA Fianarantsoa

@@ -1,0 +1,15 @@
+00 NR NAURU (General)
+01 NR Aiwo
+02 NR Anabar
+03 NR Anetan
+04 NR Anibare
+05 NR Baiti
+06 NR Boe
+07 NR Buada
+08 NR Denigomodu
+09 NR Ewa
+10 NR Ijuw
+11 NR Meneng
+12 NR Nibok
+13 NR Uaboe
+14 NR Yaren

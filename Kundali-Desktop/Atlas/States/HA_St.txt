@@ -1,0 +1,10 @@
+00 HA HAITI (General)
+03 HA Nord-Ouest
+06 HA Artibonite
+07 HA Centre
+08 HA Grand'Anse
+09 HA Nord
+10 HA Nord-Est
+11 HA Ouest
+12 HA Sud
+13 HA Sud-Est

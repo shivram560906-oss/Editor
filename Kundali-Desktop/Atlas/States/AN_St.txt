@@ -1,0 +1,7 @@
+00 AN ANDORRA (General)
+01 AN Andorra
+02 AN Canillo
+03 AN Encamp
+04 AN La Massana
+05 AN Ordino
+06 AN Sant Julia de Loria

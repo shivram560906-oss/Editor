@@ -1,0 +1,12 @@
+00 ST ST. LUCIA (General)
+01 ST Anse-la-Raye
+02 ST Dauphin
+03 ST Castries
+04 ST Choiseul
+05 ST Dennery
+06 ST Gros Islet
+07 ST Laborie
+08 ST Micoud
+09 ST Soufriere
+10 ST Vieux Fort
+11 ST Praslin

@@ -1,0 +1,12 @@
+00 LS LIECHTENSTEIN (General)
+01 LS Balzers
+02 LS Eschen
+03 LS Gamprin
+04 LS Mauren
+05 LS Planken
+06 LS Ruggell
+07 LS Schaan
+08 LS Schellenberg
+09 LS Triesen
+10 LS Triesenberg
+11 LS Vaduz

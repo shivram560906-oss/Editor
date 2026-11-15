@@ -1,0 +1,16 @@
+00 SA SAUDI ARABIA (General)
+99 SA SA99
+02 SA Al Bahah
+03 SA Al Jawf
+05 SA Al Madinah
+06 SA Ash Sharqiyah
+08 SA Al Qasim
+09 SA Al Qurayyat
+10 SA Ar Riyad
+11 SA Asir
+14 SA Makkah
+15 SA Al Hudud ash Shamaliyah
+16 SA Najran
+17 SA Jizan
+19 SA Tabuk
+13 SA Ha'il

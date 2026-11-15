@@ -1,0 +1,93 @@
+00 UK UNITED KINGDOM (General)
+01 UK Avon
+02 UK Bedford
+03 UK Berkshire
+04 UK Buckingham
+05 UK Cambridge
+06 UK Cheshire
+07 UK Cleveland
+08 UK Cornwall
+09 UK Cumbria
+10 UK Derby
+11 UK Devon
+12 UK Dorset
+13 UK Durham
+14 UK East Sussex
+15 UK Essex
+16 UK Gloucester
+17 UK Greater London
+18 UK Greater Manchester
+19 UK Hampshire
+20 UK Hereford and Worcester
+21 UK Hertford
+22 UK Humberside
+23 UK Isle of Wight
+24 UK Kent
+25 UK Lancashire
+26 UK Leicester
+27 UK Lincoln
+28 UK Merseyside
+29 UK Norfolk
+30 UK North Yorkshire
+31 UK Northampton
+32 UK Northumberland
+33 UK Nottingham
+34 UK Oxford
+35 UK Shropshire
+36 UK Somerset
+37 UK South Yorkshire
+38 UK Stafford
+39 UK Suffolk
+40 UK Surrey
+41 UK Tyne and Wear
+42 UK Warwick
+43 UK West Midlands
+44 UK West Sussex
+45 UK West Yorkshire
+46 UK Wiltshire
+52 UK Antrim
+53 UK Ards
+54 UK Armagh
+55 UK Ballymena
+56 UK Ballymoney
+57 UK Banbridge
+58 UK Belfast
+59 UK Carrickfergus
+64 UK Down
+63 UK Craigavon
+62 UK Cookstown
+61 UK Coleraine
+60 UK Castlereagh
+65 UK Dungannon
+66 UK Fermanagh
+67 UK Larne
+68 UK Limavady
+69 UK Lisburn
+70 UK Londonderry
+71 UK Magherafelt
+72 UK Moyle
+73 UK Newry and Mourne
+74 UK Newtownabbey
+75 UK North Down
+76 UK Omagh
+77 UK Strabane
+85 UK Orkney
+86 UK Shetland
+87 UK Strathclyde
+88 UK Tayside
+89 UK Western Isles
+78 UK Borders
+79 UK Central
+80 UK Dumfries and Galloway
+81 UK Fife
+82 UK Grampian
+83 UK Highland
+84 UK Lothian
+90 UK Clwyd
+91 UK Dyfed
+92 UK Gwent
+93 UK Gwynedd
+94 UK Mid Glamorgan
+95 UK Powys
+96 UK South Glamorgan
+97 UK West Glamorgan

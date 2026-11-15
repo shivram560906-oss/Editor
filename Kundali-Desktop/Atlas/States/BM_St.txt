@@ -1,0 +1,15 @@
+00 BM BURMA (General)
+01 BM Rakhine State
+02 BM Chin State
+03 BM Irrawaddy
+04 BM Kachin State
+05 BM Karan State
+06 BM Kayah State
+07 BM Magwe
+08 BM Mandalay
+09 BM Pegu
+10 BM Sagain
+11 BM Shan State
+12 BM Tenasserim
+13 BM Mon State
+14 BM Rangoon

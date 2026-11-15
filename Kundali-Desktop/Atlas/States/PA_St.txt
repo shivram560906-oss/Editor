@@ -1,0 +1,20 @@
+00 PA PARAGUAY (General)
+01 PA Alto Parana
+02 PA Amambay
+03 PA Boqueron
+04 PA Caaguazu
+05 PA Caazapa
+06 PA Central
+07 PA Concepcion
+08 PA Cordillera
+10 PA Guaira
+11 PA Itapua
+12 PA Misiones
+13 PA Neembucu
+15 PA Paraguari
+16 PA Presidente Hayes
+17 PA San Pedro
+18 PA Alto Paraguay
+19 PA Canindeyu
+20 PA Chaco
+21 PA Nueva Asuncion

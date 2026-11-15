@@ -1,0 +1,22 @@
+00 EN ESTONIA (General)
+01 EN Harjumaa
+02 EN Hiiumaa
+03 EN Ida-Virumaa
+04 EN Jarvamaa
+05 EN Jogevamaa
+06 EN Kohtla-Jarve
+07 EN Laanemaa
+08 EN Laane-Virumaa
+09 EN Narva
+10 EN Parnu
+11 EN Parnumaa
+12 EN Polvamaa
+13 EN Raplamaa
+14 EN Saaremaa
+15 EN Sillamae
+16 EN Tallinn
+17 EN Tartu
+18 EN Tartumaa
+20 EN Viljandimaa
+21 EN Vorumaa
+19 EN Valgamaa

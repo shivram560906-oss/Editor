@@ -1,0 +1,13 @@
+00 MR MAURITANIA (General)
+07 MR Adrar
+05 MR Brakna
+08 MR Dakhlet Nouadhibou
+03 MR Assaba
+04 MR Gorgol
+10 MR Guidimaka
+01 MR Hodh Ech Chargui
+02 MR Hodh El Gharbi
+12 MR Inchiri
+11 MR Tiris Zemmour
+09 MR Tagant
+06 MR Trarza

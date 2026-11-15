@@ -1,0 +1,11 @@
+00 NS SURINAME (General)
+10 NS Brokopondo
+11 NS Commewijne
+12 NS Coronie
+13 NS Marowijne
+14 NS Nickerie
+15 NS Para
+16 NS Paramaribo
+17 NS Saramacca
+18 NS Sipaliwini
+19 NS Wanica

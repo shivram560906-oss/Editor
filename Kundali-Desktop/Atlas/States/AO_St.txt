@@ -1,0 +1,19 @@
+00 AO ANGOLA (General)
+01 AO Benguela
+02 AO Bie
+03 AO Cabinda
+04 AO Cuando Cubango
+05 AO Cuanza Norte
+06 AO Cuanza Sul
+07 AO Cunene
+08 AO Huambo
+09 AO Huila
+10 AO Luanda
+12 AO Malanje
+13 AO Namibe
+14 AO Moxico
+15 AO Uige
+16 AO Zaire
+17 AO Lunda Norte
+18 AO Lunda Sul
+19 AO Bengo

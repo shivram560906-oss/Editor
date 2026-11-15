@@ -1,0 +1,9 @@
+00 KE KENYA (General)
+01 KE Central
+02 KE Coast
+03 KE Eastern
+05 KE Nairobi Area
+06 KE North-Eastern
+07 KE Nyanza
+08 KE Rift Valley
+09 KE Western

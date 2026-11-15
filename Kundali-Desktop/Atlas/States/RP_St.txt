@@ -1,0 +1,136 @@
+00 RP PHILIPPINES (General)
+01 RP Abra
+02 RP Agusan del Norte
+03 RP Agusan del Sur
+04 RP Aklan
+05 RP Albay
+06 RP Antique
+07 RP Bataan
+08 RP Batanes
+09 RP Batangas
+10 RP Benguet
+11 RP Bohol
+12 RP Bukidnon
+13 RP Bulacan
+14 RP Cagayan
+15 RP Camarines Norte
+16 RP Camarines Sur
+17 RP Camiguin
+18 RP Capiz
+19 RP Catanduanes
+20 RP Cavite
+21 RP Cebu
+22 RP Basilan
+23 RP Eastern Samar
+24 RP Davao
+25 RP Davao del Sur
+26 RP Davao Oriental
+27 RP Ifugao
+28 RP Ilocos Norte
+29 RP Ilocos Sur
+30 RP Iloilo
+31 RP Isabela
+32 RP Kalinga-Apayao
+33 RP Laguna
+34 RP Lanao del Norte
+35 RP Lanao del Sur
+36 RP La Union
+37 RP Leyte
+38 RP Marinduque
+39 RP Masbate
+40 RP Mindoro Occidental
+41 RP Mindoro Oriental
+42 RP Misamis Occidental
+43 RP Misamis Oriental
+44 RP Mountain
+45 RP RP45
+46 RP Negros Oriental
+47 RP Nueva Ecija
+49 RP Palawan
+48 RP Nueva Vizcaya
+50 RP Pampanga
+51 RP Pangasinan
+53 RP Rizal
+54 RP Romblon
+55 RP Samar
+56 RP Maguindanao
+57 RP North Cotabato
+58 RP Sorsogon
+59 RP Southern Leyte
+60 RP Sulu
+61 RP Surigao del Norte
+62 RP Surigao del Sur
+63 RP Tarlac
+64 RP Zambales
+65 RP Zamboanga del Norte
+66 RP Zamboanga del Sur
+67 RP Northern Samar
+68 RP Quirino
+69 RP Siquijor
+70 RP South Cotabato
+71 RP Sultan Kudarat
+72 RP Tawi-Tawi
+A1 RP Angeles
+A2 RP Bacolod
+A3 RP Bago
+A4 RP Baguio
+A5 RP Bais
+A6 RP Basilan
+A7 RP Batangas
+A8 RP Butuan
+A9 RP Cabanatuan
+B1 RP Cadiz
+B2 RP Cagayan de Oro
+B3 RP Calbayog
+B4 RP Caloocan
+B5 RP Canlaon
+B6 RP Cavite
+B7 RP Cebu
+B8 RP Cotabato
+B9 RP Dagupan
+C1 RP Danao
+C2 RP Dapitan
+C3 RP Davao
+C4 RP Dipolog
+C5 RP Dumaguete
+C6 RP General Santos
+C7 RP Gingoog
+C8 RP Iligan
+C9 RP Iloilo
+D1 RP Iriga
+D2 RP La Carlota
+D3 RP Laoag
+D4 RP Lapu-Lapu
+D5 RP Legaspi
+D6 RP Lipa
+D7 RP Lucena
+D8 RP Mandaue
+D9 RP Manila
+E1 RP Marawi
+E2 RP Naga
+E3 RP Olongapo
+E4 RP Ormoc
+E5 RP Oroquieta
+E6 RP Ozamis
+E7 RP Pagadian
+E8 RP Palayan
+E9 RP Pasay
+F1 RP Puerto Princesa
+F2 RP Quezon
+F3 RP Roxas
+F5 RP San Carlos, Pangasinan
+F4 RP San Carlos, Negros Occidental
+F6 RP San Jose
+F7 RP San Pablo
+F8 RP Silay
+F9 RP Surigao
+G1 RP Tacloban
+G2 RP Tagaytay
+G3 RP Tagbilaran
+G4 RP Tangub
+G5 RP Toledo
+G6 RP Trece Martires
+G7 RP Zamboanga
+G8 RP Aurora
+H2 RP Quezon
+H3 RP Negros Occidental

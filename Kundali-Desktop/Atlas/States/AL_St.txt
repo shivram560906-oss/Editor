@@ -1,0 +1,27 @@
+00 AL ALBANIA (General)
+01 AL Berat
+02 AL Dibre
+03 AL Durres
+04 AL Elbasan
+05 AL Fier
+06 AL Gjirokaster
+07 AL Gramsh
+08 AL Kolonje
+09 AL Korce
+10 AL Kruje
+11 AL Kukes
+12 AL Lezhe
+13 AL Librazhd
+14 AL Lushnje
+15 AL Mat
+16 AL Mirdite
+17 AL Permet
+18 AL Pogradec
+19 AL Puke
+20 AL Sarande
+21 AL Shkoder
+22 AL Skrapar
+23 AL Tepelene
+26 AL Tropoje
+27 AL Vlore
+28 AL Tirane

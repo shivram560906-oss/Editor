@@ -1,0 +1,8 @@
+00 BP SOLOMON ISLANDS (General)
+05 BP Central
+06 BP Guadalcanal
+07 BP Isabel
+08 BP Makira
+09 BP Temotu
+04 BP Western
+03 BP Malaita

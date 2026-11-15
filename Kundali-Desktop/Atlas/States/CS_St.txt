@@ -1,0 +1,8 @@
+00 CS COSTA RICA (General)
+01 CS Alajuela
+02 CS Cartago
+03 CS Guanacaste
+04 CS Heredia
+06 CS Limon
+07 CS Puntarenas
+08 CS San Jose

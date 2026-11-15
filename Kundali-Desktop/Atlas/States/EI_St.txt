@@ -1,0 +1,27 @@
+00 EI IRELAND (General)
+01 EI Carlow
+02 EI Cavan
+03 EI Clare
+04 EI Cork
+06 EI Donegal
+07 EI Dublin
+10 EI Galway
+11 EI Kerry
+12 EI Kildare
+13 EI Kilkenny
+14 EI Leitrim
+15 EI Laois
+16 EI Limerick
+18 EI Longford
+19 EI Lough
+20 EI Mayo
+21 EI Meath
+22 EI Monagham
+23 EI Offaly
+24 EI Roscommon
+25 EI Silgo
+26 EI Tipperary
+27 EI Waterford
+29 EI Westmead
+30 EI Wexford
+31 EI Wicklow

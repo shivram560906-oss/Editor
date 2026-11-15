@@ -1,0 +1,41 @@
+00 ET ETHIOPIA (General)
+03 ET ET03
+04 ET ET04
+05 ET ET05
+06 ET ET06
+02 ET ET02
+07 ET ET07
+08 ET ET08
+09 ET ET09
+10 ET ET10
+11 ET ET11
+12 ET ET12
+13 ET ET13
+14 ET ET14
+01 ET Arsi
+17 ET Asosa
+18 ET Borena
+43 ET Welega
+39 ET Gamo Gofa
+38 ET Bale
+37 ET Tigray
+40 ET Ilubabor
+41 ET Kefa
+42 ET Sidamo
+35 ET Semen Welo
+34 ET Semen shewa
+33 ET Semen Gonder
+32 ET Omo
+31 ET Ogaden
+30 ET Nazret
+29 ET Misrak Haregre
+28 ET Misrak Gojam
+27 ET Mirab Shewa
+26 ET Mirab Harerge
+25 ET Mirab Gojam
+24 ET Metekel
+23 ET Gambela
+22 ET Dire Dawa
+21 ET Debub Welo
+20 ET Debub Shewa
+19 ET Debub Gonder

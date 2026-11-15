@@ -1,0 +1,5 @@
+00 WZ SWAZILAND (General)
+01 WZ Hhohho
+02 WZ Lubombo
+03 WZ Manzini
+04 WZ Shiselweni

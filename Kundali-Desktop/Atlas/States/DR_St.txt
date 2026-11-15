@@ -1,0 +1,31 @@
+00 DR DOMINICAN REPUBLIC (General)
+01 DR Azua
+02 DR Baoruco
+03 DR Barahona
+04 DR Dajabon
+05 DR Distrito Nacional
+06 DR Duarte
+08 DR Espaillat
+09 DR Independencia
+10 DR La Altagracia
+11 DR Elias Pina
+12 DR La Romana
+14 DR Maria Trinidad Sanchez
+15 DR Monte Cristi
+16 DR Pedernales
+17 DR Peravia
+18 DR Puerto Plata
+19 DR Salcedo
+20 DR Samana
+21 DR Sanchez Ramirez
+23 DR San Juan
+24 DR San Pedro de Macoris
+25 DR Santiago
+26 DR Santiago Rodriguez
+27 DR Valverde
+28 DR El Seibo
+29 DR Hato Mayor
+30 DR La Vega
+31 DR Monsenor Nouel
+32 DR Monte Plata
+33 DR San Cristobal

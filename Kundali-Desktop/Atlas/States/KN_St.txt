@@ -1,0 +1,13 @@
+00 KN KOREA, DEMOCRATIC PEOPLE'S REPUBLIC OF (General)
+01 KN Chagang-do
+03 KN Hamgyong-namdo
+06 KN Hwanghae-namdo
+07 KN Hwanghae-pukto
+08 KN Kaesong-si
+09 KN Kangwon-do
+12 KN P'yongyang-si
+11 KN P'yongan-bukto
+13 KN Yanggang-do
+14 KN Namp'o-si
+15 KN P'yongan-bukto
+16 KN Hamgyong-bukto

@@ -1,0 +1,11 @@
+00 RW RWANDA (General)
+01 RW Butare
+02 RW Byumba
+03 RW Cyangugu
+04 RW Gikongoro
+05 RW Gisenyi
+06 RW Gitarama
+07 RW Kibungo
+08 RW Kibuye
+09 RW Kigali
+10 RW Ruhengeri

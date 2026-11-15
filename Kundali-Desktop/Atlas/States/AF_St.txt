@@ -1,0 +1,34 @@
+00 AF AFGHANISTAN (General)
+01 AF Badakhshan
+02 AF Badghis
+03 AF Baghlan
+05 AF Bamian
+06 AF Farah
+07 AF Faryab
+08 AF Ghazn
+09 AF Ghowr
+10 AF Helmand
+11 AF Herat
+13 AF Kabol
+14 AF Kapisa
+15 AF Konar
+16 AF Laghman
+17 AF Lowgar
+18 AF Nangarhar
+19 AF Nimruz
+20 AF Oruzgan
+21 AF Paktia
+22 AF Parvan
+23 AF Kandahar
+24 AF Kondoz
+25 AF AF25
+26 AF Takhar
+27 AF Vardak
+28 AF Zabol
+29 AF Paktika
+30 AF Balkh
+04 AF AF04
+12 AF AF12
+31 AF Jowzjan
+32 AF Samangan
+33 AF Sar-e Pol

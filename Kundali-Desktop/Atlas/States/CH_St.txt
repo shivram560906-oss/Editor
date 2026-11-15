@@ -1,0 +1,31 @@
+00 CH CHINA (General)
+31 CH Hainan
+01 CH Anhui
+02 CH Zhejiang
+03 CH Jiangxi
+04 CH Jiangsu
+05 CH Jilin
+06 CH Qinghai
+07 CH Fujian
+08 CH Heilongjiang
+09 CH Henan
+10 CH Hebei
+11 CH Hunan
+12 CH Hubei
+13 CH Xinjiang
+14 CH Xizang
+15 CH Gansu
+16 CH Guangxi
+18 CH Guizhou
+19 CH Liaoning
+20 CH Nei Mongol
+21 CH Ningxia
+22 CH Beijing
+23 CH Shanghai
+24 CH Shanxi
+25 CH Shandong
+26 CH Shaanxi
+27 CH Sichuan
+28 CH Tianjin
+29 CH Yunnan
+30 CH Guangdong

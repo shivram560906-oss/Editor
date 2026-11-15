@@ -1,0 +1,10 @@
+00 BE BELGIUM (General)
+01 BE Antwerpen
+02 BE Brabant
+03 BE Hainaut
+04 BE Liege
+05 BE Limburg
+06 BE Luxembourg
+07 BE Namur
+08 BE Oost-Vlaanderen
+09 BE West-Vlaanderen

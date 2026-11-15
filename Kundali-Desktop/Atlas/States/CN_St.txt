@@ -1,0 +1,4 @@
+00 CN COMOROS (General)
+01 CN Anjouan
+02 CN Grande Comore
+03 CN Moheli

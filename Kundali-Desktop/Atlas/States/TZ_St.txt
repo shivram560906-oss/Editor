@@ -1,0 +1,26 @@
+00 TZ TANZANIA , UNITED REPUBLIC OF (General)
+01 TZ Arusha
+02 TZ Dar es Salaam
+03 TZ Dodoma
+04 TZ Iringa
+05 TZ Kigoma
+06 TZ Kilimanjaro
+07 TZ Lindi
+08 TZ Mara
+09 TZ Mbeya
+10 TZ Morogoro
+11 TZ Mtwara
+12 TZ Mwanza
+13 TZ Pemba North
+15 TZ Shinyanga
+16 TZ Singida
+17 TZ Tabora
+18 TZ Tanga
+19 TZ Ziwa Magharibi
+20 TZ Pemba South
+14 TZ Ruvuma
+21 TZ Zanzibar Central/South
+22 TZ Zanzibar North
+23 TZ Dar es Salaam
+24 TZ Rukwa
+25 TZ Zanzibar Urban/West

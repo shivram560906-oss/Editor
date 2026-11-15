@@ -1,0 +1,15 @@
+11 UR UR11
+14 UR UR14
+15 UR UR15
+01 UR Armyanskaya Sovetskaya Sotsialisticheskaya Respublika
+02 UR Azerbaydzhanskaya Sovetskaya Sotsialisticheskaya Respublika
+03 UR Belorusskaya Sovetskaya Sotsialisticheskaya Respublika
+04 UR Estonskaya Sovetskaya Sotsialisticheskaya Respublika
+05 UR Gruzinskaya Sovetskaya Sotsialisticheskaya Respublika
+06 UR Kazakhskaya Sovetskaya Sotsialisticheskaya Respublika
+07 UR Kirgizskaya Sovetskaya Sotsialisticheskaya Respublika
+08 UR Latviyskaya Sovetskaya Sotsialisticheskaya Respublika
+09 UR Litovskaya Sovetskaya Sotsialisticheskaya Respublika
+12 UR Tadzhikskaya Sovetskaya Sotsialisticheskaya Respublika
+13 UR Turkmenskaya Sovetskaya Sotsialisticheskaya Respublika
+10 UR Moldova, Sovetskaya Sotsialisticheskaya Respublika

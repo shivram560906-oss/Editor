@@ -1,0 +1,27 @@
+00 ID INDONESIA (General)
+01 ID Aceh
+02 ID Bali
+03 ID Bengkulu
+04 ID Jakarta Raya
+05 ID Jambi
+06 ID Jawa Barat
+07 ID Jawa Tengah
+08 ID Jawa Timur
+10 ID Yogyakarta
+11 ID Kalimantan Barat
+12 ID Kalimantan Selatan
+13 ID Kalimantan Tengah
+14 ID Kalimantan Timur
+15 ID Lampung
+16 ID Maluku
+17 ID Nusa Tenggara Barat
+18 ID Nusa Tenggara Timur
+19 ID Riau
+20 ID Sulawesi Selatan
+21 ID Sulawesi Tengah
+22 ID Sulawesi Tenggara
+23 ID Sulawesi Utara
+24 ID Sumatera Barat
+25 ID Sumatera Selatan
+26 ID Sumatera Utara
+27 ID Timor Timur

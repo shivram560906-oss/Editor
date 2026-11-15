@@ -1,0 +1,50 @@
+00 PL POLAND (General)
+23 PL Biaa Podlaska
+24 PL Biaystok
+25 PL Bielsko
+26 PL Bydgoszcz
+27 PL Chem
+28 PL Ciechanow
+29 PL Czestochowa
+30 PL Elblag
+31 PL Gdansk
+32 PL Gorzow
+33 PL Jelenia Gora
+34 PL Kalisz
+35 PL Katowice
+36 PL Kielce
+37 PL Konin
+38 PL Koszalin
+39 PL Krakow
+40 PL Krosno
+41 PL Legnica
+42 PL Leszno
+43 PL odz
+44 PL omza
+45 PL Lublin
+46 PL Nowy Sacz
+47 PL Olsztyn
+48 PL Opole
+49 PL Ostroeka
+50 PL Pia
+51 PL Piotrkow
+52 PL Pock
+53 PL Poznan
+54 PL Przemysl
+55 PL Radom
+56 PL Rzeczow
+57 PL Siedlce
+58 PL Sieradz
+59 PL Skierniewice
+60 PL Supsk
+61 PL Suwaki
+62 PL Szczecin
+63 PL Tarnobrzeg
+64 PL Tarnow
+65 PL Torun
+66 PL Wabrzych
+67 PL Warszawa
+68 PL Wocawek
+69 PL Wrocaw
+70 PL Zamosc
+71 PL Zielona Gora

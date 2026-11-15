@@ -1,0 +1,15 @@
+00 NL NETHERLANDS (General)
+01 NL Drenthe
+02 NL Friesland
+03 NL Gelderland
+04 NL Groningen
+05 NL Limburg
+06 NL Noord-Brabant
+07 NL Noord-Holland
+08 NL Overijssel
+09 NL Utrecht
+10 NL Zeeland
+11 NL Zuid-Holland
+12 NL Dronten
+13 NL Zuidelijke IJsselmeerpolders
+14 NL Lelystad

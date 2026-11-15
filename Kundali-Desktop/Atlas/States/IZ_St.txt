@@ -1,0 +1,19 @@
+00 IZ IRAQ (General)
+01 IZ Al Anbar
+02 IZ Al Basrah
+03 IZ Al Muthanna
+04 IZ Al Qadisiyah
+05 IZ As Sulaymaniyah
+06 IZ Babil
+07 IZ Baghdad
+08 IZ Dahuk
+09 IZ Dhi Qar
+10 IZ Diyala
+11 IZ Arbil
+12 IZ Karbala'
+13 IZ At Ta'mim
+14 IZ Maysan
+15 IZ Ninawa
+16 IZ Wasit
+17 IZ An Najaf
+18 IZ Salah ad Din

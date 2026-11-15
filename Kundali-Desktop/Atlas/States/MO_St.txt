@@ -1,0 +1,40 @@
+00 MO MOROCCO (General)
+01 MO Agadir
+02 MO Al Hoceima
+03 MO Azilal
+04 MO Ben Slimane
+05 MO Beni Mellal
+06 MO Boulemane
+07 MO Casablanca
+08 MO Chaouen
+09 MO El Jadida
+10 MO El Kelaa des Srarhna
+11 MO Er Rachidia
+12 MO Essaouira
+13 MO Fes
+14 MO Figuig
+15 MO Kenitra
+16 MO Khemisset
+17 MO Khenifra
+18 MO Khouribga
+19 MO Marrakech
+20 MO Meknes
+21 MO Nador
+22 MO Ouarzazate
+23 MO Oujda
+24 MO Rabat-Sale
+25 MO Safi
+26 MO Settat
+27 MO Tanger
+29 MO Tata
+30 MO Taza
+32 MO Tiznit
+33 MO Guelmim
+34 MO Ifrane
+35 MO Laayoune
+36 MO Tan-Tan
+37 MO Taounate
+38 MO Sidi Kacem
+39 MO Taroudannt
+40 MO Tetouan
+41 MO Larache

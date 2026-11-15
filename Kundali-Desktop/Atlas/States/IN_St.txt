@@ -1,0 +1,36 @@
+00 IN INDIA (General)
+01 IN Andaman and Nicobar Islands
+02 IN Andhra Pradesh
+03 IN Arunachal Pradesh
+04 IN Assam
+05 IN Bihar
+06 IN Chandigarh
+07 IN Chattisgarh
+08 IN Daman and Dui
+09 IN Dadar and Nagar Haveli
+10 IN Delhi
+11 IN Gujarat
+12 IN Goa
+13 IN Himachal Pradesh
+14 IN Haryana
+15 IN Jharkhand
+16 IN Jammu and Kashmir
+17 IN Karnataka
+18 IN Kerala
+19 IN Lakshwadeep
+20 IN Meghalaya
+21 IN Maharashtra
+22 IN Manipur
+23 IN Madhya Pradesh
+24 IN Mizoram
+25 IN Nagaland
+26 IN Orissa
+27 IN Punjab
+28 IN Pondicherry
+29 IN Rajasthan
+30 IN Sikkim
+31 IN Tamil Nadu
+32 IN Tripura
+33 IN Uttar Pradesh
+34 IN Uttaranchal
+35 IN West Bengal

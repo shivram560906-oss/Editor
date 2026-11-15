@@ -1,0 +1,7 @@
+00 BH BELIZE (General)
+01 BH Belize
+02 BH Cayo
+03 BH Corozal
+04 BH Orange Walk
+05 BH Stann Creek
+06 BH Toledo

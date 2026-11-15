@@ -1,0 +1,12 @@
+00 NH VANUATU (General)
+05 NH Ambrym
+06 NH Aoba/Maewo
+07 NH Banks/Torres
+08 NH Efate
+09 NH Epi
+10 NH Malakula
+11 NH Paama
+12 NH Pentecote
+13 NH Santo/Malo
+14 NH Shepherd
+15 NH Tafea

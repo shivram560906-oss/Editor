@@ -1,0 +1,27 @@
+00 EG EGYPT (General)
+01 EG Ad Daqahliyah
+02 EG Al Bahr al Ahmar
+03 EG Al Buhayrah
+04 EG Al Fayyum
+05 EG Al Gharbiyah
+06 EG Al Iskandariyah
+07 EG Al Ismailiyah
+08 EG Al Jizah
+09 EG Al Minufiyah
+10 EG Al Minya
+11 EG Al Qahirah
+12 EG Al Qalyubiyah
+13 EG Al Wadi al Jadid
+14 EG Ash Sharqiyah
+15 EG As Suways
+16 EG Aswan
+17 EG Asyut
+18 EG Bani Suwayf
+19 EG Bur Said
+20 EG Dumyat
+21 EG Kafr ash Shaykh
+22 EG Matruh
+23 EG Qina
+24 EG Suhaj
+26 EG Janub Sina'
+27 EG Shamal Sina'

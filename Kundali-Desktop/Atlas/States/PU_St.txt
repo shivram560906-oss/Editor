@@ -1,0 +1,10 @@
+00 PU GUINEA-BISSAU (General)
+01 PU Bafata
+04 PU Oio
+02 PU Quinara
+05 PU Bolama
+06 PU Cacheu
+07 PU Tombali
+10 PU Gabu
+11 PU Bissau
+12 PU Biombo

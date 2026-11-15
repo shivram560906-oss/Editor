@@ -1,0 +1,28 @@
+# Docker build context for the Kundali FastAPI service.
+# Keep secrets, local databases and caches out of the image.
+.git
+.gitignore
+.env
+**/.env
+!.env.example
+
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.ruff_cache
+**/node_modules
+
+.tts-cache
+*.log
+Kundali-Desktop/jyotish.db
+Kundali-Desktop/backend/jyotish.db
+Kundali-Desktop/backups
+
+# Not needed by the API runtime.
+Kundali-Desktop/Atlas
+Kundali-Desktop/public
+Kundali-Desktop/docs
+Kundali-Desktop/tools
+Kundali-Desktop/gui/tests
+Kundali-Desktop/tests
+editor.original.html

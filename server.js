@@ -24,8 +24,10 @@ loadEnv();
    The FastAPI engine is started lazily on the first Kundali request, then
    kept warm. If it is already running on the port we simply reuse it. */
 const KUNDALI_BACKEND_DIR = path.join(__dirname, "Kundali-Desktop", "backend");
+const KUNDALI_REMOTE_BASE = (process.env.KUNDALI_BACKEND_URL || "").trim().replace(/\/+$/, "");
 const KUNDALI_BACKEND_PORT = Number(process.env.KUNDALI_BACKEND_PORT || 8000);
-const KUNDALI_BASE = `http://127.0.0.1:${KUNDALI_BACKEND_PORT}`;
+const KUNDALI_BASE = KUNDALI_REMOTE_BASE || `http://127.0.0.1:${KUNDALI_BACKEND_PORT}`;
+const KUNDALI_REMOTE = !!KUNDALI_REMOTE_BASE;
 const KUNDALI_DROP_KEYS = ["comprehensive_book", "yogini_dasha_five_level", "tribhagi_dasha"];
 let kundaliProc = null;
 let kundaliStarting = null;
@@ -75,6 +77,9 @@ function spawnKundaliBackend() {
 }
 
 async function ensureKundaliBackend() {
+  // A remote engine (e.g. a separate Render service) may be asleep. Do not
+  // block on a health probe: the actual proxy request wakes it up.
+  if (KUNDALI_REMOTE) return true;
   if (await kundaliAlive()) return true;
   if (!kundaliStarting) {
     kundaliStarting = (async () => {
@@ -174,8 +179,11 @@ async function proxyKundaliCities(req, res, url) {
 async function proxyKundaliPlaces(req, res) {
   const ok = await ensureKundaliBackend();
   if (!ok) return kundaliJson(res, 502, { error: "Kundali backend could not be started." });
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 90000);
   try {
-    const resp = await fetch(KUNDALI_BASE + "/api/cities/hierarchy");
+    const resp = await fetch(KUNDALI_BASE + "/api/cities/hierarchy", { signal: ctl.signal });
+    clearTimeout(timer);
     const text = await resp.text();
     res.writeHead(resp.ok ? 200 : resp.status, {
       "Content-Type": "application/json; charset=utf-8",
@@ -184,6 +192,7 @@ async function proxyKundaliPlaces(req, res) {
     });
     res.end(text);
   } catch (e) {
+    clearTimeout(timer);
     kundaliJson(res, 502, { error: "Kundali places unavailable: " + (e && e.message ? e.message : e) });
   }
 }
@@ -694,6 +703,7 @@ const STATIC_MIME = {
   ".woff2": "font/woff2",
   ".mp3": "audio/mpeg",
   ".wav": "audio/wav",
+  ".json": "application/json; charset=utf-8",
 };
 function serveStaticAsset(req, res, pathname) {
   if (req.method !== "GET" && req.method !== "HEAD") {
@@ -935,6 +945,11 @@ const server = http.createServer((req, res) => {
       }
     });
     req.on("error", () => { try { res.writeHead(500); res.end(); } catch (e) { } });
+    return;
+  }
+
+  if (url.pathname === "/places.json" && req.method === "GET") {
+    serveStaticAsset(req, res, url.pathname);
     return;
   }
 

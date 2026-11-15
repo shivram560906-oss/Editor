@@ -807,6 +807,11 @@ input[type=checkbox] {
   accent-color: var(--ac); cursor: pointer; flex: 0 0 auto;
 }
 .kun-loc-note { color: var(--mut-2); font-size: 11px; line-height: 1.5; margin-top: -4px; }
+.kun-retry {
+  background: none; border: none; padding: 0; font: inherit; color: var(--ac);
+  cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+.kun-retry:hover { color: var(--fg); }
 #kf_custom_place_wrap[hidden] { display: none; }
 .kun-f input[readonly] { color: var(--mut); cursor: default; }
 .kun-f input[readonly]:focus { border-color: var(--line-2); box-shadow: none; }
@@ -5727,6 +5732,21 @@ ${dateLine}
     const KUN_GOLD = '#f6d365', KUN_GOLD2 = '#e8b923', KUN_TEXT = '#e9eefb', KUN_MUT = '#9fb0d0', KUN_DIM = '#7183a8';
     const KUN_GOOD = '#34d399', KUN_BAD = '#fb7185', KUN_LINE = '#2b3856', KUN_PANEL = '#121d35', KUN_PANEL2 = '#17233e';
     let KUN_META = {}, KUN_LAST_DATA = null, KUN_LAST_PARAMS = null, kunCalMode = 'ad', kunGender = 'male';
+    const KUN_PLACES_CACHE_KEY = 'kunPlacesV1';
+    const KUN_FALLBACK_COUNTRIES = ('Nepal|Argentina|Australia|Austria|Bahrain|Bangladesh|Belgium|Bhutan|Brazil|Canada|Chile|China|Colombia|Czech Republic|Denmark|Egypt|Ethiopia|Finland|France|Germany|Greece|Hungary|India|Indonesia|Iran|Iraq|Ireland|Israel|Italy|Japan|Jordan|Kenya|Kuwait|Lebanon|Malaysia|Mexico|Morocco|Myanmar|Netherlands|New Zealand|Nigeria|Norway|Oman|Pakistan|Peru|Philippines|Poland|Portugal|Qatar|Russia|Saudi Arabia|Singapore|South Africa|South Korea|Spain|Sri Lanka|Sweden|Switzerland|Taiwan|Thailand|Turkey|UAE|UK|USA|Vietnam')
+      .split('|').map(name => ({ name, label: name === 'Nepal' ? 'Nepal / नेपाल' : name }));
+    function kunReadPlacesCache() {
+      try {
+        const raw = localStorage.getItem(KUN_PLACES_CACHE_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (data && Array.isArray(data.cities) && Array.isArray(data.countries) && data.countries.length) return data;
+      } catch (e) { }
+      return null;
+    }
+    function kunCachePlaces(data) {
+      try { localStorage.setItem(KUN_PLACES_CACHE_KEY, JSON.stringify(data)); } catch (e) { }
+    }
     let kunPlaces = null, kunPlacesReq = null, kunPlacesLoaded = false, kunCityChoices = [], kunPlaceSel = null;
 
     const kunA = s => esc(s == null ? '' : String(s));
@@ -6667,6 +6687,21 @@ ${dateLine}
       if (kunPlaces) return kunPlaces;
       if (kunPlacesReq) return kunPlacesReq;
       kunPlacesReq = (async () => {
+        // The hierarchy is static. Prefer the cached/bundled copy so the form
+        // works instantly even while the Python engine is starting.
+        const cached = kunReadPlacesCache();
+        if (cached) { kunPlaces = cached; return cached; }
+        try {
+          const r = await fetch('places.json', { cache: 'no-cache' });
+          if (r.ok) {
+            const data = await r.json();
+            if (data && Array.isArray(data.cities) && Array.isArray(data.countries) && data.countries.length) {
+              kunPlaces = data;
+              kunCachePlaces(data);
+              return data;
+            }
+          }
+        } catch (e) { }
         const r = await fetch('/api/kundali/places', { cache: 'no-store' });
         const txt = await r.text();
         let data = null;
@@ -6674,6 +6709,7 @@ ${dateLine}
         if (!r.ok || !data) throw new Error((data && (data.error || data.detail)) || ('जन्म स्थान सूची लोड भएन (' + r.status + ')'));
         if (!Array.isArray(data.cities) || !Array.isArray(data.countries)) throw new Error('जन्म स्थान सूची अमान्य छ।');
         kunPlaces = data;
+        kunCachePlaces(data);
         return data;
       })();
       try { return await kunPlacesReq; } finally { kunPlacesReq = null; }
@@ -6685,7 +6721,10 @@ ${dateLine}
       sel.disabled = !!disabled;
       sel.value = '';
     }
-    function kunCountryList() { return (kunPlaces && kunPlaces.countries) || []; }
+    function kunCountryList() {
+      const list = (kunPlaces && kunPlaces.countries) || [];
+      return list.length ? list : KUN_FALLBACK_COUNTRIES;
+    }
     function kunRegionList(country) { return (kunPlaces && kunPlaces.regions && kunPlaces.regions[country]) || []; }
     function kunDistrictList(country, region) {
       const byCountry = (kunPlaces && kunPlaces.districts && kunPlaces.districts[country]) || {};
@@ -6925,6 +6964,37 @@ ${dateLine}
       kunFillSelect($('kf_country'), 'देश छान्नुहोस्', kunCountryList(), false);
       if (selected) $('kf_country').value = selected;
     }
+    function kunShowPlacesError() {
+      $('kf_custom').checked = true;
+      kunSetCustom(true);
+      const note = $('kf_loc_note');
+      if (!note) return;
+      note.innerHTML = '';
+      note.append('जन्म स्थान सूची लोड हुन सकेन — Custom location प्रयोग गर्नुहोस् वा ');
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.className = 'kun-retry';
+      retry.textContent = 'पुनः प्रयास';
+      retry.onclick = () => kunRetryPlaces();
+      note.append(retry, '।');
+    }
+    async function kunRetryPlaces() {
+      kunPlaces = null; kunPlacesReq = null; kunPlacesLoaded = false;
+      const btn = $('kun-go'), old = btn.textContent;
+      btn.disabled = true; btn.textContent = 'जन्म स्थान सूची लोड हुँदै…';
+      try {
+        await kunLoadPlaces();
+        kunInitPlaceDefaults();
+        kunPlacesLoaded = true;
+        $('kf_loc_note').textContent = 'देश, प्रदेश र जिल्ला छान्दा अक्षांश, देशान्तर र समय क्षेत्र स्वतः भरिन्छ।';
+        $('kf_custom').checked = false;
+        kunSetCustom(false);
+      } catch (e) {
+        kunShowPlacesError();
+      } finally {
+        btn.disabled = false; btn.textContent = old;
+      }
+    }
     async function kunOpenModal() {
       const m = $('kun-modal');
       if (!m) return;
@@ -6943,14 +7013,8 @@ ${dateLine}
         kunInitPlaceDefaults();
         kunPlacesLoaded = true;
       } catch (e) {
-        $('kf_loc_note').textContent = 'जन्म स्थान सूची लोड हुन सकेन — Custom location प्रयोग गरेर अक्षांश/देशान्तर भर्नुहोस्।';
-        if (!$('kf_country').options.length) {
-          $('kf_country').innerHTML = '';
-          $('kf_country').add(new Option('Nepal / नेपाल', 'Nepal'));
-          $('kf_country').value = 'Nepal';
-        }
-        $('kf_custom').checked = true;
-        kunSetCustom(true);
+        kunFillCountries('');
+        kunShowPlacesError();
       } finally {
         btn.disabled = false; btn.textContent = old;
       }
@@ -7036,6 +7100,7 @@ ${dateLine}
       };
     }
     kunInitModal();
+    kunLoadPlaces().catch(() => { });
 
 
     $('bk').onclick = async () => {

@@ -4555,7 +4555,7 @@
     items: [], cur: -1, tpl: 'cosmic', tplPreview: null, search: '',
     openPages: new Set(), rightTab: 'order', dateLabel: '', demo: null,
     play: { on: false, t: 0, raf: 0, last: 0 }, importing: false,
-    dragFrom: -1, primeT: 0, resolve: null, toastT: 0, key: null,
+    sortTouch: false, primeT: 0, resolve: null, toastT: 0, key: null,
     auto: false, autoOpts: null, autoFp: '', elSel: -1, undo: [], redo: [],
     mode: 'edit', dirty: false, saveT: 0, adPick: false, baseEls: new Map(), transit: null,
     privacyStyle: 'soft', model: 'cosmic'
@@ -5026,6 +5026,7 @@
     const rTabs = document.querySelector('#kun-builder .kb-right-tabs');
     if (rTabs) rTabs.addEventListener('click', kbRightClick);
     kbBindOrderDnd();
+    kbBindSceneSort();
     q('kb-play').onclick = kbPlayToggle;
     q('kb-prev').onclick = () => kbStep(-1);
     q('kb-next').onclick = () => kbStep(1);
@@ -5159,6 +5160,15 @@
     kbRenderAll();
   }
 
+  /* Element id identifies a card across AUTO rebuilds of the same model;
+     autoKey is the stable fallback when a design model swaps the card's
+     first element. Both are saved so a hand-picked order survives a
+     reopen and a model switch. */
+  function kbOrderBase(it) {
+    const el = it && (it.el || (it.els && it.els[0] && it.els[0].el));
+    if (el && el.id) return String(el.id);
+    return it && it.autoKey ? String(it.autoKey) : '';
+  }
   function kbMoveTo(from, to) {
     if (from === to || from < 0 || from >= kb.items.length) return;
     to = clamp(to, 0, kb.items.length - 1);
@@ -5167,7 +5177,34 @@
     if (kb.cur === from) kb.cur = to;
     else if (from < kb.cur && to >= kb.cur) kb.cur--;
     else if (from > kb.cur && to <= kb.cur) kb.cur++;
+    kbMarkDirty();
     kbRenderAll();
+  }
+  /* The scene strip only shows enabled cards. Put the new active sequence
+     back into the same active slots so disabled cards keep their place,
+     then land the preview on the moved card. */
+  function kbReorderActive(from, to) {
+    const active = kbActiveItems();
+    if (from === to || from < 0 || from >= active.length) return false;
+    kbSnap();
+    const moved = active.splice(from, 1)[0];
+    to = clamp(to, 0, active.length);
+    active.splice(to, 0, moved);
+    let ai = 0;
+    for (let i = 0; i < kb.items.length; i++) {
+      if (kb.items[i].enabled !== false) kb.items[i] = active[ai++];
+    }
+    kb.cur = kb.items.indexOf(moved);
+    kb.elSel = (moved.els && moved.els.length) ? 0 : -1;
+    kb.tplPreview = null;
+    const items = kbPreviewItems();
+    const at = items.indexOf(moved);
+    if (at >= 0) kb.play.t = kbSceneStart(items, at);
+    kbMarkDirty();
+    kbRenderAll();
+    kbSyncOverlay();
+    kbToast('कार्ड क्रम बदलियो: ' + (moved.title || moved.el.name));
+    return true;
   }
   function kbMoveItem(i, d) { kbMoveTo(i, i + d); }
   function kbDuplicateItem(i) {
@@ -5196,33 +5233,250 @@
     kbToast('तत्व बदलियो: ' + f.el.name);
   }
 
+  /* ─────────── pointer sort: mouse + touch card reorder ───────────
+     HTML5 drag never fires for touch, so the scene strip and the order
+     rows use Pointer Events. A mouse lifts after a few pixels; a finger
+     waits for a short press so a horizontal swipe still scrolls the
+     card strip. The drop line and the floating ghost make the exact
+     landing slot obvious on a phone. */
+  let kbSortClickLock = 0;
+  document.addEventListener('touchmove', ev => {
+    if (kb.sortTouch) { if (ev.cancelable) ev.preventDefault(); }
+  }, { passive: false });
+
+  function kbSortClickBlock(box) {
+    if (!box || box.dataset.kbSortClick === '1') return;
+    box.dataset.kbSortClick = '1';
+    box.addEventListener('click', ev => {
+      if (performance.now() > kbSortClickLock) return;
+      kbSortClickLock = 0;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+    }, true);
+  }
+
+  function kbBindSortable(box, spec) {
+    if (!box || !spec || box.dataset.kbSortable === '1') return;
+    box.dataset.kbSortable = '1';
+    const axis = spec.axis === 'x' ? 'x' : 'y';
+    const itemAt = el => (el && el.closest ? el.closest(spec.item) : null);
+    const liveItems = () => Array.prototype.slice.call(box.querySelectorAll(spec.item))
+      .filter(el => !el.classList.contains('kb-sort-source'));
+    const coord = ev => (axis === 'x' ? ev.clientX : ev.clientY);
+    const scrollOf = () => (spec.scroller ? spec.scroller() : box);
+    let press = null, drag = null;
+
+    function detach() {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp, true);
+      document.removeEventListener('pointercancel', onCancel, true);
+    }
+    function clearPress() {
+      if (press && press.hold) clearTimeout(press.hold);
+      if (press) press.hold = 0;
+      detach();
+      press = null;
+    }
+    function cleanup(commit) {
+      const d = drag;
+      drag = null;
+      if (d) {
+        if (d.ghost && d.ghost.parentNode) d.ghost.parentNode.removeChild(d.ghost);
+        if (d.line && d.line.parentNode) d.line.parentNode.removeChild(d.line);
+        d.src.classList.remove('kb-sort-source');
+        if (d.raf) cancelAnimationFrame(d.raf);
+        document.body.classList.remove('kb-sort-active');
+        kb.sortTouch = false;
+        if (commit && d.from >= 0 && d.target != null && d.from !== d.target) {
+          kbSortClickLock = performance.now() + 320;
+          spec.onDrop(d.from, d.target);
+        } else if (commit && d.from >= 0 && d.target != null) {
+          kbSortClickLock = performance.now() + 180;
+        }
+      }
+      clearPress();
+    }
+    function place(ev) {
+      if (!drag) return;
+      drag.last = ev;
+      drag.ghost.style.left = (ev.clientX - drag.offX) + 'px';
+      drag.ghost.style.top = (ev.clientY - drag.offY) + 'px';
+      const sc = scrollOf();
+      if (sc) {
+        const r = sc.getBoundingClientRect();
+        const p = coord(ev);
+        const pad = Math.min(54, (axis === 'x' ? r.width : r.height) * .24);
+        drag.dir = p < (axis === 'x' ? r.left : r.top) + pad ? -1
+          : p > (axis === 'x' ? r.right : r.bottom) - pad ? 1 : 0;
+      }
+      const els = liveItems();
+      let target = els.length;
+      for (let i = 0; i < els.length; i++) {
+        const r = els[i].getBoundingClientRect();
+        const mid = axis === 'x' ? r.left + r.width / 2 : r.top + r.height / 2;
+        if (coord(ev) < mid) { target = i; break; }
+      }
+      drag.target = target;
+      const base = box.getBoundingClientRect();
+      if (axis === 'x') {
+        const edge = els[target] ? els[target].getBoundingClientRect().left
+          : (els.length ? els[els.length - 1].getBoundingClientRect().right : base.left);
+        drag.line.style.left = edge + 'px';
+        drag.line.style.top = base.top + 'px';
+        drag.line.style.height = Math.max(16, base.height) + 'px';
+      } else {
+        const edge = els[target] ? els[target].getBoundingClientRect().top
+          : (els.length ? els[els.length - 1].getBoundingClientRect().bottom : base.top);
+        drag.line.style.top = edge + 'px';
+        drag.line.style.left = base.left + 'px';
+        drag.line.style.width = base.width + 'px';
+      }
+    }
+    function tick() {
+      if (!drag) return;
+      const sc = scrollOf();
+      if (sc && drag.dir) {
+        const step = 12;
+        if (axis === 'x') {
+          const max = Math.max(0, sc.scrollWidth - sc.clientWidth);
+          const was = sc.scrollLeft;
+          sc.scrollLeft = clamp(was + drag.dir * step, 0, max);
+          if (sc.scrollLeft !== was && drag.last) place(drag.last);
+        } else {
+          const max = Math.max(0, sc.scrollHeight - sc.clientHeight);
+          const was = sc.scrollTop;
+          sc.scrollTop = clamp(was + drag.dir * step, 0, max);
+          if (sc.scrollTop !== was && drag.last) place(drag.last);
+        }
+      }
+      drag.raf = requestAnimationFrame(tick);
+    }
+    function begin(ev) {
+      if (!press || drag) return;
+      if (spec.canDrag && !spec.canDrag()) { clearPress(); return; }
+      const src = press.src;
+      const r = src.getBoundingClientRect();
+      if (!r.width && !r.height) { clearPress(); return; }
+      const ghost = src.cloneNode(true);
+      ghost.removeAttribute('id');
+      const ids = ghost.querySelectorAll('[id]');
+      for (let i = 0; i < ids.length; i++) ids[i].removeAttribute('id');
+      ghost.classList.add('kb-sort-ghost');
+      ghost.style.width = r.width + 'px';
+      ghost.style.height = r.height + 'px';
+      ghost.style.left = r.left + 'px';
+      ghost.style.top = r.top + 'px';
+      document.body.appendChild(ghost);
+      const line = document.createElement('div');
+      line.className = 'kb-sort-line ' + axis;
+      document.body.appendChild(line);
+      drag = {
+        src: src, ghost: ghost, line: line, last: ev,
+        from: liveItems().indexOf(src),
+        offX: ev.clientX - r.left, offY: ev.clientY - r.top,
+        target: null, dir: 0, raf: 0
+      };
+      if (drag.from < 0) { cleanup(false); return; }
+      if (press.hold) { clearTimeout(press.hold); press.hold = 0; }
+      src.classList.add('kb-sort-source');
+      document.body.classList.add('kb-sort-active');
+      if (press.touch) kb.sortTouch = true;
+      place(ev);
+      drag.raf = requestAnimationFrame(tick);
+    }
+    function onMove(ev) {
+      if (!press) return;
+      press.last = ev;
+      const dx = ev.clientX - press.x, dy = ev.clientY - press.y;
+      const far = Math.hypot(dx, dy);
+      if (drag) {
+        if (ev.cancelable) ev.preventDefault();
+        place(ev);
+        return;
+      }
+      if (press.touch) {
+        if (far < 9) return;
+        if (press.handle) {
+          if (press.hold) { clearTimeout(press.hold); press.hold = 0; }
+          begin(ev);
+          if (drag) { if (ev.cancelable) ev.preventDefault(); place(ev); }
+          return;
+        }
+        if (press.hold) { clearTimeout(press.hold); press.hold = 0; }
+        if (axis === 'x' && Math.abs(dx) > Math.abs(dy) * 1.15) {
+          /* A quick horizontal swipe is still a strip scroll. */
+          const sc = scrollOf();
+          if (sc) {
+            sc.scrollLeft = press.scroll0 - dx;
+            press.scrolling = true;
+            if (ev.cancelable) ev.preventDefault();
+          }
+        } else {
+          /* Let the page / panel scroll normally. */
+          clearPress();
+        }
+        return;
+      }
+      if (far < 4) return;
+      begin(ev);
+      if (drag) { if (ev.cancelable) ev.preventDefault(); place(ev); }
+    }
+    function onUp(ev) {
+      if (!press) return;
+      if (drag) { if (ev.cancelable) ev.preventDefault(); cleanup(true); return; }
+      if (press.scrolling) kbSortClickLock = performance.now() + 320;
+      clearPress();
+    }
+    function onCancel() { cleanup(false); }
+
+    box.addEventListener('pointerdown', ev => {
+      if (ev.button != null && ev.button !== 0) return;
+      const src = itemAt(ev.target);
+      if (!src || src.classList.contains('kb-sort-source')) return;
+      const ctrl = ev.target.closest('input,textarea,select,a,button');
+      if (ctrl && ctrl !== src) return;
+      if (spec.canDrag && !spec.canDrag()) return;
+      const sc = scrollOf();
+      const handle = spec.handle && ev.target.closest(spec.handle);
+      press = {
+        src: src, x: ev.clientX, y: ev.clientY,
+        touch: ev.pointerType === 'touch' || ev.pointerType === 'pen',
+        hold: 0, scrolling: false, last: ev, handle: !!handle,
+        scroll0: sc ? (axis === 'x' ? sc.scrollLeft : sc.scrollTop) : 0
+      };
+      if (press.touch && !press.handle) {
+        press.hold = setTimeout(() => {
+          if (press && !drag) begin({ clientX: press.x, clientY: press.y, cancelable: false });
+        }, 230);
+      }
+      document.addEventListener('pointermove', onMove, { passive: false });
+      document.addEventListener('pointerup', onUp, true);
+      document.addEventListener('pointercancel', onCancel, true);
+    }, { passive: true });
+  }
+
   function kbBindOrderDnd() {
     const body = q('kb-right-body'); if (!body) return;
-    body.addEventListener('dragstart', e => {
-      const row = e.target.closest('[data-row]'); if (!row) return;
-      kb.dragFrom = +row.dataset.row;
-      row.classList.add('dragging');
-      try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(kb.dragFrom)); } catch (err) { }
+    kbBindSortable(body, {
+      item: '.kb-orow', axis: 'y', scroller: () => body, handle: '.grip',
+      canDrag: () => kb.items.length > 0,
+      onDrop: (from, to) => {
+        if (from === to) return;
+        kbSnap();
+        kbMoveTo(from, to);
+      }
     });
-    body.addEventListener('dragover', e => {
-      if (kb.dragFrom < 0) return;
-      const row = e.target.closest('[data-row]'); if (!row) return;
-      e.preventDefault();
-      body.querySelectorAll('.kb-orow').forEach(r => r.classList.remove('drag-over'));
-      row.classList.add('drag-over');
+    kbSortClickBlock(body);
+  }
+
+  function kbBindSceneSort() {
+    const strip = q('kb-scenes'); if (!strip) return;
+    kbBindSortable(strip, {
+      item: '[data-scene]', axis: 'x', scroller: () => strip,
+      canDrag: () => !!(kb.items.length && kbActiveItems().length),
+      onDrop: (from, to) => kbReorderActive(from, to)
     });
-    body.addEventListener('drop', e => {
-      if (kb.dragFrom < 0) return;
-      const row = e.target.closest('[data-row]'); if (!row) return;
-      e.preventDefault();
-      const to = +row.dataset.row;
-      const from = kb.dragFrom; kb.dragFrom = -1;
-      kbMoveTo(from, to);
-    });
-    body.addEventListener('dragend', () => {
-      kb.dragFrom = -1;
-      body.querySelectorAll('.kb-orow').forEach(r => { r.classList.remove('dragging'); r.classList.remove('drag-over'); });
-    });
+    kbSortClickBlock(strip);
   }
 
   function kbRenderRight() {
@@ -5239,7 +5493,7 @@
     if (!kb.items.length) return '<div class="kb-empty">अझै कुनै तत्व छानिएको छैन।<br>बायाँको सूचीबाट चार्ट, तालिका, कार्ड वा शीर्षक छान्नुहोस्।<br><br>केही नछानेमा पुरानै ३२ स्लाइड डिफल्ट टाइमलाइन रहन्छ।</div>';
     const active = kbActiveItems();
     let h = '<div class="kb-section"><div class="kb-section-title">' + (kb.auto ? 'स्वचालित कार्ड क्रम' : 'दृश्य क्रम') + ' <span>' + active.length + ' / ' + kb.items.length + ' सक्रिय</span></div>';
-    if (kb.auto) h += '<div class="kb-sub" style="margin:-2px 0 8px">कार्डको चेकबक्स हटाउँदा त्यो कार्ड प्रिभ्यू/टाइमलाइनबाट हट्छ र क्रमका खाली ठाउँ स्वतः मिल्छ।</div>';
+    if (kb.auto) h += '<div class="kb-sub" style="margin:-2px 0 8px">कार्ड वा ⠿ तानेर माथि/तल सार्नुहोस् — बाँकी क्रम स्वतः मिल्छ। चेकबक्स हटाउँदा त्यो कार्ड प्रिभ्यू/टाइमलाइनबाट हट्छ।</div>';
     h += '<div class="kb-order">';
     kb.items.forEach((it, i) => {
       const on = i === kb.cur;
@@ -5247,8 +5501,8 @@
       const elCount = it.els && it.els.length ? it.els.length : 1;
       const label = it.title || it.el.name;
       const small = it.autoNo ? ('कार्ड ' + neNum(it.autoNo) + ' · ' + elCount + ' तत्व · ' + it.dur.toFixed(1) + 's') : ('पृष्ठ ' + kbNum(it.el.page) + ' · ' + (KB_TYPE_NE[it.el.type] || it.el.type) + ' · ' + it.dur.toFixed(1) + 's + ' + it.gap.toFixed(1) + 's');
-      h += '<div class="kb-orow' + (on ? ' on' : '') + (en ? '' : ' off') + '" draggable="true" data-row="' + i + '">' +
-        '<span class="grip" title="Drag to reorder">⠿</span>' +
+      h += '<div class="kb-orow' + (on ? ' on' : '') + (en ? '' : ' off') + '" data-row="' + i + '">' +
+        '<span class="grip" title="तानेर क्रम बदल्नुहोस्">⠿</span>' +
         '<input class="kb-oen" type="checkbox" data-order-enable="' + i + '"' + (en ? ' checked' : '') + ' title="Enable / disable this card" aria-label="Enable card">' +
         '<input class="kb-onum" type="number" min="1" max="' + kb.items.length + '" value="' + (i + 1) + '" data-order-pos="' + i + '" title="Position number">' +
         '<div class="kb-oinfo" data-order-pick="' + i + '"><b>' + kbEsc(label) + '</b><small>' + kbEsc(small) + '</small></div>' +
@@ -5866,8 +6120,13 @@
     return {
       v: 3, fp: kb.autoFp, saved: Date.now(), tpl: kb.tpl,
       privacyStyle: kb.privacyStyle || 'soft',
+      /* Card order is part of the layout. The element id survives AUTO
+         rebuilds, so reopening or switching a model keeps the hand-picked
+         sequence instead of snapping back to the catalog order. */
+      order: kb.items.map(kbOrderBase).filter(Boolean),
       cards: kb.items.map(it => ({
-        autoKey: it.autoKey || '', title: it.title || '', enabled: it.enabled !== false,
+        autoKey: it.autoKey || '', orderKey: kbOrderBase(it),
+        title: it.title || '', enabled: it.enabled !== false,
         dur: it.dur, gap: it.gap, tpl: it.tpl, set: Object.assign({}, it.set),
         cardBox: it.cardBox ? it.cardBox.slice() : null, chrome: !!it.chrome,
         scrollDur: it.scrollDur, scrollDelay: it.scrollDelay, hideScrollBar: !!it.hideScrollBar,
@@ -5896,9 +6155,21 @@
     const dy = (lay.v || 2) < 3 ? -56 : 0;
     if (lay.tpl) kb.tpl = lay.tpl;
     if (lay.privacyStyle) kb.privacyStyle = lay.privacyStyle;
+    /* Each saved card is claimed once. Keying only by autoKey makes every
+       continuation card of a long note land on the first sibling, so match
+       the stable element id first and keep a pool of unclaimed cards. */
+    const orderPool = kb.items.slice();
     lay.cards.forEach((c, i) => {
-      const it = kb.items.find(x => x.autoKey && x.autoKey === c.autoKey) || kb.items[i];
+      let it = null;
+      if (c.orderKey) {
+        const k = orderPool.findIndex(x => kbOrderBase(x) === c.orderKey);
+        if (k >= 0) it = orderPool.splice(k, 1)[0];
+      }
+      if (!it && c.autoKey) it = kb.items.find(x => x.autoKey && x.autoKey === c.autoKey && orderPool.indexOf(x) >= 0);
+      if (!it) it = kb.items[i];
       if (!it) return;
+      const claimed = orderPool.indexOf(it);
+      if (claimed >= 0) orderPool.splice(claimed, 1);
       if (c.title) it.title = c.title;
       it.enabled = c.enabled !== false;
       if (c.dur != null) it.dur = +c.dur;
@@ -5969,6 +6240,25 @@
         it.el = (it.els[0] || {}).el || it.el;
       }
     });
+    /* Rebuild the saved sequence. Unknown/missing cards stay appended in
+       their generated order, so a new AUTO card can never disappear. A
+       design model can swap a card's first element (and therefore its
+       element id), so fall back to the card's stable autoKey mapping. */
+    if (Array.isArray(lay.order) && lay.order.length) {
+      const pool = kb.items.slice(), ordered = [];
+      const savedAuto = new Map();
+      lay.cards.forEach(c => { if (c.orderKey && c.autoKey) savedAuto.set(c.orderKey, c.autoKey); });
+      lay.order.forEach(k => {
+        let idx = pool.findIndex(x => kbOrderBase(x) === k);
+        if (idx < 0 && savedAuto.has(k)) {
+          const ak = savedAuto.get(k);
+          idx = pool.findIndex(x => x.autoKey && x.autoKey === ak);
+        }
+        if (idx >= 0) ordered.push(pool.splice(idx, 1)[0]);
+      });
+      pool.forEach(it => ordered.push(it));
+      if (ordered.length === kb.items.length) kb.items = ordered;
+    }
   }
 
   function kbAutoSave(manual) {
@@ -6119,7 +6409,7 @@
           }
           return out;
         });
-        kbApplyLayout({ privacyStyle: oldLayout.privacyStyle, cards: cards });
+        kbApplyLayout({ privacyStyle: oldLayout.privacyStyle, order: oldLayout.order, cards: cards });
       }
       const saved = kbAutoLoad();
       if (saved) kbApplyLayout(saved);
@@ -6600,7 +6890,9 @@
     if (!items.length) { strip.innerHTML = ''; return; }
     strip.innerHTML = items.map((it, i) => {
       const nm = it.title || it.el.name;
-      return '<button class="kb-scene-chip" data-scene="' + i + '" title="' + kbAttr(nm) + '">' + (i + 1) + '. ' + kbEsc(nm) + '</button>';
+      return '<button class="kb-scene-chip" data-scene="' + i + '" title="तानेर क्रम बदल्नुहोस् · ' + kbAttr(nm) + '">' +
+        '<span class="kb-scene-grip" aria-hidden="true">⠿</span>' +
+        '<span class="kb-scene-name">' + (i + 1) + '. ' + kbEsc(nm) + '</span></button>';
     }).join('');
     strip.scrollLeft = keep;
   }

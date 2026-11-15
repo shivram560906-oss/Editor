@@ -6615,7 +6615,16 @@ ${dateLine}
       const st = $('st');
       st.textContent = 'कुण्डली गणना भइरहेको छ… (Kundali-Desktop)';
       try {
-        const resp = await fetch('/api/kundali/calculate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params) });
+        const resp = await fetch('/api/kundali/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          // The web viewer never renders the heavy Yogini tree or the book;
+          // ask the engine to skip them (the proxy enforces this as well).
+          body: JSON.stringify(Object.assign({}, params, {
+            include_yogini_tree: false,
+            include_comprehensive_book: false
+          }))
+        });
         const txt = await resp.text();
         let data = null;
         try { data = JSON.parse(txt) } catch (e) { }

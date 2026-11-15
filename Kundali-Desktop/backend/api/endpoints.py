@@ -138,6 +138,10 @@ class ChartRequest(JanmapatrikaDetails):
     node_type: str = "MEAN"
     house_system: str = "WHOLE_SIGN"
     city: Optional[str] = None
+    # The web editor does not render these heavyweight sections; it asks the
+    # engine to skip them so free-tier CPUs and response sizes stay small.
+    include_yogini_tree: bool = True
+    include_comprehensive_book: bool = True
 
     @field_validator("birth_date")
     @classmethod
@@ -602,6 +606,7 @@ def perform_calculations(
     house_system: str = "WHOLE_SIGN",
     calculation_siddhanta: str = "DRIK",
     include_yogini_tree: bool = True,
+    include_comprehensive_book: bool = True,
 ) -> Dict[str, Any]:
     
     # 1. Parse hour, minute, second from time string.
@@ -1066,10 +1071,12 @@ def perform_calculations(
         "remedies": remedies_data
     }
 
-    # Add comprehensive 50+ page book generator model
-    result_payload["comprehensive_book"] = build_comprehensive_kundali_book(
-        result_payload, language="ne"
-    )
+    # Add comprehensive 50+ page book generator model. The web proxy strips it
+    # from responses, so it can be skipped entirely for browser requests.
+    if include_comprehensive_book:
+        result_payload["comprehensive_book"] = build_comprehensive_kundali_book(
+            result_payload, language="ne"
+        )
 
     return result_payload
 
@@ -1091,6 +1098,8 @@ def calculate_chart(request: Request, req: ChartRequest):
             timezone_id=req.timezone_id,
             node_type=req.node_type,
             house_system=req.house_system,
+            include_yogini_tree=req.include_yogini_tree,
+            include_comprehensive_book=req.include_comprehensive_book,
         )
         return results
     except ValueError as e:

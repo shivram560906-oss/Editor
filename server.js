@@ -130,13 +130,25 @@ function proxyKundaliCalculate(req, res) {
     if (tooLarge) return;
     const ok = await ensureKundaliBackend();
     if (!ok) return kundaliJson(res, 502, { error: "Kundali backend could not be started. Check that Python dependencies are installed in Kundali-Desktop/backend." });
+    // The browser never renders the 20k-node Yogini tree or the 50+ page book,
+    // and slimKundali() strips them anyway. Skipping them in the engine keeps
+    // free-tier CPUs and response sizes small.
+    let payload = Buffer.concat(chunks);
+    try {
+      const parsed = JSON.parse(payload.toString("utf8"));
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        parsed.include_yogini_tree = false;
+        parsed.include_comprehensive_book = false;
+        payload = Buffer.from(JSON.stringify(parsed), "utf8");
+      }
+    } catch (e) { /* forward the original body if it is not JSON */ }
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), 180000);
     try {
       const resp = await fetch(KUNDALI_BASE + "/api/calculate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: Buffer.concat(chunks),
+        body: payload,
         signal: ctl.signal
       });
       clearTimeout(timer);

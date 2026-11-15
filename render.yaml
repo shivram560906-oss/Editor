@@ -1,0 +1,15 @@
+# Render Blueprint: Kundali calculation engine.
+#
+# The editor's Node service stays as-is. This Blueprint creates only the
+# Python/FastAPI engine used by /api/kundali/*. After it deploys, copy the
+# service URL into the Node service as KUNDALI_BACKEND_URL.
+#
+# Apply with: Render Dashboard -> New + -> Blueprint -> select this repo.
+services:
+  - type: web
+    name: shivram-kundali
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: Kundali-Desktop/backend/Dockerfile
+    healthCheckPath: /health/live

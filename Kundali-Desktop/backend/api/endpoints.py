@@ -4,7 +4,7 @@ import re
 from copy import deepcopy
 
 import nepali_datetime
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, field_validator
@@ -25,6 +25,7 @@ from calculator import lal_kitab as lal_kitab_calc
 from calculator import remedies as remedies_calc
 from cities_data import CITIES
 from location_hierarchy import build_location_hierarchy
+from janmapatrika_page import render_janmapatrika_page
 from rate_limit import limiter
 
 router = APIRouter()
@@ -137,6 +138,10 @@ class ChartRequest(JanmapatrikaDetails):
     node_type: str = "MEAN"
     house_system: str = "WHOLE_SIGN"
     city: Optional[str] = None
+    # The editor's form stores "male"/"female"; the desktop Janmapatrika page
+    # reads the legacy numeric convention (1 = female).  Kept optional because
+    # the calculation engine itself never uses gender.
+    gender: Optional[str] = None
     # The web editor does not render these heavyweight sections; it asks the
     # engine to skip them so free-tier CPUs and response sizes stay small.
     include_yogini_tree: bool = True
@@ -1112,6 +1117,77 @@ def calculate_chart(request: Request, req: ChartRequest):
         raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Calculation Error: {str(e)}")
+
+
+def _janmapatrika_metadata(req: ChartRequest) -> Dict[str, Any]:
+    """Identity fields consumed by the desktop Janmapatrika page.
+
+    ``perform_calculations`` only returns astronomical data.  The desktop app
+    enriches that result with the form's identity details before opening the
+    page; the web editor sends the same details as chart-request extras, so
+    they are merged back here.
+    """
+    details: Dict[str, Any] = {}
+    for field in JANMAPATRIKA_TEXT_LIMITS:
+        value = getattr(req, field, None)
+        if value:
+            details[field] = value
+
+    gender = str(req.gender or "").strip().lower()
+    if gender:
+        details["gender"] = 1 if gender in {"female", "f", "1", "स्त्री", "महिला", "पुत्री"} else 0
+    return details
+
+
+@router.post("/janmapatrika/page")
+@limiter.limit(settings.CALCULATE_RATE_LIMIT)
+def janmapatrika_page(request: Request, req: ChartRequest):
+    """Render the exact PySide6 desktop Janmapatrika page as a PNG.
+
+    The page contains QPainter charts and QTextDocument dasha tables, so the
+    desktop widget is the only exact renderer.  The same engine calculation is
+    reused, then a short-lived worker draws the real page offscreen.
+    """
+    try:
+        results = perform_calculations(
+            name=req.name,
+            birth_date=req.birth_date,
+            birth_time=req.birth_time,
+            latitude=req.latitude,
+            longitude=req.longitude,
+            timezone=req.timezone,
+            ayanamsha_type=req.ayanamsha_type,
+            city=req.city,
+            timezone_id=req.timezone_id,
+            node_type=req.node_type,
+            house_system=req.house_system,
+            include_yogini_tree=False,
+            include_comprehensive_book=False,
+        )
+        identity = _janmapatrika_metadata(req)
+        if identity:
+            results.setdefault("metadata", {}).update(identity)
+
+        png, width, height = render_janmapatrika_page(results)
+        return Response(
+            content=png,
+            media_type="image/png",
+            headers={
+                "X-Janmapatrika-Width": str(width),
+                "X-Janmapatrika-Height": str(height),
+                "Cache-Control": "private, max-age=86400",
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=f"Validation Error: {str(e)}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Janmapatrika render error: {str(e)[:1600]}",
+        )
+
 
 @router.get("/transits/planetary-transition-window")
 def get_planetary_transition_window(

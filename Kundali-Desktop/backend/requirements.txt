@@ -18,6 +18,10 @@ slowapi==0.1.10
 # Database migrations
 alembic==1.18.5
 
+# Exact desktop Janmapatrika page renderer. The API only needs Qt Core/Gui/
+# Widgets; PySide6-Essentials is the smallest wheel that provides them.
+PySide6-Essentials==6.11.1
+
 # Test and API client tooling
 pytest==9.1.1
 httpx==0.28.1

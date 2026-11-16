@@ -17,6 +17,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Qt runtime libraries and Devanagari fonts for the exact desktop
+# Janmapatrika page renderer (QtWidgets + QTextDocument + QPainter).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 libegl1 libxkbcommon0 libfontconfig1 libfreetype6 \
+    libdbus-1-3 libglib2.0-0 \
+    fonts-noto-core fonts-noto-extra fonts-deva \
+    && rm -rf /var/lib/apt/lists/*
+
 # Run without root. /app stays writable for the SQLite database.
 RUN groupadd --system app && useradd --system --gid app --home /app app \
     && mkdir -p /app/data \
@@ -32,13 +40,20 @@ COPY Kundali-Desktop/backend/ ./backend/
 COPY Kundali-Desktop/de421.bsp ./de421.bsp
 
 # Backend modules reuse these pure-Python GUI helpers (location cascade,
-# Nepali dates and planet labels). They import no PySide6, so the API image
-# stays small.
+# Nepali dates and planet labels).
 COPY Kundali-Desktop/gui/__init__.py ./gui/__init__.py
+COPY Kundali-Desktop/gui/theme.py ./gui/theme.py
 COPY Kundali-Desktop/gui/utils/__init__.py ./gui/utils/__init__.py
 COPY Kundali-Desktop/gui/utils/location_data.py ./gui/utils/location_data.py
 COPY Kundali-Desktop/gui/utils/bs_calendar.py ./gui/utils/bs_calendar.py
 COPY Kundali-Desktop/gui/utils/planet_colors.py ./gui/utils/planet_colors.py
+
+# The authoritative desktop Janmapatrika page. The render worker imports this
+# widget exactly as the desktop app does; the editing pipeline stays SVG.
+COPY Kundali-Desktop/gui/widgets/__init__.py ./gui/widgets/__init__.py
+COPY Kundali-Desktop/gui/widgets/janmapatrika_widget.py ./gui/widgets/janmapatrika_widget.py
+COPY Kundali-Desktop/gui/widgets/north_indian_chart.py ./gui/widgets/north_indian_chart.py
+COPY Kundali-Desktop/gui/widgets/shadbala_bar_widget.py ./gui/widgets/shadbala_bar_widget.py
 
 RUN chown -R app:app /app
 

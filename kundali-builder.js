@@ -156,7 +156,7 @@
   }
   function kbFooter(no, title) {
     let s = '<line x1="46" y1="1214" x2="674" y2="1214" stroke="#2b3856" stroke-width="1"/>';
-    s += kunT(46, 1238, 'Kundali-Desktop · वास्तविक गणना', 12, '#7183a8', 500);
+    s += kunT(46, 1238, 'वैदिक जन्मपत्रिका · वास्तविक गणना', 12, '#7183a8', 500);
     s += kunT(674, 1238, 'पृष्ठ ' + neNum(no), 12, '#7183a8', 500, 'end');
     return kbEl(no, title, 'footer', 'फुटर — पृष्ठ ' + neNum(no), [46, 1204, 628, 54], s, 4.8);
   }
@@ -1231,7 +1231,7 @@
         kbEl(no, title, 'note', 'जन्म मिति (BS) र समय', [46, 780, 628, 44], kunT(360, 800, dateLabel, 21, '#e9eefb', 600, 'middle'), 6.2),
         kbEl(no, title, 'note', 'जन्म स्थान', [46, 812, 628, 44], kunT(360, 838, placeLabel, 17, '#9fb0d0', 500, 'middle'), 6.2),
         kbEl(no, title, 'cards', 'लग्न · चन्द्र · नक्षत्र कार्ड', [46, 880, 628, 130], chips, 7.2),
-        kbEl(no, title, 'note', 'अयनांश ब्याज', [46, 1040, 628, 56], kunT(360, 1070, 'Kundali-Desktop · ' + (meta.ayanamsha_type || 'LAHIRI') + ' अयनांश', 14, '#7183a8', 500, 'middle'), 5.6),
+        kbEl(no, title, 'note', 'अयनांश ब्याज', [46, 1040, 628, 56], kunT(360, 1070, (meta.ayanamsha_type || 'LAHIRI') + ' अयनांश', 14, '#7183a8', 500, 'middle'), 5.6),
         kbFooter(no, title)
       ]));
     }
@@ -1259,7 +1259,7 @@
       pages.push(kbPage(no, title, 'Birth Details', [
         kbHeader(no, title, 'Birth Details'),
         birthTable,
-        kbEl(no, title, 'note', 'जन्म समय नोट', [46, 1040, 628, 44], kunT(46, 1060, 'जन्म समय स्थानीय समयमा हो। समय क्षेत्र DST सहित Kundali-Desktop ले मिलाएको छ।', 13, '#7183a8', 500), 6),
+        kbEl(no, title, 'note', 'जन्म समय नोट', [46, 1040, 628, 44], kunT(46, 1060, 'जन्म समय स्थानीय समयमा हो। समय क्षेत्र DST सहित वास्तविक गणना गरिएको छ।', 13, '#7183a8', 500), 6),
         kbFooter(no, title)
       ]));
     }
@@ -1277,7 +1277,7 @@
       const cw = 196, gap = 16, x0 = 360 - (chipData.length * cw + (chipData.length - 1) * gap) / 2;
       chipData.forEach((c, i) => chips += kunCard(x0 + i * (cw + gap), 902, cw, 108, c[0], c[1], '#e8b923', { fs: 19, chars: 10, lh: 25 }));
       pages.push(kbPage(no, title, 'उत्तर भारतीय शैली', [
-        kbHeader(no, title, 'उत्तर भारतीय शैली · Kundali-Desktop रेन्डरर'),
+        kbHeader(no, title, 'उत्तर भारतीय शैली · वैदिक कुण्डली'),
         kbChartEl(no, title, houses, lagnaSign, 'लग्न कुण्डली चार्ट', 60, 190, 600),
         kbEl(no, title, 'note', 'लग्न अंश', [46, 802, 628, 50], kunT(360, 822, 'लग्न: ' + kunSignByNum(lagnaSign) + ' · ' + kunDMS(lagna.longitude_in_sign || 0), 20, '#e9eefb', 700, 'middle'), 6.2),
         kbEl(no, title, 'note', 'ग्रह संकेत व्याख्या', [46, 842, 628, 40], kunT(360, 862, 'सू चं मं बु गु शु श रा के = ग्रह · (व) = वक्री', 13, '#9fb0d0', 500, 'middle'), 5.6),
@@ -1644,7 +1644,7 @@
         kbCardEl(no, title, 'केतु कार्ड', 374, 340, 300, 120, 'केतु', kunSignByNum(ketu.sign_number) + ' · भाव ' + neNum(ketu.house || '—'), '#e8b923', { fs: 21, chars: 18 }),
         kbCardEl(no, title, 'अक्षभित्रका ग्रह', 46, 486, 628, 120, 'अक्षभित्रका ग्रह', inside, present ? '#fb7185' : '#9fb0d0', { fs: 19, chars: 40 }),
         kbCardEl(no, title, 'अक्षबाहिरका ग्रह', 46, 626, 628, 120, 'अक्षबाहिरका ग्रह', outside, '#34d399', { fs: 19, chars: 40 }),
-        kbEl(no, title, 'note', 'कालसर्प नोट', [46, 780, 628, 60], kunT(46, 800, 'कालसर्प दोष राहु-केतु अक्षभित्र सबै सात ग्रह परेमा मानिन्छ। यो गणना Kundali-Desktop बाट।', 13, '#9fb0d0', 500), 6.2),
+        kbEl(no, title, 'note', 'कालसर्प नोट', [46, 780, 628, 60], kunT(46, 800, 'कालसर्प दोष राहु-केतु अक्षभित्र सबै सात ग्रह परेमा मानिन्छ।', 13, '#9fb0d0', 500), 6.2),
         kbFooter(no, title)
       ]));
     }
@@ -1681,7 +1681,7 @@
       const no = pages.length + 1, title = 'रत्न तथा उपाय';
       const rem = data.remedies || {}, gems = rem.recommended_gemstones || [];
       if (gems.length) {
-        const els = [kbHeader(no, title, 'Kundali-Desktop को लग्नेश/भाग्येश आधारित सिफारिस')];
+        const els = [kbHeader(no, title, 'लग्नेश तथा भाग्येश आधारित सिफारिस')];
         gems.slice(0, 3).forEach((g, i) => {
           const yy = 184 + i * 208;
           let inner = '<rect x="46" y="' + yy + '" width="628" height="192" rx="16" fill="#121d35" stroke="#2b3856" stroke-width="1.5"/>';
@@ -1696,7 +1696,7 @@
         });
         els.push(kbEl(no, title, 'note', 'रत्न सल्लाह', [46, 824, 628, 50], kunT(46, 844, 'रत्न धारण गर्नुअघि योग्य ज्योतिषी वा रत्न विशेषज्ञसँग परामर्श गर्नुहोस्।', 13, '#9fb0d0', 500), 6.2));
         els.push(kbFooter(no, title));
-        pages.push(kbPage(no, title, 'Kundali-Desktop को सिफारिस', els));
+        pages.push(kbPage(no, title, 'शास्त्रीय सिफारिस', els));
       }
     }
 
@@ -1745,7 +1745,7 @@
         kbEl(no, title, 'table', 'ग्रह विवरण ग्रिड', [286, 200, 392, 380], statsSvg, 8),
         kbEl(no, title, 'report', 'लालकिताब फल', [46, 588, 628, 220], report, 7.6),
         kbEl(no, title, 'report', 'उपाय', [46, 822, 628, 104], upay, 7),
-        kbEl(no, title, 'note', 'ग्रह विश्लेषण नोट', [46, 940, 628, 50], kunT(46, 980, 'ग्रह स्थिति, षड्बल, विंशोपक र अवस्था Kundali-Desktop बाट गणना गरिएको हो।', 12, '#7183a8', 500), 6.2),
+        kbEl(no, title, 'note', 'ग्रह विश्लेषण नोट', [46, 940, 628, 50], kunT(46, 980, 'ग्रह स्थिति, षड्बल, विंशोपक र अवस्था वास्तविक गणितीय आधारमा गणना गरिएका हुन्।', 12, '#7183a8', 500), 6.2),
         kbFooter(no, title)
       ]));
     });
@@ -1772,7 +1772,7 @@
         endNameEl,
         kbEl(no, title, 'note', 'जन्म मिति र स्थान', [46, 580, 628, 44], kunT(360, 592, kunDateNe(meta.birth_date) + ' · ' + (meta.city || meta.birth_place || ''), 17, '#9fb0d0', 500, 'middle'), 6.2),
         kbEl(no, title, 'cards', 'अन्तिम चिप कार्डहरू', [46, 660, 628, 140], chips, 7),
-        kbEl(no, title, 'note', 'प्रस्तुति नोट १', [46, 870, 628, 50], kunT(360, 890, 'यो प्रस्तुति Kundali-Desktop को वास्तविक गणना डाटाबाट स्वतः बनाइएको हो।', 14, '#9fb0d0', 500, 'middle'), 6.2),
+        kbEl(no, title, 'note', 'प्रस्तुति नोट १', [46, 870, 628, 50], kunT(360, 890, 'यो प्रस्तुति वास्तविक गणितीय कुण्डली गणना डाटाबाट स्वतः बनाइएको हो।', 14, '#9fb0d0', 500, 'middle'), 6.2),
         kbEl(no, title, 'note', 'प्रस्तुति नोट २', [46, 910, 628, 44], kunT(360, 920, 'कुनै पनि फलादेश ग्रह स्थिति, षड्बल, दशा र योगको गणनामा आधारित छ।', 13, '#7183a8', 500, 'middle'), 6.2),
         kbFooter(no, title)
       ]));
@@ -1858,7 +1858,7 @@
         kbTableEl(no, title, 'षोडश वर्ग तालिका', 46, 184, 628, [
           { t: 'वर्ग', w: 78 }, { t: 'लग्न', w: 128 }, { t: 'चन्द्र राशि', w: 138 }, { t: 'सूर्य राशि', w: 138 }, { t: 'ग्रह', w: 76 }
         ], rows, { rowH: 52, headH: 50, fs: 15, hfs: 13 }, 9),
-        kbEl(no, title, 'note', 'षोडश वर्ग नोट', [46, 1074, 628, 40], kunT(46, 1092, 'D1 = राशि, D9 = नवमांश; सबै सोह्र वर्ग Kundali-Desktop बाट गणना गरिएका वास्तविक चार्ट हुन्।', 12, '#7183a8', 500), 6.2),
+        kbEl(no, title, 'note', 'षोडश वर्ग नोट', [46, 1074, 628, 40], kunT(46, 1092, 'D1 = राशि, D9 = नवमांश; सबै सोह्र वर्ग शास्त्रीय पद्धतिबाट गणना गरिएका वास्तविक चार्ट हुन्।', 12, '#7183a8', 500), 6.2),
         kbFooter(no, title)
       ]));
     }
@@ -1887,7 +1887,7 @@
           kbTableEl(no, title, 'भाव चलित तालिका', 46, 738, 628, [
             { t: 'ग्रह', w: 92 }, { t: 'राशि', w: 112 }, { t: 'राशि भाव', w: 92 }, { t: 'भाव चलित', w: 100 }, { t: 'भेद', w: 232 }
           ], rows, { rowH: 40, headH: 44, fs: 13, hfs: 12 }, 8.6),
-          kbEl(no, title, 'note', 'भाव चलित नोट', [46, 1146, 628, 34], kunT(46, 1163, 'भाव चलित Kundali-Desktop को house placements बाट; कुनै गणना अनुमान गरिएको छैन।', 12, '#7183a8', 500), 6.2),
+          kbEl(no, title, 'note', 'भाव चलित नोट', [46, 1146, 628, 34], kunT(46, 1163, 'भाव चलित cusp house placements बाट; कुनै गणना अनुमान गरिएको छैन।', 12, '#7183a8', 500), 6.2),
           kbFooter(no, title)
         ]));
       }
@@ -1949,7 +1949,7 @@
           kbTableEl(no, title, 'विशेष लग्न तालिका', 46, 700, 628, [
             { t: 'विशेष लग्न', w: 142 }, { t: 'राशि', w: 92 }, { t: 'अंश', w: 110 }, { t: 'भाव', w: 56 }, { t: 'अर्थ', w: 228 }
           ], rows, { rowH: 64, headH: 50, fs: 13, hfs: 12 }, 7.6),
-          kbEl(no, title, 'note', 'विशेष लग्न नोट', [46, 1014, 628, 36], kunT(46, 1032, 'भाव लग्न, होरा लग्न, घटी लग्न र प्राणपद — Kundali-Desktop को special_lagnas गणना।', 12, '#7183a8', 500), 6.2),
+          kbEl(no, title, 'note', 'विशेष लग्न नोट', [46, 1014, 628, 36], kunT(46, 1032, 'भाव लग्न, होरा लग्न, घटी लग्न र प्राणपद — विशेष लग्न गणना।', 12, '#7183a8', 500), 6.2),
           kbFooter(no, title)
         ]));
       }
@@ -1981,7 +1981,7 @@
           kbTableEl(no, title, 'उपग्रह तालिका', 46, 700, 628, [
             { t: 'उपग्रह', w: 142 }, { t: 'राशि', w: 92 }, { t: 'अंश', w: 110 }, { t: 'भाव', w: 56 }, { t: 'अर्थ', w: 228 }
           ], rows, { rowH: 64, headH: 50, fs: 13, hfs: 12 }, 7.6),
-          kbEl(no, title, 'note', 'उपग्रह नोट', [46, 1014, 628, 36], kunT(46, 1032, 'काल, यमघण्टक, गुलिक र मान्दी — Kundali-Desktop को upagrahas गणना।', 12, '#7183a8', 500), 6.2),
+          kbEl(no, title, 'note', 'उपग्रह नोट', [46, 1014, 628, 36], kunT(46, 1032, 'काल, यमघण्टक, गुलिक र मान्दी — उपग्रह गणना।', 12, '#7183a8', 500), 6.2),
           kbFooter(no, title)
         ]));
       }
@@ -2187,7 +2187,7 @@
             cellColor: (ri, ci, v) => ri === activeIdx ? '#34d399' : null
           }, 9),
           kbEl(no, title, 'banner', 'सक्रिय अष्टोत्तरी दशा ब्यानर', [46, 826, 628, 92], card, 7),
-          kbEl(no, title, 'note', 'अष्टोत्तरी नोट', [46, 934, 628, 44], kunT(46, 952, 'अष्टोत्तरी दशा — ८ ग्रहको १०८ वर्षे चक्र; BS मिति Kundali-Desktop बाट।', 12, '#9fb0d0', 500), 6.2),
+          kbEl(no, title, 'note', 'अष्टोत्तरी नोट', [46, 934, 628, 44], kunT(46, 952, 'अष्टोत्तरी दशा — ८ ग्रहको १०८ वर्षे चक्र; वास्तविक वि.सं. मिति गणना।', 12, '#9fb0d0', 500), 6.2),
           kbFooter(no, title)
         ]));
       }
@@ -2554,8 +2554,8 @@
             cards += kunT(70, yy + 56, g.gemstone || '—', 21, '#f6d365', 700);
             cards += kunPara(70, yy + 84, g.reason || '—', 70, 12.5, 18, '#e9eefb', 3);
           });
-          pages.push(kbPage(no, title, 'धारण नगर्नुहोस् — Kundali-Desktop को चेतावनी', [
-            kbHeader(no, title, 'धारण नगर्नुहोस् — Kundali-Desktop को चेतावनी'),
+          pages.push(kbPage(no, title, 'धारण नगर्नुहोस् — शास्त्रीय चेतावनी', [
+            kbHeader(no, title, 'धारण नगर्नुहोस् — शास्त्रीय चेतावनी'),
             kbEl(no, title, 'report', 'निषिद्ध रत्न कार्डहरू', [46, 184, 628, chunk.length * 148 - 12], cards, 7.6),
             kbEl(no, title, 'note', 'निषिद्ध रत्न नोट', [46, 790, 628, 44], kunT(46, 808, 'विरोधाभास वा त्रिक भावेश भएका ग्रहका रत्न विशेष परामर्श बिना नलगाउनुहोस्।', 12, '#9fb0d0', 500), 6.2),
             kbFooter(no, title)
@@ -2612,7 +2612,7 @@
         pages.push(kbPage(no, title, 'लग्नेश, भाग्येश र पीडित ग्रहका रुद्राक्ष', [
           kbHeader(no, title, 'लग्नेश, भाग्येश र पीडित ग्रहका रुद्राक्ष'),
           kbEl(no, title, 'report', 'रुद्राक्ष कार्डहरू', [46, 184, 628, Math.min(3, list.length) * 182 - 14], cards, 7.6),
-          kbEl(no, title, 'note', 'रुद्राक्ष नोट', [46, 744, 628, 44], kunT(46, 762, 'रुद्राक्ष सिफारिस Kundali-Desktop को ग्रह-पीडा र लग्नेश/भाग्येश आधारित हो।', 12, '#9fb0d0', 500), 6.2),
+          kbEl(no, title, 'note', 'रुद्राक्ष नोट', [46, 744, 628, 44], kunT(46, 762, 'रुद्राक्ष सिफारिस ग्रह-पीडा र लग्नेश/भाग्येश आधारित हो।', 12, '#9fb0d0', 500), 6.2),
           kbFooter(no, title)
         ]));
       }
@@ -2641,7 +2641,7 @@
           pages.push(kbPage(no, title, 'बीज मन्त्र, जप, दान, उपवास र यन्त्र', [
             kbHeader(no, title, 'बीज मन्त्र, जप, दान, उपवास र यन्त्र'),
             kbEl(no, title, 'report', 'मन्त्र र दान कार्डहरू', [46, 184, 628, chunk.length * 168 - 12], cards, 7.6),
-            kbEl(no, title, 'note', 'मन्त्र नोट', [46, Math.min(1044, 184 + chunk.length * 168 + 6), 628, 36], kunT(46, Math.min(1062, 184 + chunk.length * 168 + 24), 'मन्त्र र दान — Kundali-Desktop को remedies.mantras_and_charity बाट।', 11, '#7183a8', 500), 6.2),
+            kbEl(no, title, 'note', 'मन्त्र नोट', [46, Math.min(1044, 184 + chunk.length * 168 + 6), 628, 36], kunT(46, Math.min(1062, 184 + chunk.length * 168 + 24), 'मन्त्र र दान — शास्त्रीय विधि तथा विधान अनुसार।', 11, '#7183a8', 500), 6.2),
             kbFooter(no, title)
           ]));
         }
@@ -3532,7 +3532,7 @@
     g.fillStyle = kbRgba(def.accent, .9); g.fillRect(46, 1191, 628 * clamp(progress || 0), 2);
     g.font = '500 10.5px "' + def.font + '","Noto Sans Devanagari",sans-serif';
     g.fillStyle = def.mut;
-    g.fillText('Kundali-Desktop · वास्तविक गणना', 46, 1218);
+    g.fillText('वैदिक जन्मपत्रिका · वास्तविक गणना', 46, 1218);
     g.textAlign = 'right';
     g.fillText(kbEllipsis(g, scene.date || '', 300), 674, 1218);
     g.textAlign = 'left';
@@ -4409,23 +4409,36 @@
       }
       if (isAd && adIm) {
         /* Astrologer portrait: a circular crop over the designed promo panel.
-           The panel caption and service lines stay readable around it, and the
-           gold ring keeps the photo tied to the card's ornament language. */
-        const ar = Math.min(w, h) * .255;
-        const acx = x + w / 2, acy = y + h * .30;
+           The panel caption and service lines stay readable below it without overlap,
+           and head-weighted framing ensures faces/heads are never chopped off. */
+        const ar = Math.min(Math.min(w, h) * .21, 74);
+        const acx = x + w / 2;
+        const acy = y + Math.min(h * .22, 92);
         g.save();
         g.beginPath(); g.arc(acx, acy, ar + 7, 0, Math.PI * 2);
         g.fillStyle = 'rgba(6,13,26,.94)'; g.fill();
         g.beginPath(); g.arc(acx, acy, ar, 0, Math.PI * 2); g.clip();
-        const k = Math.max((ar * 2) / Math.max(1, adIm.naturalWidth), (ar * 2) / Math.max(1, adIm.naturalHeight));
+
+        const zoom = Math.max(0.6, Math.min(3, +(e.photoZoom || 1)));
+        const k = Math.max((ar * 2) / Math.max(1, adIm.naturalWidth), (ar * 2) / Math.max(1, adIm.naturalHeight)) * zoom;
         const dw = adIm.naturalWidth * k, dh = adIm.naturalHeight * k;
+
+        // Head-weighted portrait positioning:
+        // By default, for portraits (dh > dw), py = 0.14 keeps hair/head fully inside the circular window.
+        // User can adjust e.photoOffsetY between 0 (top/head) and 1 (bottom), and e.photoOffsetX between 0 and 1.
+        const py = e.photoOffsetY != null ? Math.max(0, Math.min(1, +e.photoOffsetY)) : (dh > dw ? 0.14 : 0.5);
+        const px = e.photoOffsetX != null ? Math.max(0, Math.min(1, +e.photoOffsetX)) : 0.5;
+
+        const drawX = (acx - ar) - (dw - ar * 2) * px;
+        const drawY = (acy - ar) - (dh - ar * 2) * py;
+
         g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-        g.drawImage(adIm, acx - dw / 2, acy - dh / 2, dw, dh);
+        g.drawImage(adIm, drawX, drawY, dw, dh);
         g.restore();
         g.strokeStyle = kbRgba(def.accent, .95); g.lineWidth = 3;
         g.beginPath(); g.arc(acx, acy, ar + 2, 0, Math.PI * 2); g.stroke();
         g.strokeStyle = kbRgba(def.accent, .3); g.lineWidth = 1.2;
-        g.beginPath(); g.arc(acx, acy, ar + 9, 0, Math.PI * 2); g.stroke();
+        g.beginPath(); g.arc(acx, acy, ar + 8, 0, Math.PI * 2); g.stroke();
       }
       if (!isAd) kbDrawPrivacy(g, e, scene, x, y, w, h, im, 0, false, def);
       /* Orbit HUD emphasis: one thin telemetry scan crosses charts and
@@ -4918,6 +4931,8 @@
          Without copying adSrc here the photo would render in the builder
          preview but silently disappear the moment the card is imported. */
       adSrc: e.adSrc || '',
+      photoOffsetY: e.photoOffsetY != null ? e.photoOffsetY : null,
+      photoZoom: e.photoZoom != null ? e.photoZoom : null,
       privacy: e.privacy && typeof e.privacy === 'object' ? Object.assign({}, e.privacy) : null,
       manual: { text: false, style: false, box: false, timing: false, visibility: false, photo: !!e.photoTouched || !!e.adSrc },
       textRuns: kbTextRunsOf(el)
@@ -5895,6 +5910,10 @@
       '<button class="kb-btn sm" data-auto-act="ad-select">' + (hasAd ? 'बदल्नुहोस्' : 'छान्नुहोस्') + '</button>' +
       (hasAd ? '<button class="kb-btn sm danger" data-auto-act="ad-remove">हटाउनुहोस्</button>' : '') +
       '</div></div>' +
+      (hasAd ? '<div class="kb-photo-adjust" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0;padding:6px 8px;background:rgba(0,0,0,.25);border:1px solid rgba(246,211,101,.2);border-radius:6px;">' +
+      '<label style="font-size:10px;color:var(--mut);display:block;">टाउको/स्थान:<input type="range" min="0" max="1" step="0.02" value="' + (adEl.photoOffsetY != null ? adEl.photoOffsetY : 0.14) + '" data-ad-offset-y style="width:100%" title="०=माथि टाउको, १=तल"></label>' +
+      '<label style="font-size:10px;color:var(--mut);display:block;">जुम (Zoom):<input type="range" min="0.8" max="2.2" step="0.05" value="' + (adEl.photoZoom != null ? adEl.photoZoom : 1) + '" data-ad-zoom style="width:100%"></label>' +
+      '</div>' : '') +
       '<div class="kb-grid2">' +
       '<button class="kb-btn sm" data-auto-act="save">Manual Save</button>' +
       '<button class="kb-btn sm" data-auto-act="reset">Reset Layout</button>' +
@@ -5964,6 +5983,10 @@
         '<button class="kb-btn sm" data-auto-act="ad-preview">Preview</button>' +
         '<button class="kb-btn sm danger" data-auto-act="ad-remove">Remove</button>' +
         '</div>' +
+        (e.adSrc ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0;padding:6px 8px;background:rgba(0,0,0,.25);border:1px solid rgba(246,211,101,.2);border-radius:6px;">' +
+        '<label style="font-size:10px;color:var(--mut);display:block;">टाउको/स्थान:<input type="range" min="0" max="1" step="0.02" value="' + (e.photoOffsetY != null ? e.photoOffsetY : 0.14) + '" data-ad-offset-y style="width:100%" title="०=माथि टाउको, १=तल"></label>' +
+        '<label style="font-size:10px;color:var(--mut);display:block;">जुम (Zoom):<input type="range" min="0.8" max="2.2" step="0.05" value="' + (e.photoZoom != null ? e.photoZoom : 1) + '" data-ad-zoom style="width:100%"></label>' +
+        '</div>' : '') +
         '<div class="kb-ad-preview' + (e.visible === false ? ' off' : '') + '">' + (e.adSrc ? '<img src="' + kbAttr(e.adSrc) + '" alt="ज्योतिषीको फोटो">' + (e.visible === false ? '<span class="kb-ad-off">बन्द छ — Enable गर्नुहोस्</span>' : '') : '<span>अझै फोटो छैन — “फोटो छान्नुहोस्” थिच्नुहोस्</span>') + '</div>';
     }
     h += '<input type="file" id="kb-ad-file" data-ad-file="1" accept="image/*" hidden>';
@@ -6169,6 +6192,24 @@
     const t = e.target;
     if (kb.tplPreview) kb.tplPreview = null;
     if (t.matches('[data-q]')) { kbQuickField(t, final); return; }
+    if (t.matches('[data-ad-offset-y]')) {
+      const targetEl = kbAdTarget(true);
+      if (targetEl) {
+        targetEl.photoOffsetY = +t.value;
+        targetEl.photoTouched = true;
+        kbMarkDirty(); kbRefresh();
+      }
+      return;
+    }
+    if (t.matches('[data-ad-zoom]')) {
+      const targetEl = kbAdTarget(true);
+      if (targetEl) {
+        targetEl.photoZoom = +t.value;
+        targetEl.photoTouched = true;
+        kbMarkDirty(); kbRefresh();
+      }
+      return;
+    }
     if (t.matches('[data-mel-search]')) {
       const list = q('kb-mel-list');
       if (list) list.innerHTML = kbMelListHTML(t.value);
@@ -6502,6 +6543,8 @@
           elObj: e.el && e.el.custom ? kbCloneElDef(e.el) : null,
           box: e.box ? e.box.slice() : null, z: e.z || 1, visible: e.visible !== false,
           group: e.group || '', locked: !!e.locked, text: e.text || '', adSrc: e.adSrc || '',
+          photoOffsetY: e.photoOffsetY != null ? e.photoOffsetY : null,
+          photoZoom: e.photoZoom != null ? e.photoZoom : null,
           photoTouched: !!e.photoTouched,
           privacy: e.privacy ? Object.assign({}, e.privacy) : null,
           anim: Object.assign({}, e.anim || {})
@@ -6578,6 +6621,8 @@
               locked: !!se.locked,
               text: se.text || '',
               adSrc: se.adSrc || '',
+              photoOffsetY: se.photoOffsetY != null ? se.photoOffsetY : null,
+              photoZoom: se.photoZoom != null ? se.photoZoom : null,
               photoTouched: !!se.photoTouched,
               privacy: se.privacy ? Object.assign({}, se.privacy) : null
             };
@@ -6598,6 +6643,8 @@
             e.locked = !!se.locked;
             e.text = se.text || '';
             e.adSrc = se.adSrc || '';
+            if (se.photoOffsetY != null) e.photoOffsetY = se.photoOffsetY;
+            if (se.photoZoom != null) e.photoZoom = se.photoZoom;
             e.photoTouched = !!se.photoTouched;
             if (se.privacy) e.privacy = Object.assign({}, se.privacy);
             e.anim = Object.assign({}, e.anim || {}, se.anim || {});

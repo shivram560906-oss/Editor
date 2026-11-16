@@ -4403,7 +4403,7 @@
         <div class="kun-head">
           <div>
             <b id="kun-title">नयाँ कुण्डली</b>
-            <span>जन्म विवरण भर्नुहोस् — गणना Kundali-Desktop को Swiss Ephemeris बाट हुन्छ।</span>
+            <span>जन्म विवरण भर्नुहोस् — गणना वास्तविक Swiss Ephemeris बाट हुन्छ।</span>
           </div>
           <button type="button" class="kun-x" id="kun-x" aria-label="Close">×</button>
         </div>
@@ -5222,7 +5222,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       ordered.forEach(i => { const c = clips[i]; let l = 0; while (ends[l] !== undefined && ends[l] > c.start + .001) l++; ends[l] = c.start + c.dur; c.lane = l });
       total = Math.max(t, ...clips.map(c => c.start + c.dur), 1);
     }
-    function picH(c) { const im = c.img, a = iw(im), b = ih_(im); if (!a || !b) return 0; const [, , sw, sh] = crop(c.shape || 'round', a, b); return sh * Math.min(W * c.size / 100 / sw, H * (c.mh || .5) / sh) }
+    function picH(c) { const im = c.img, a = iw(im), b = ih_(im); if (!a || !b) return 0; const [, , sw, sh] = crop(c.shape || 'round', a, b, c); return sh * Math.min(W * c.size / 100 / sw, H * (c.mh || .5) / sh) }
     function drawClip(c, t) {
       if (c.kun) { if (window.kunDrawCustomClip) window.kunDrawCustomClip(c, t); return }
       const lt = t - c.start, im = c.img ? procImg(c) : null, sw0 = iw(im), sh0 = ih_(im); c.box = null;
@@ -5231,7 +5231,7 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
       const full = c.pos == 'full', m = 60 * U, shp = c.shape || 'round'; let x, y, w, h, sx = 0, sy = 0, sw = sw0, sh = sh0;
       if (full) { const k = Math.max(W / sw0, H / sh0); w = sw0 * k; h = sh0 * k; x = (W - w) / 2; y = (H - h) / 2 }
       else {
-        [sx, sy, sw, sh] = crop(shp, sw0, sh0);
+        [sx, sy, sw, sh] = crop(shp, sw0, sh0, c);
         const custom = c.cx != null, maxW = W * c.size / 100, maxH = custom ? 1e9 : H * (c.pos == 'center' ? .7 : (c.mh || .5)), k = Math.min(maxW / sw, maxH / sh);
         w = sw * k; h = sh * k;
         if (custom) { x = c.cx * W - w / 2; y = c.cy * H - h / 2 } else { x = (W - w) / 2; y = c.pos == 'top' ? m : c.pos == 'bottom' ? H - h - m : (H - h) / 2 }
@@ -6188,6 +6188,18 @@ ${adEl ? `<div class="kli-info" style="border-top:none;padding-top:4px">
       </div>
     </div>
   </div>
+  ${adEl.adSrc ? `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;background:rgba(0,0,0,0.25);padding:6px 8px;border:1px solid rgba(246,211,101,.25);border-radius:6px;">
+    <div>
+      <label style="font-size:10px;color:var(--mut);display:block;margin-bottom:2px">टाउको/स्थान स्थिति</label>
+      <input type="range" min="0" max="1" step="0.02" value="${adEl.photoOffsetY != null ? adEl.photoOffsetY : 0.14}" id="kl_photo_offset_y" style="width:100%" title="०=माथि टाउको, १=तल">
+    </div>
+    <div>
+      <label style="font-size:10px;color:var(--mut);display:block;margin-bottom:2px">फोटो जुम (Zoom)</label>
+      <input type="range" min="0.8" max="2.2" step="0.05" value="${adEl.photoZoom != null ? adEl.photoZoom : 1}" id="kl_photo_zoom" style="width:100%">
+    </div>
+  </div>
+  ` : ''}
   <input type="file" id="kl_photo_file" accept="image/*" hidden>
 </div>` : ''}
 <div class="kli-layers-panel">
@@ -6287,9 +6299,29 @@ ${adEl ? `<div class="kli-info" style="border-top:none;padding-top:4px">
       const photoPick = ed.querySelector('[data-kl-photo="pick"]');
       const photoRemove = ed.querySelector('[data-kl-photo="remove"]');
       const photoFile = ed.querySelector('#kl_photo_file');
+      const photoOffsetY = ed.querySelector('#kl_photo_offset_y');
+      const photoZoom = ed.querySelector('#kl_photo_zoom');
       if (photoPick && photoFile) photoPick.onclick = () => { photoFile.value = ''; photoFile.click(); };
       if (photoRemove) photoRemove.onclick = () => {
         if (kunSetAdPhoto(c, adJ, '')) $('st').textContent = 'ज्योतिषीको फोटो हटाइयो।';
+      };
+      if (photoOffsetY) photoOffsetY.oninput = () => {
+        const sc2 = kunSceneEnsure(c.kun), e = sc2.els[adJ];
+        if (e) {
+          e.photoOffsetY = +photoOffsetY.value;
+          e.manual.photo = true;
+          draw(cur);
+          try { commitPending() } catch (err) { }
+        }
+      };
+      if (photoZoom) photoZoom.oninput = () => {
+        const sc2 = kunSceneEnsure(c.kun), e = sc2.els[adJ];
+        if (e) {
+          e.photoZoom = +photoZoom.value;
+          e.manual.photo = true;
+          draw(cur);
+          try { commitPending() } catch (err) { }
+        }
       };
       if (photoFile) photoFile.onchange = () => {
         const f = photoFile.files && photoFile.files[0];
@@ -6648,7 +6680,21 @@ ${adEl ? `<div class="kli-info" style="border-top:none;padding-top:4px">
     }
     /* shapes, masks and background removal (shared by pictures and watermark logos) */
     const SQ = ['circle', 'square', 'sqround', 'diamond', 'hex'];
-    function crop(shp, w0, h0) { if (!SQ.includes(shp)) return [0, 0, w0, h0]; const q = Math.min(w0, h0); return [(w0 - q) / 2, (h0 - q) / 2, q, q] }
+    function crop(shp, w0, h0, c) {
+      if (!SQ.includes(shp)) return [0, 0, w0, h0];
+      const q = Math.min(w0, h0);
+      let sx = (w0 - q) / 2;
+      let sy = (h0 - q) / 2;
+      if (h0 > w0) {
+        // Portrait photo: head is in the top 10-30%. Default to 0.14 to preserve head/hair.
+        const fy = (c && c.photoY != null) ? clamp(+c.photoY, 0, 1) : 0.14;
+        sy = Math.max(0, Math.min(h0 - q, (h0 - q) * fy));
+      } else if (w0 > h0 && c && c.photoX != null) {
+        const fx = clamp(+c.photoX, 0, 1);
+        sx = Math.max(0, Math.min(w0 - q, (w0 - q) * fx));
+      }
+      return [sx, sy, q, q];
+    }
     function shapePath(c, shp, x, y, w, h, u) {
       c.beginPath();
       if (shp == 'circle' || shp == 'oval') c.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, 7);
@@ -7717,6 +7763,7 @@ ${dateLine}
         <div class="grid2">
           <div class="field"><label>Position</label><select data-k="pos">${op(['top', 'center', 'bottom', 'full'], c.pos)}</select></div>
           <div class="field"><label>Mask shape</label><select data-k="shape" title="Mask shape">${opm(SH, c.shape || 'round')}</select></div>
+          <div class="field"><label>Focus (टाउको स्थिति)</label><input type="range" data-k="photoY" min="0" max="1" step="0.02" value="${c.photoY != null ? c.photoY : 0.14}" title="मास्क भित्र टाउको/अनुहार मिलाउने स्थिति (०=माथि टाउको, १=तल)"></div>
           <div class="field"><label>Remove background</label><select data-k="rb" title="Remove background">${opm(WBG, c.rb || 'none')}</select></div>
           <div class="field"><label>Strength</label><input type="range" data-k="tol" min="2" max="80" value="${c.tol ?? 25}" title="Remove strength (offline mode)"></div>
           <div class="field"><label>Animation</label><select data-k="fx">${op(['fade', 'zoom', 'rise'], c.fx)}</select></div>
@@ -8225,6 +8272,20 @@ ${dateLine}
       } else kunPress = null;
     };
     cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', endDrag);
+    cv.addEventListener('dblclick', ev => {
+      const [x, y] = cpt(ev);
+      const pt = kunPt(x, y);
+      if (pt.x >= 35 && pt.x <= 685 && pt.y >= 500 && pt.y <= 620) {
+        const targetClip = clips.find(k => k && k.kun && (String(k.kun.title || '').includes('जन्मपत्रिका') || String(k.kun.title || '').includes('कुण्डली निर्माण')));
+        if (targetClip) {
+          cur = targetClip.start + 0.1;
+          selC = clips.indexOf(targetClip); selT = 'c';
+          if (targetClip.kun) kunExpanded.add(targetClip.id);
+          draw(cur); renderTL(); renderEd();
+          $('st').textContent = 'जन्मपत्रिका (कुण्डली निर्माण) कार्ड खोलियो।';
+        }
+      }
+    });
     cv.addEventListener('wheel', e => {
       const c = selT == 'c' ? clips[selC] : null; if (playing || exporting || inShow() || !c || !vis(c) || c.kun) return;
       const [x, y] = cpt(e); if (!inB(c.box, x, y, SELH * U)) return;
@@ -8740,7 +8801,7 @@ ${dateLine}
       s += '<line x1="46" y1="156" x2="674" y2="156" stroke="' + KUN_LINE + '" stroke-width="1.5"/>';
       s += body;
       s += '<line x1="46" y1="1214" x2="674" y2="1214" stroke="' + KUN_LINE + '" stroke-width="1"/>';
-      s += kunT(46, 1238, opts.foot || 'Kundali-Desktop · वास्तविक गणना', 12, KUN_DIM, 500);
+      s += kunT(46, 1238, opts.foot || 'वैदिक ज्योतिष · वास्तविक गणना', 12, KUN_DIM, 500);
       s += kunT(674, 1238, 'पृष्ठ ' + neNum(page), 12, KUN_DIM, 500, 'end');
       return s + '</svg>';
     }
@@ -8786,8 +8847,8 @@ ${dateLine}
       ];
       const cw = 196, gap = 16, x0 = 360 - (chips.length * cw + (chips.length - 1) * gap) / 2;
       chips.forEach((c, i) => body += kunCard(x0 + i * (cw + gap), 892, cw, 112, c[0], c[1], KUN_GOLD2, { fs: 19, chars: 10, lh: 25 }));
-      body += kunT(360, 1070, 'Kundali-Desktop · ' + (meta.ayanamsha_type || 'LAHIRI') + ' अयनांश', 14, KUN_DIM, 500, 'middle');
-      return kunSlideSVG('जन्म कुण्डली', 'वैदिक ज्योतिष प्रस्तुति', body, { page: 1, foot: 'गणना: Kundali-Desktop (Swiss Ephemeris)' });
+      body += kunT(360, 1070, (meta.ayanamsha_type || 'LAHIRI') + ' अयनांश', 14, KUN_DIM, 500, 'middle');
+      return kunSlideSVG('जन्म कुण्डली', 'वैदिक ज्योतिष प्रस्तुति', body, { page: 1, foot: 'वैदिक गणना (Swiss Ephemeris)' });
     }
 
     function kunBirthSlide(data, meta) {
@@ -8807,7 +8868,7 @@ ${dateLine}
         ['गणना प्रणाली', (meta.ephemeris || 'SWISS') + ' · v' + (meta.calculation_version || '1.0.0')]
       ];
       let body = kunTable(46, 184, 628, [{ t: 'विवरण', w: 210 }, { t: 'मान', w: 418 }], rows, { rowH: 60, headH: 50, fs: 17, hfs: 14, align: ['left', 'left'] });
-      body += kunT(46, 1060, 'जन्म समय स्थानीय समयमा हो। समय क्षेत्र DST सहित Kundali-Desktop ले मिलाएको छ।', 13, KUN_DIM, 500);
+      body += kunT(46, 1060, 'जन्म समय स्थानीय समयमा हो। समय क्षेत्र DST सहित वास्तविक गणना गरिएको छ।', 13, KUN_DIM, 500);
       return kunSlideSVG('जन्म विवरण', 'Birth Details', body);
     }
 
@@ -8826,7 +8887,7 @@ ${dateLine}
       ];
       const cw = 196, gap = 16, x0 = 360 - (chips.length * cw + (chips.length - 1) * gap) / 2;
       chips.forEach((c, i) => body += kunCard(x0 + i * (cw + gap), 902, cw, 108, c[0], c[1], KUN_GOLD2, { fs: 19, chars: 10, lh: 25 }));
-      return kunSlideSVG('लग्न कुण्डली (D1)', 'उत्तर भारतीय शैली · Kundali-Desktop रेन्डरर', body);
+      return kunSlideSVG('लग्न कुण्डली (D1)', 'उत्तर भारतीय शैली · वैदिक कुण्डली', body);
     }
 
     function kunPlanetTableSlide(data) {
@@ -9108,7 +9169,7 @@ ${dateLine}
       const outside = (k.grahas_outside || []).map(g => KUN_NE[g.name] || g.name).join(', ') || '—';
       body += kunCard(46, 486, 628, 120, 'अक्षभित्रका ग्रह', inside, present ? KUN_BAD : KUN_MUT, { fs: 19, chars: 40 });
       body += kunCard(46, 626, 628, 120, 'अक्षबाहिरका ग्रह', outside, KUN_GOOD, { fs: 19, chars: 40 });
-      body += kunT(46, 800, 'कालसर्प दोष राहु-केतु अक्षभित्र सबै सात ग्रह परेमा मानिन्छ। यो गणना Kundali-Desktop बाट।', 13, KUN_MUT, 500);
+      body += kunT(46, 800, 'कालसर्प दोष राहु-केतु अक्षभित्र सबै सात ग्रह परेमा मानिन्छ।', 13, KUN_MUT, 500);
       return kunSlideSVG('कालसर्प दोष विश्लेषण', 'Rahu-Ketu axis र ग्रह स्थिति', body);
     }
 
@@ -9149,7 +9210,7 @@ ${dateLine}
         body += kunPara(70, y + 160, g.benefit || '', 74, 12, 16, KUN_MUT, 1);
       });
       body += kunT(46, 800, 'रत्न धारण गर्नुअघि योग्य ज्योतिषी वा रत्न विशेषज्ञसँग परामर्श गर्नुहोस्।', 13, KUN_MUT, 500);
-      return kunSlideSVG('रत्न तथा उपाय', 'Kundali-Desktop को लग्नेश/भाग्येश आधारित सिफारिस', body);
+      return kunSlideSVG('रत्न तथा उपाय', 'लग्नेश तथा भाग्येश आधारित सिफारिस', body);
     }
     function kunGrahaSlide(data, p) {
       const name = p.name, ne = KUN_NE[name] || name;
@@ -9186,7 +9247,7 @@ ${dateLine}
       body += kunPara(70, 662, lk.phal || 'यो ग्रहको लालकिताब फल उपलब्ध छैन।', 39, 16, 25, KUN_TEXT, 4);
       body += kunT(70, 788, 'उपाय', 15, KUN_GOOD, 700);
       (lk.upayas || []).slice(0, 2).forEach((u, i) => body += kunT(70, 820 + i * 30, '• ' + kunFit(u, 44), 14, '#b9c6e4', 500));
-      body += kunT(46, 980, 'ग्रह स्थिति, षड्बल, विंशोपक र अवस्था Kundali-Desktop बाट गणना गरिएको हो।', 12, KUN_DIM, 500);
+      body += kunT(46, 980, 'ग्रह स्थिति, षड्बल, विंशोपक र अवस्था वास्तविक गणितीय आधारमा गणना गरिएको हो।', 12, KUN_DIM, 500);
       return kunSlideSVG(ne + ' ग्रह विश्लेषण', name + ' · ' + (p.sign_name || ''), body);
     }
 
@@ -9206,9 +9267,9 @@ ${dateLine}
       ];
       const cw = 148, gap = 12, x0 = 360 - (chips.length * cw + (chips.length - 1) * gap) / 2;
       chips.forEach((c, i) => body += kunCard(x0 + i * (cw + gap), 680, cw, 112, c[0], c[1], KUN_GOLD2, { fs: 18, chars: 8, lh: 24 }));
-      body += kunT(360, 890, 'यो प्रस्तुति Kundali-Desktop को वास्तविक गणना डाटाबाट स्वतः बनाइएको हो।', 14, KUN_MUT, 500, 'middle');
+      body += kunT(360, 890, 'यो प्रस्तुति वास्तविक गणना डाटाबाट स्वतः बनाइएको हो।', 14, KUN_MUT, 500, 'middle');
       body += kunT(360, 920, 'कुनै पनि फलादेश ग्रह स्थिति, षड्बल, दशा र योगको गणनामा आधारित छ।', 13, KUN_DIM, 500, 'middle');
-      return kunSlideSVG('धन्यवाद', 'जन्म कुण्डली प्रस्तुति समाप्त', body, { foot: 'Kundali-Desktop · Swiss Ephemeris' });
+      return kunSlideSVG('धन्यवाद', 'जन्म कुण्डली प्रस्तुति समाप्त', body, { foot: 'वैदिक ज्योतिष · वास्तविक गणना' });
     }
 
     function kunLoadImage(url) {
@@ -9432,7 +9493,7 @@ ${dateLine}
 
     async function calculateKundaliFromParams(params) {
       const st = $('st');
-      st.textContent = 'कुण्डली गणना भइरहेको छ… (Kundali-Desktop)';
+      st.textContent = 'कुण्डली गणना भइरहेको छ…';
       try {
         const resp = await fetch('/api/kundali/calculate', {
           method: 'POST',

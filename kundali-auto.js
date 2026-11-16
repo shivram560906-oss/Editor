@@ -177,21 +177,24 @@
   function dignity(p) { return typeof kunStateText === 'function' ? kunStateText(p) : '—'; }
   function short(txt, n) { return typeof kunFit === 'function' ? kunFit(txt == null ? '—' : txt, n || 46) : String(txt || '').slice(0, n || 46); }
 
-  function header(no, title, sub) {
-    const n = String(title || '').length;
-    const fs = n <= 20 ? 32 : n <= 26 ? 28 : n <= 32 ? 25 : 22;
-    let s = '<rect x="' + L + '" y="94" width="56" height="4" rx="2" fill="' + GOLD2 + '"/>';
-    s += '<circle cx="636" cy="96" r="3.2" fill="' + GOLD + '" opacity=".65"/>';
-    s += '<circle cx="650" cy="96" r="1.8" fill="' + GOLD + '" opacity=".35"/>';
-    s += T(L, 136, title, fs, GOLD, 700);
-    if (sub) {
-      s += T(L, 160, sub, 13.5, MUT, 500);
-      s += '<line x1="' + L + '" y1="174" x2="' + R + '" y2="174" stroke="' + GOLD2 + '" stroke-opacity=".28" stroke-width="1.3"/>';
-    } else {
-      s += '<line x1="' + L + '" y1="154" x2="' + R + '" y2="154" stroke="' + GOLD2 + '" stroke-opacity=".28" stroke-width="1.3"/>';
-    }
-    const box = [L - 6, 88, W + 12, sub ? 96 : 82];
-    const st = { x: L, y: 136, size: fs, color: GOLD, weight: 700, single: true };
+  function cosmicCardBg(x, y, w, h, col, rx) {
+    const r = rx || 16;
+    const c = col || GOLD;
+    let s = '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + r + '" fill="#0b1730" fill-opacity=".92" stroke="' + c + '" stroke-opacity=".52" stroke-width="1.5"/>';
+    s += '<rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="' + (w - 2) + '" height="' + Math.min(36, h * .3) + '" rx="' + (r - 1) + '" fill="' + c + '" fill-opacity=".06"/>';
+    s += '<rect x="' + x + '" y="' + (y + 14) + '" width="5.5" height="' + (h - 28) + '" rx="2.5" fill="' + c + '"/>';
+    return s;
+  }
+
+  function header(no, title) {
+    const fs = 36;
+    let s = '<circle cx="' + (L + 20) + '" cy="126" r="16" fill="#132446" stroke="' + GOLD + '" stroke-opacity=".85" stroke-width="1.4"/>';
+    s += T(L + 20, 126, 'ॐ', 19, GOLD, 700, 'middle');
+    s += T(L + 48, 137, title, fs, GOLD, 700);
+    s += '<line x1="' + L + '" y1="158" x2="' + R + '" y2="158" stroke="' + GOLD2 + '" stroke-opacity=".55" stroke-width="1.8"/>';
+    s += '<circle cx="' + (R - 6) + '" cy="158" r="3.2" fill="' + GOLD + '"/>';
+    const box = [L - 6, 92, W + 12, 74];
+    const st = { x: L + 48, y: 137, size: fs, color: GOLD, weight: 700, single: true };
     return el(no, title, 'heading', 'शीर्षक — ' + title, box, s, 5.4, { editable: true, textStyle: st, defaultText: title });
   }
   function pz(el, id, label, x, y, w, h) {
@@ -871,12 +874,16 @@
 
     /* ═══════════════════════════════════════════════════════════════
        ११ पूर्ण स्वचालित कार्डहरू (11 CANONICAL AUTOMATIC CARDS)
+       - ठूलो, स्पष्ट र आकर्षक फन्ट (Large, legible & prominent text)
+       - अनावश्यक हेडर र फुटर हटाइएको (No useless filler notes/footers)
+       - पूर्ण भर्टिकल स्पेसको सही उपयोग (Full vertical canvas utilization)
+       - प्रिमियम कस्मिक ग्लास ब्याकग्राउन्ड (Luxury Cosmic Glass Styling)
        ═══════════════════════════════════════════════════════════════ */
 
     /* ── CARD 01: जन्म विवरण (Birth Details & Entry Form with Animated Space BG) ── */
     {
       const no = 1, title = 'जन्म विवरण';
-      const nameFs = fitFlowSize(name, 452, 40, 22);
+      const nameFs = fitFlowSize(name, 480, 44, 28);
       const coords = 'अक्षांश: ' + num(meta.latitude, 4) + '°  ·  देशान्तर: ' + num(meta.longitude, 4) + '°';
       const fName = meta.father_name || (data.metadata || {}).father_name || '';
       const mName = meta.mother_name || (data.metadata || {}).mother_name || '';
@@ -885,28 +892,28 @@
 
       const spaceArt = (() => {
         let s = '<defs>';
-        s += '<radialGradient id="spcGlow" cx="50%" cy="45%" r="60%"><stop offset="0%" stop-color="#f6d365" stop-opacity=".22"/><stop offset="35%" stop-color="#3b82f6" stop-opacity=".15"/><stop offset="85%" stop-color="#050b18" stop-opacity="0"/></radialGradient>';
-        s += '<linearGradient id="orbG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f6d365" stop-opacity=".65"/><stop offset="100%" stop-color="#38bdf8" stop-opacity=".25"/></linearGradient>';
+        s += '<radialGradient id="spcGlow" cx="50%" cy="45%" r="65%"><stop offset="0%" stop-color="#f6d365" stop-opacity=".25"/><stop offset="35%" stop-color="#3b82f6" stop-opacity=".18"/><stop offset="85%" stop-color="#050b18" stop-opacity="0"/></radialGradient>';
+        s += '<linearGradient id="orbG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f6d365" stop-opacity=".75"/><stop offset="100%" stop-color="#38bdf8" stop-opacity=".3"/></linearGradient>';
         s += '</defs>';
-        s += '<rect x="' + L + '" y="80" width="' + W + '" height="940" rx="24" fill="url(#spcGlow)"/>';
+        s += '<rect x="' + L + '" y="80" width="' + W + '" height="980" rx="24" fill="url(#spcGlow)"/>';
         const stars = [
-          [90, 110, 2.4, .85], [160, 130, 1.6, .5], [230, 95, 2.8, .9], [320, 115, 1.8, .6], [500, 105, 2.5, .85], [590, 125, 1.8, .6],
-          [78, 230, 1.5, .5], [626, 210, 2.4, .8], [98, 370, 2.0, .7], [612, 390, 1.8, .6], [88, 520, 2.2, .75], [632, 540, 2.0, .7],
-          [82, 690, 1.7, .6], [618, 710, 2.6, .85], [105, 860, 2.0, .7], [604, 880, 1.6, .5], [240, 960, 2.4, .8], [480, 950, 2.0, .7],
-          [135, 460, 1.4, .4], [575, 480, 1.6, .5], [175, 640, 2.1, .7], [535, 660, 1.8, .6], [360, 120, 3.2, .95]
+          [90, 110, 2.6, .9], [160, 130, 1.8, .6], [230, 95, 3.0, .95], [320, 115, 2.0, .7], [500, 105, 2.8, .9], [590, 125, 2.0, .7],
+          [78, 230, 1.8, .6], [626, 210, 2.6, .85], [98, 370, 2.2, .75], [612, 390, 2.0, .7], [88, 520, 2.4, .8], [632, 540, 2.2, .75],
+          [82, 690, 1.9, .65], [618, 710, 2.8, .9], [105, 860, 2.2, .75], [604, 880, 1.8, .6], [240, 980, 2.6, .85], [480, 970, 2.2, .75],
+          [135, 460, 1.6, .5], [575, 480, 1.8, .6], [175, 640, 2.3, .75], [535, 660, 2.0, .7], [360, 120, 3.5, 1.0]
         ];
         stars.forEach(st => {
           s += '<circle cx="' + st[0] + '" cy="' + st[1] + '" r="' + st[2] + '" fill="#ffffff" opacity="' + st[3] + '"/>';
         });
-        s += '<ellipse cx="360" cy="510" rx="275" ry="115" fill="none" stroke="url(#orbG1)" stroke-width="1.6" stroke-dasharray="7 5" transform="rotate(-18 360 510)"/>';
-        s += '<ellipse cx="360" cy="510" rx="225" ry="88" fill="none" stroke="' + GOLD2 + '" stroke-opacity=".32" stroke-width="1.3" transform="rotate(22 360 510)"/>';
-        s += '<ellipse cx="360" cy="510" rx="165" ry="62" fill="none" stroke="#60a5fa" stroke-opacity=".38" stroke-width="1.2"/>';
+        s += '<ellipse cx="360" cy="530" rx="285" ry="120" fill="none" stroke="url(#orbG1)" stroke-width="1.8" stroke-dasharray="8 6" transform="rotate(-18 360 530)"/>';
+        s += '<ellipse cx="360" cy="530" rx="230" ry="92" fill="none" stroke="' + GOLD2 + '" stroke-opacity=".38" stroke-width="1.4" transform="rotate(22 360 530)"/>';
+        s += '<ellipse cx="360" cy="530" rx="170" ry="65" fill="none" stroke="#60a5fa" stroke-opacity=".42" stroke-width="1.3"/>';
         const pls = [
-          [170, 475, 7.5, GOLD], [545, 570, 6.5, '#6ee7ff'], [235, 550, 5.5, '#fb7185'],
-          [480, 465, 5.2, '#34d399'], [360, 445, 8.0, '#fbbf24'], [430, 595, 6.8, '#c4b5fd'], [275, 460, 6.2, '#60a5fa']
+          [170, 495, 8.5, GOLD], [545, 590, 7.5, '#6ee7ff'], [235, 570, 6.5, '#fb7185'],
+          [480, 485, 6.0, '#34d399'], [360, 465, 9.0, '#fbbf24'], [430, 615, 7.5, '#c4b5fd'], [275, 480, 7.0, '#60a5fa']
         ];
         pls.forEach(p => {
-          s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (p[2] + 4) + '" fill="' + p[3] + '" opacity=".22"/>';
+          s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (p[2] + 4) + '" fill="' + p[3] + '" opacity=".25"/>';
           s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + p[2] + '" fill="' + p[3] + '"/>';
         });
         return s;
@@ -914,11 +921,11 @@
 
       const infoBox = (() => {
         let s = '';
-        s += '<circle cx="360" cy="118" r="28" fill="#12233f" stroke="' + GOLD + '" stroke-opacity=".5" stroke-width="1.4"/>';
-        s += T(360, 118, 'ॐ', 28, GOLD, 700, 'middle');
-        s += T(360, 168, name, nameFs, GOLD, 700, 'middle');
-        s += T(360, 198, '॥ वैदिक जन्म पत्रिका विवरण ॥', 15.5, MUT, 600, 'middle');
-        s += '<line x1="200" y1="214" x2="520" y2="214" stroke="' + GOLD2 + '" stroke-opacity=".35" stroke-width="1.4"/>';
+        s += '<circle cx="360" cy="116" r="32" fill="#132446" stroke="' + GOLD + '" stroke-opacity=".8" stroke-width="1.6"/>';
+        s += T(360, 116, 'ॐ', 32, GOLD, 700, 'middle');
+        s += T(360, 178, name, nameFs, GOLD, 700, 'middle');
+        s += T(360, 216, '॥ वैदिक जन्म पत्रिका विवरण ॥', 18, MUT, 600, 'middle');
+        s += '<line x1="180" y1="234" x2="540" y2="234" stroke="' + GOLD2 + '" stroke-opacity=".45" stroke-width="1.6"/>';
 
         const fields = [
           ['📅', 'जन्म मिति', dateBs + (adDate ? '  (ई.सं. ' + adDate + ')' : ''), GOLD],
@@ -927,11 +934,10 @@
           ['🌐', 'भौगोलिक स्थिति', coords, '#c4b5fd']
         ];
         fields.forEach((f, idx) => {
-          const fy = 236 + idx * 102;
-          s += '<rect x="' + L + '" y="' + fy + '" width="' + W + '" height="90" rx="16" fill="#0c1830" stroke="' + f[3] + '" stroke-opacity=".35" stroke-width="1.3"/>';
-          s += '<rect x="' + L + '" y="' + (fy + 14) + '" width="5" height="62" rx="2.5" fill="' + f[3] + '"/>';
-          s += T(L + 24, fy + 32, f[0] + '  ' + f[1], 15.5, MUT, 600);
-          s += T(L + 24, fy + 68, f[2], 21, INK, 700);
+          const fy = 256 + idx * 124;
+          s += cosmicCardBg(L, fy, W, 112, f[3], 18);
+          s += T(L + 28, fy + 38, f[0] + '  ' + f[1], 19, MUT, 600);
+          s += T(L + 28, fy + 82, f[2], 28, f[3], 700);
         });
 
         const extraList = [];
@@ -939,32 +945,31 @@
         if (mName) extraList.push('आमा: ' + mName);
         if (gotra) extraList.push('गोत्र: ' + gotra);
         if (extraList.length) {
-          s += '<rect x="' + L + '" y="654" width="' + W + '" height="60" rx="14" fill="#0d1f3c" stroke="#223052" stroke-width="1"/>';
-          s += T(360, 688, extraList.join('   ·   '), 15.5, '#e9eefb', 600, 'middle');
+          s += '<rect x="' + L + '" y="760" width="' + W + '" height="68" rx="16" fill="#0d1f3c" stroke="#2b3e6b" stroke-width="1.3"/>';
+          s += T(360, 802, extraList.join('   ·   '), 20, '#f8fbff', 600, 'middle');
         }
 
-        const cy = extraList.length ? 730 : 660;
+        const cy = extraList.length ? 846 : 764;
         const cw = 190, cg = 17;
         const chips = [
-          ['लग्न राशि', sign(ls) + ' · ' + dms(lagna.longitude_in_sign || 0), GOLD2],
+          ['लग्न राशि', sign(ls) + ' (' + dms(lagna.longitude_in_sign || 0) + ')', GOLD2],
           ['चन्द्र राशि', sign(moon.sign_number || 1) + ' · ' + (moon.nakshatra_nepali || '—'), '#6ee7ff'],
           ['जन्म नक्षत्र', (moon.nakshatra_nepali || '—') + ' · पद ' + ne(moon.nakshatra_pada || '१'), '#c4b5fd']
         ];
         chips.forEach((c, i) => {
           const cx = L + i * (cw + cg);
-          s += '<rect x="' + cx + '" y="' + cy + '" width="' + cw + '" height="110" rx="14" fill="#0d1830" stroke="' + c[2] + '" stroke-opacity=".4" stroke-width="1.3"/>';
-          s += '<rect x="' + cx + '" y="' + (cy + 10) + '" width="4" height="90" rx="2" fill="' + c[2] + '"/>';
-          s += T(cx + 16, cy + 34, c[0], 13.5, MUT, 600);
-          s += T(cx + 16, cy + 72, c[1], 17.5, INK, 700);
+          s += cosmicCardBg(cx, cy, cw, 150, c[2], 16);
+          s += T(cx + 18, cy + 38, c[0], 17, MUT, 600);
+          s += T(cx + 18, cy + 82, c[1], 24, c[2], 700);
+          s += T(cx + 18, cy + 122, 'प्राकृतिक प्रभाव', 14.5, DIM, 500);
         });
 
         return s;
       })();
 
       push(no, title, 'जन्म परिचय', [
-        artEl(no, title, 'अन्तरिक्ष पृष्ठभूमि कला', [L, 80, W, 940], spaceArt, 7.8),
-        el(no, title, 'report', 'जन्म विवरण फाराम', [L, 90, W, 880], infoBox, 8.4),
-        footer(no, title)
+        artEl(no, title, 'अन्तरिक्ष पृष्ठभूमि कला', [L, 80, W, 980], spaceArt, 7.8),
+        el(no, title, 'report', 'जन्म विवरण फाराम', [L, 84, W, 980], infoBox, 8.4)
       ], { priority: ORDER.birth, key: 'card-01', privacyStyle: 'strong' });
     }
 
@@ -972,9 +977,9 @@
     {
       const no = 2, title = 'अवकाहडा चक्र';
       const itemsGrid = [
-        ['जन्म राशि', av.rashi || sign(moon.sign_number || 1), GOLD, 'चन्द्रमा रहेको राशि'],
+        ['जन्म राशि', av.rashi || sign(moon.sign_number || 1), GOLD, 'चन्द्रमा रहेको मूल राशि'],
         ['राशि स्वामी', av.rashi_lord || KUN_NE_ACTIVE[KUN_SIGN_LORD_ACTIVE[(moon.sign_number || 1) - 1]] || '—', '#6ee7ff', 'राशिको अधिपती ग्रह'],
-        ['जन्म नक्षत्र', (av.nakshatra || moon.nakshatra_nepali || '—') + ' (' + ne(av.pada || moon.nakshatra_pada || 1) + ' चरण)', '#c4b5fd', 'जन्मकालीन नक्षत्र'],
+        ['जन्म नक्षत्र', (av.nakshatra || moon.nakshatra_nepali || '—') + ' (' + ne(av.pada || moon.nakshatra_pada || 1) + ' पद)', '#c4b5fd', 'जन्मकालीन नक्षत्र र चरण'],
         ['नक्षत्र स्वामी', KUN_NE_ACTIVE[moon.nakshatra_lord] || moon.nakshatra_lord || '—', '#34d399', 'नक्षत्रको ग्रह स्वामी'],
         ['नामाक्षर', av.name_akshara || '—', GOLD2, 'राशिअनुसारको आदि अक्षर'],
         ['वर्ण', av.varna || 'विप्र', '#60a5fa', 'प्रवृत्ति र कार्य तत्त्व'],
@@ -986,23 +991,20 @@
         ['तिथि र करण', ((pc.tithi && (pc.tithi.nepali || pc.tithi.birth_nepali)) || '—') + ' · ' + ((pc.karana && pc.karana.nepali) || '—'), '#34d399', 'पञ्चाङ्ग तिथि र करण']
       ];
 
-      const bw = 292, bh = 108, gx = 20, gy = 14;
+      const bw = 292, bh = 144, gx = 20, gy = 16;
       let gridSvg = '';
       itemsGrid.forEach((it, idx) => {
         const col = idx % 2, row = Math.floor(idx / 2);
-        const bx = L + col * (bw + gx), by = 196 + row * (bh + gy);
-        gridSvg += '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh + '" rx="14" fill="#0d1830" stroke="' + it[2] + '" stroke-opacity=".35" stroke-width="1.3"/>';
-        gridSvg += '<rect x="' + bx + '" y="' + (by + 12) + '" width="4" height="' + (bh - 24) + '" rx="2" fill="' + it[2] + '"/>';
-        gridSvg += T(bx + 18, by + 30, it[0], 14, MUT, 600);
-        gridSvg += T(bx + 18, by + 66, it[1], 19, INK, 700);
-        gridSvg += T(bx + 18, by + 94, it[3], 12, DIM, 500);
+        const bx = L + col * (bw + gx), by = 176 + row * (bh + gy);
+        gridSvg += cosmicCardBg(bx, by, bw, bh, it[2], 16);
+        gridSvg += T(bx + 20, by + 36, it[0], 18, it[2], 700);
+        gridSvg += T(bx + 20, by + 82, it[1], 28, '#ffffff', 700);
+        gridSvg += T(bx + 20, by + 120, it[3], 15.5, '#b3c2de', 500);
       });
 
       push(no, title, 'अवकाहडा', [
-        header(no, title, 'अवकाहडा चक्र · १२ शास्त्रीय अङ्गहरूको विवरण'),
-        graphEl(no, title, 'अवकाहडा ग्रिड', [L, 192, W, 740], gridSvg, 8.8),
-        note(no, title, 'अवकाहडा नोट', [L, 946, W, 68], 'अवकाहडा चक्रले जातकको मूल प्रकृति, स्वभाव, विवाह-मेलापक (अष्टकूट) र दैनिक गुण निर्धारण गर्दछ।', { size: 14, lh: 21, lines: 2 }),
-        footer(no, title)
+        header(no, title),
+        graphEl(no, title, 'अवकाहडा ग्रिड', [L, 172, W, 960], gridSvg, 8.8)
       ], { priority: ORDER.avakahada, key: 'card-02' });
     }
 
@@ -1012,32 +1014,53 @@
       const vim = dashas.length ? dashas : [];
       const md = vim.find(x => +x.level === 1) || vim[0] || {};
       const ad = vim.find(x => +x.level === 2) || {};
-      const rows = vim.slice(0, 5).map((x, i) => [['महादशा', 'अन्तर्दशा', 'प्रत्यन्तर', 'सूक्ष्म', 'प्राण'][i] || ('स्तर ' + ne(x.level)), x.lordNe || pName(x.lord), bsOf(x.startBs, x.start), bsOf(x.endBs, x.end)]);
+      const rows = vim.slice(0, 4).map((x, i) => [['महादशा', 'अन्तर्दशा', 'प्रत्यन्तर', 'सूक्ष्म'][i] || ('स्तर ' + ne(x.level)), x.lordNe || pName(x.lord), bsOf(x.startBs, x.start), bsOf(x.endBs, x.end)]);
       if (!rows.length) rows.push(['महादशा', '—', '—', '—']);
 
-      const mdEffect = 'महादशा स्वामी ' + (md.lordNe || '—') + ' (' + lordEffect(data, md.lord) + ')। यस अवधिमा जातकको जीवनको मुख्य दिशा, दीर्घकालीन कर्म, प्रतिष्ठा र भाग्यको मूल प्रवाह निर्धारित हुन्छ।';
+      const mdEffect = 'महादशा स्वामी ' + (md.lordNe || '—') + ' (' + lordEffect(data, md.lord) + ')। यस अवधिमा जीवनको मुख्य दिशा, दीर्घकालीन कर्म, प्रतिष्ठा र भाग्यको मूल प्रवाह निर्धारित हुन्छ।';
       const adEffect = 'अन्तर्दशा स्वामी ' + (ad.lordNe || '—') + ' (' + lordEffect(data, ad.lord) + ')। वर्तमान समयमा दैनिक कार्य, पारिवारिक वातावरण, आम्दानी र तत्कालीन निर्णयहरू यसबाट प्रभावित छन्।';
 
+      const mdBoxSvg = (() => {
+        let s = cosmicCardBg(L, 176, 292, 196, GOLD, 18);
+        s += T(L + 22, 214, 'सक्रिय महादशा', 19, MUT, 600);
+        s += T(L + 22, 268, md.lordNe || '—', 40, GOLD, 700);
+        s += T(L + 22, 318, 'अवधि: ' + bsOf(md.startBs, md.start), 17.5, '#ffffff', 600);
+        s += T(L + 22, 348, 'देखि ' + bsOf(md.endBs, md.end) + ' सम्म', 17.5, '#ffffff', 600);
+        return s;
+      })();
+
+      const adBoxSvg = (() => {
+        let s = cosmicCardBg(L + 312, 176, 292, 196, '#6ee7ff', 18);
+        s += T(L + 334, 214, 'सक्रिय अन्तर्दशा', 19, MUT, 600);
+        s += T(L + 334, 268, ad.lordNe || '—', 40, '#6ee7ff', 700);
+        s += T(L + 334, 318, 'अवधि: ' + bsOf(ad.startBs, ad.start), 17.5, '#ffffff', 600);
+        s += T(L + 334, 348, 'देखि ' + bsOf(ad.endBs, ad.end) + ' सम्म', 17.5, '#ffffff', 600);
+        return s;
+      })();
+
+      const mdRepSvg = (() => {
+        let s = cosmicCardBg(L, 390, W, 178, GOLD2, 18);
+        s += T(L + 26, 426, 'महादशा प्रभाव · ' + (md.lordNe || '—'), 23, GOLD, 700);
+        s += P(L + 26, 462, mdEffect, 50, 19.5, 28, INK, 4);
+        return s;
+      })();
+
+      const adRepSvg = (() => {
+        let s = cosmicCardBg(L, 584, W, 178, '#6ee7ff', 18);
+        s += T(L + 26, 620, 'अन्तर्दशा प्रभाव · ' + (ad.lordNe || '—'), 23, '#8be9ff', 700);
+        s += P(L + 26, 656, adEffect, 50, 19.5, 28, INK, 4);
+        return s;
+      })();
+
       push(no, title, 'विंशोत्तरी दशा', [
-        header(no, title, 'सक्रिय विंशोत्तरी महादशा र अन्तर्दशा · वि.सं. मिति र फल'),
-        dashaBox(no, title, 'सक्रिय महादशा', L, 196, 290, 164, 'सक्रिय महादशा', md.lordNe || '—', bsOf(md.startBs, md.start), bsOf(md.endBs, md.end), GOLD2),
-        dashaBox(no, title, 'सक्रिय अन्तर्दशा', L + 314, 196, 290, 164, 'सक्रिय अन्तर्दशा', ad.lordNe || '—', bsOf(ad.startBs, ad.start), bsOf(ad.endBs, ad.end), '#6ee7ff'),
-        el(no, title, 'report', 'महादशा प्रभाव विवरण', [L, 376, W, 140], (() => {
-          let s = '<rect x="' + L + '" y="376" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="' + GOLD2 + '" stroke-opacity=".38" stroke-width="1.3"/>';
-          s += T(L + 22, 404, 'महादशा प्रभाव · ' + (md.lordNe || '—'), 18, GOLD, 700);
-          s += P(L + 22, 434, mdEffect, 52, 15, 21, MUT, 4);
-          return s;
-        })(), 8.2),
-        el(no, title, 'report', 'अन्तर्दशा प्रभाव विवरण', [L, 528, W, 140], (() => {
-          let s = '<rect x="' + L + '" y="528" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="#6ee7ff" stroke-opacity=".35" stroke-width="1.3"/>';
-          s += T(L + 22, 556, 'अन्तर्दशा प्रभाव · ' + (ad.lordNe || '—'), 18, '#8be9ff', 700);
-          s += P(L + 22, 586, adEffect, 52, 15, 21, MUT, 4);
-          return s;
-        })(), 8.2),
-        table(no, title, 'विंशोत्तरी दशा स्तर तालिका', L, 682, W, [
+        header(no, title),
+        el(no, title, 'cards', 'सक्रिय महादशा', [L, 176, 292, 196], mdBoxSvg, 8.2),
+        el(no, title, 'cards', 'सक्रिय अन्तर्दशा', [L + 312, 176, 292, 196], adBoxSvg, 8.2),
+        el(no, title, 'report', 'महादशा प्रभाव विवरण', [L, 390, W, 178], mdRepSvg, 8.4),
+        el(no, title, 'report', 'अन्तर्दशा प्रभाव विवरण', [L, 584, W, 178], adRepSvg, 8.4),
+        table(no, title, 'विंशोत्तरी दशा स्तर तालिका', L, 780, W, [
           { t: 'स्तर', w: 136 }, { t: 'दशा स्वामी', w: 134 }, { t: 'सुरु (वि.सं.)', w: 164 }, { t: 'अन्त्य (वि.सं.)', w: 170 }
-        ], rows, { rowH: 52, headH: 46, fs: 14.5, hfs: 13, align: ['left', 'left', 'left', 'left'] }, 9),
-        footer(no, title)
+        ], rows, { rowH: 60, headH: 50, fs: 19, hfs: 17, align: ['left', 'left', 'left', 'left'] }, 9)
       ], { priority: ORDER.vimshottari, key: 'card-03' });
     }
 
@@ -1062,37 +1085,58 @@
       const mdPhal = yoginiPhalMap[md.name] || ('योगिनी ' + (md.nameNe || '—') + ' (ग्रह ' + (md.lord ? pName(md.lord) : '—') + ') को चक्रीय प्रभाव सक्रिय छ। मन, कर्म र आत्मबलमा अनुकूल प्रभाव पर्नेछ।');
       const adPhal = 'अन्तर्दशा ' + (ad.nameNe || '—') + (ad.lord ? ' (ग्रह ' + pName(ad.lord) + ')' : '') + ' ले तत्कालीन परिस्थिति, स्वास्थ्य र मनोबलमा योगिनीको फललाई प्रत्यक्ष रूपमा प्रकट गर्दछ।';
 
+      const mdBoxSvg = (() => {
+        let s = cosmicCardBg(L, 176, 292, 196, '#c4b5fd', 18);
+        s += T(L + 22, 214, 'योगिनी महादशा', 19, MUT, 600);
+        s += T(L + 22, 268, md.nameNe || '—', 38, '#d8ccff', 700);
+        s += T(L + 22, 318, 'अवधि: ' + bsOf(md.startBs, md.start), 17.5, '#ffffff', 600);
+        s += T(L + 22, 348, 'देखि ' + bsOf(md.endBs, md.end) + ' सम्म', 17.5, '#ffffff', 600);
+        return s;
+      })();
+
+      const adBoxSvg = (() => {
+        let s = cosmicCardBg(L + 312, 176, 292, 196, GOOD, 18);
+        s += T(L + 334, 214, 'योगिनी अन्तर्दशा', 19, MUT, 600);
+        s += T(L + 334, 268, ad.nameNe || '—', 38, '#b9f6d9', 700);
+        s += T(L + 334, 318, 'अवधि: ' + bsOf(ad.startBs, ad.start), 17.5, '#ffffff', 600);
+        s += T(L + 334, 348, 'देखि ' + bsOf(ad.endBs, ad.end) + ' सम्म', 17.5, '#ffffff', 600);
+        return s;
+      })();
+
+      const mdRepSvg = (() => {
+        let s = cosmicCardBg(L, 390, W, 178, '#c4b5fd', 18);
+        s += T(L + 26, 426, 'महादशा प्रभाव · ' + (md.nameNe || '—'), 23, '#d8ccff', 700);
+        s += P(L + 26, 462, mdPhal, 50, 19.5, 28, INK, 4);
+        return s;
+      })();
+
+      const adRepSvg = (() => {
+        let s = cosmicCardBg(L, 584, W, 178, GOOD, 18);
+        s += T(L + 26, 620, 'अन्तर्दशा प्रभाव · ' + (ad.nameNe || '—'), 23, '#b9f6d9', 700);
+        s += P(L + 26, 656, adPhal, 50, 19.5, 28, INK, 4);
+        return s;
+      })();
+
       push(no, title, 'योगिनी दशा', [
-        header(no, title, 'सक्रिय योगिनी महादशा र अन्तर्दशा · वि.सं. मिति र फल'),
-        dashaBox(no, title, 'योगिनी महादशा', L, 196, 290, 164, 'योगिनी महादशा', (md.nameNe || '—') + ' (' + (md.lord ? pName(md.lord) : '—') + ')', bsOf(md.startBs, md.start), bsOf(md.endBs, md.end), '#c4b5fd'),
-        dashaBox(no, title, 'योगिनी अन्तर्दशा', L + 314, 196, 290, 164, 'योगिनी अन्तर्दशा', (ad.nameNe || '—') + ' (' + (ad.lord ? pName(ad.lord) : '—') + ')', bsOf(ad.startBs, ad.start), bsOf(ad.endBs, ad.end), GOOD),
-        el(no, title, 'report', 'योगिनी महादशा फल', [L, 376, W, 140], (() => {
-          let s = '<rect x="' + L + '" y="376" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="#c4b5fd" stroke-opacity=".35" stroke-width="1.3"/>';
-          s += T(L + 22, 404, 'महादशा प्रभाव · ' + (md.nameNe || '—'), 18, '#d8ccff', 700);
-          s += P(L + 22, 434, mdPhal, 52, 15, 21, MUT, 4);
-          return s;
-        })(), 8.2),
-        el(no, title, 'report', 'योगिनी अन्तर्दशा फल', [L, 528, W, 140], (() => {
-          let s = '<rect x="' + L + '" y="528" width="' + W + '" height="140" rx="14" fill="#0d1830" stroke="' + GOOD + '" stroke-opacity=".35" stroke-width="1.3"/>';
-          s += T(L + 22, 556, 'अन्तर्दशा प्रभाव · ' + (ad.nameNe || '—'), 18, '#b9f6d9', 700);
-          s += P(L + 22, 586, adPhal, 52, 15, 21, MUT, 4);
-          return s;
-        })(), 8.2),
-        table(no, title, 'योगिनी दशा तालिका', L, 682, W, [
+        header(no, title),
+        el(no, title, 'cards', 'योगिनी महादशा', [L, 176, 292, 196], mdBoxSvg, 8.2),
+        el(no, title, 'cards', 'योगिनी अन्तर्दशा', [L + 312, 176, 292, 196], adBoxSvg, 8.2),
+        el(no, title, 'report', 'योगिनी महादशा फल', [L, 390, W, 178], mdRepSvg, 8.4),
+        el(no, title, 'report', 'योगिनी अन्तर्दशा फल', [L, 584, W, 178], adRepSvg, 8.4),
+        table(no, title, 'योगिनी दशा तालिका', L, 780, W, [
           { t: 'स्तर', w: 148 }, { t: 'योगिनी (स्वामी)', w: 172 }, { t: 'सुरु (वि.सं.)', w: 142 }, { t: 'अन्त्य (वि.सं.)', w: 142 }
-        ], rows, { rowH: 52, headH: 46, fs: 14, hfs: 13, align: ['left', 'left', 'left', 'left'] }, 9),
-        footer(no, title)
+        ], rows, { rowH: 60, headH: 50, fs: 19, hfs: 17, align: ['left', 'left', 'left', 'left'] }, 9)
       ], { priority: ORDER.yogini, key: 'card-04' });
     }
 
     /* ── CARD 05: ग्रह स्तम्भ (3D Bar Chart) + कारक / मारक / सम ग्रह ── */
     {
       const no = 5, title = 'ग्रह स्तम्भ र सम्बन्ध';
-      const baseY = 550, minH = 28, maxH = 340, colW = 54, gap = 11;
+      const baseY = 560, minH = 32, maxH = 330, colW = 54, gap = 11;
       const x0 = Math.round(L + (W - (colW * 9 + gap * 8)) / 2);
 
-      let cols = T(L, 196, 'स्तम्भको उचाइ = राशिभित्रको वास्तविक अंश (०°–३०°)', 14, DIM, 500);
-      cols += '<line x1="' + L + '" y1="' + (baseY + 2) + '" x2="' + R + '" y2="' + (baseY + 2) + '" stroke="#2b3856" stroke-width="1.2"/>';
+      let cols = T(L, 186, 'स्तम्भको उचाइ = राशिभित्रको वास्तविक अंश (०°–३०°)', 16, MUT, 600);
+      cols += '<line x1="' + L + '" y1="' + (baseY + 2) + '" x2="' + R + '" y2="' + (baseY + 2) + '" stroke="#2b3856" stroke-width="1.4"/>';
       KUN_ORDER_ACTIVE.forEach((n, i) => {
         const p = planets.find(x => x.name === n);
         if (!p) return;
@@ -1102,14 +1146,14 @@
         const dg = dignity(p);
         const col = /उच्च/.test(dg) ? GOLD2 : /नीच/.test(dg) ? BAD : /(स्वराशि|मूलत्रिकोण)/.test(dg) ? GOOD : '#60a5fa';
         const cx = x + colW / 2;
-        cols += '<ellipse cx="' + cx + '" cy="' + (baseY + 4) + '" rx="' + (colW * .62) + '" ry="7" fill="#000" opacity=".34"/>';
-        cols += '<polygon points="' + (x + colW) + ',' + y + ' ' + (x + colW + 9) + ',' + (y - 9) + ' ' + (x + colW + 9) + ',' + (baseY - 9) + ' ' + (x + colW) + ',' + baseY + '" fill="' + col + '" opacity=".38"/>';
-        cols += '<polygon points="' + x + ',' + y + ' ' + (x + 9) + ',' + (y - 9) + ' ' + (x + colW + 9) + ',' + (y - 9) + ' ' + (x + colW) + ',' + y + '" fill="' + col + '" opacity=".72"/>';
-        cols += '<rect x="' + x + '" y="' + y + '" width="' + colW + '" height="' + h + '" rx="3" fill="' + col + '" opacity=".82" stroke="' + col + '" stroke-opacity=".9"/>';
-        cols += '<rect x="' + (x + 5) + '" y="' + (y + 9) + '" width="4" height="' + Math.max(6, h - 18) + '" rx="2" fill="#ffffff" opacity=".22"/>';
-        cols += T(cx, y - 16, pName(n), 13.5, INK, 700, 'middle');
-        cols += T(cx, baseY + 22, sign(p.sign_number || 1), 12.5, MUT, 600, 'middle');
-        cols += T(cx, baseY + 42, dms(deg).replace(/″$/, ''), 12.5, GOLD, 700, 'middle');
+        cols += '<ellipse cx="' + cx + '" cy="' + (baseY + 5) + '" rx="' + (colW * .62) + '" ry="7" fill="#000" opacity=".4"/>';
+        cols += '<polygon points="' + (x + colW) + ',' + y + ' ' + (x + colW + 9) + ',' + (y - 9) + ' ' + (x + colW + 9) + ',' + (baseY - 9) + ' ' + (x + colW) + ',' + baseY + '" fill="' + col + '" opacity=".42"/>';
+        cols += '<polygon points="' + x + ',' + y + ' ' + (x + 9) + ',' + (y - 9) + ' ' + (x + colW + 9) + ',' + (y - 9) + ' ' + (x + colW) + ',' + y + '" fill="' + col + '" opacity=".82"/>';
+        cols += '<rect x="' + x + '" y="' + y + '" width="' + colW + '" height="' + h + '" rx="3" fill="' + col + '" opacity=".88" stroke="' + col + '" stroke-opacity=".95"/>';
+        cols += '<rect x="' + (x + 5) + '" y="' + (y + 9) + '" width="4" height="' + Math.max(6, h - 18) + '" rx="2" fill="#ffffff" opacity=".25"/>';
+        cols += T(cx, y - 16, pName(n), 18, '#ffffff', 700, 'middle');
+        cols += T(cx, baseY + 24, sign(p.sign_number || 1), 16, MUT, 600, 'middle');
+        cols += T(cx, baseY + 48, dms(deg).replace(/″$/, ''), 16, GOLD, 700, 'middle');
       });
 
       const groups = { karaka: [], maraka: [], sama: [] };
@@ -1121,26 +1165,25 @@
       const relBox = (() => {
         let s = '';
         const rows = [
-          ['कारक ग्रह (शुभ फलदायी)', groups.karaka.join('  ·  ') || 'कुनै छैन', GOOD, '#102a1e', 'उन्नति, प्रतिष्ठा र कार्यसिद्धि दिने सहयोगी ग्रहहरू'],
-          ['मारक ग्रह (सतर्कता चाहिने)', groups.maraka.join('  ·  ') || 'कुनै छैन', BAD, '#2a1018', 'स्वास्थ्य, खर्च र वादविवादमा सचेत रहनुपर्ने ग्रहहरू'],
-          ['सम ग्रह (तटस्थ/सन्तुलित)', groups.sama.join('  ·  ') || 'कुनै छैन', '#60a5fa', '#101e2e', 'सन्तुलित, निष्पक्ष र कर्म अनुसार फल दिने ग्रहहरू']
+          ['कारक ग्रह (शुभ फलदायी)', groups.karaka.join('  ·  ') || 'कुनै छैन', GOOD, '#0f291c', 'उन्नति, प्रतिष्ठा र कार्यसिद्धि दिने सहयोगी ग्रहहरू'],
+          ['मारक ग्रह (सतर्कता चाहिने)', groups.maraka.join('  ·  ') || 'कुनै छैन', BAD, '#2b0f17', 'स्वास्थ्य, खर्च र वादविवादमा सचेत रहनुपर्ने ग्रहहरू'],
+          ['सम ग्रह (तटस्थ/सन्तुलित)', groups.sama.join('  ·  ') || 'कुनै छैन', '#60a5fa', '#0f1d30', 'सन्तुलित, निष्पक्ष र कर्म अनुसार फल दिने ग्रहहरू']
         ];
         rows.forEach((r, idx) => {
-          const ry = 628 + idx * 114;
-          s += '<rect x="' + L + '" y="' + ry + '" width="' + W + '" height="102" rx="16" fill="' + r[3] + '" stroke="' + r[2] + '" stroke-opacity=".45" stroke-width="1.4"/>';
-          s += '<rect x="' + L + '" y="' + (ry + 14) + '" width="5" height="74" rx="2.5" fill="' + r[2] + '"/>';
-          s += T(L + 24, ry + 32, r[0], 16.5, r[2], 700);
-          s += T(L + 24, ry + 66, r[1], 21, INK, 700);
-          s += T(L + 24, ry + 90, r[4], 12.5, MUT, 500);
+          const ry = 644 + idx * 156;
+          s += '<rect x="' + L + '" y="' + ry + '" width="' + W + '" height="142" rx="18" fill="' + r[3] + '" stroke="' + r[2] + '" stroke-opacity=".55" stroke-width="1.6"/>';
+          s += '<rect x="' + L + '" y="' + (ry + 16) + '" width="6" height="110" rx="3" fill="' + r[2] + '"/>';
+          s += T(L + 28, ry + 38, r[0], 21, r[2], 700);
+          s += T(L + 28, ry + 82, r[1], 30, '#ffffff', 700);
+          s += T(L + 28, ry + 120, r[4], 16, MUT, 500);
         });
         return s;
       })();
 
       push(no, title, 'ग्रह स्तम्भ', [
-        header(no, title, 'नौ ग्रह ३डी स्तम्भ र कारक, मारक, सम वर्गीकरण'),
-        graphEl(no, title, '३डी स्तम्भ चार्ट', [L, 186, W, 420], cols, 9.8),
-        el(no, title, 'report', 'कारक मारक सम प्यानल', [L, 620, W, 360], relBox, 8.4),
-        footer(no, title)
+        header(no, title),
+        graphEl(no, title, '३डी स्तम्भ चार्ट', [L, 172, W, 450], cols, 9.8),
+        el(no, title, 'report', 'कारक मारक सम प्यानल', [L, 640, W, 480], relBox, 8.4)
       ], { priority: ORDER.pillars, key: 'card-05' });
     }
 
@@ -1179,26 +1222,23 @@
         let s = '';
         const items = [
           ['💼 १. पेशा र आम्दानी', careerPhal, GOLD],
-          ['❤️ २. प्रेम सम्बन्ध', lovePhal, '#f472b6'],
+          ['❤️ २. प्रेम तथा सम्बन्ध', lovePhal, '#f472b6'],
           ['🎨 ३. शुभ रंग', myColor[0] + ' (दैनिक कार्य तथा महत्वपूर्ण भेटघाटमा प्राथमिकता दिनुहोस्)', myColor[1]],
           ['💎 ४. शुभ रत्न', myGem + ' (विज्ञ ज्योतिषीको सल्लाहमा विधिवत धारण गर्नुहोस्)', '#6ee7ff'],
           ['🔢 ५. शुभ अंक', myNum + ' (नयाँ कार्य शुभारम्भ र शुभ निर्णयका लागि उत्तम अंक)', '#34d399']
         ];
         items.forEach((it, idx) => {
-          const iy = 196 + idx * 148;
-          s += '<rect x="' + L + '" y="' + iy + '" width="' + W + '" height="136" rx="16" fill="#0d1830" stroke="' + it[2] + '" stroke-opacity=".38" stroke-width="1.3"/>';
-          s += '<rect x="' + L + '" y="' + (iy + 14) + '" width="5" height="108" rx="2.5" fill="' + it[2] + '"/>';
-          s += T(L + 24, iy + 34, it[0], 18, it[2], 700);
-          s += P(L + 24, iy + 66, it[1], 52, 15, 22, INK, 3);
+          const iy = 176 + idx * 190;
+          s += cosmicCardBg(L, iy, W, 176, it[2], 18);
+          s += T(L + 28, iy + 40, it[0], 23, it[2], 700);
+          s += P(L + 28, iy + 76, it[1], 50, 19.5, 28, '#ffffff', 3);
         });
         return s;
       })();
 
       push(no, title, 'यो वर्षको फल', [
-        header(no, title, '⭐ यो वर्ष — पेशा, प्रेम, शुभ रंग, रत्न र अंक'),
-        el(no, title, 'report', 'यो वर्ष फल सूची', [L, 192, W, 760], forecastBox, 9.4),
-        note(no, title, 'यो वर्ष नोट', [L, 956, W, 58], 'यो फल जन्मकालीन कुण्डली, भावेशको स्थिति र सक्रिय गोचरको आधारमा तयार गरिएको हो।', { size: 14, lh: 20, lines: 2 }),
-        footer(no, title)
+        header(no, title),
+        el(no, title, 'report', 'यो वर्ष फल सूची', [L, 172, W, 960], forecastBox, 9.4)
       ], { priority: ORDER.thisYear, key: 'card-06' });
     }
 
@@ -1211,6 +1251,9 @@
       const jpEl = el(no, title, 'report', 'जन्मपत्रिका (कुण्डली निर्माण) — पूर्ण दस्तावेज',
         [L, 58, W, 1052], jp.inner, 18,
         { scroll: true, jp: true, scrollBbox: [L, 58, W, jp.height] });
+      if (window.KunJanmapatrika && window.KunJanmapatrika.apply) {
+        window.KunJanmapatrika.apply(jpEl, jp);
+      }
       if (jp.privacy && jp.privacy.length) {
         jpEl.privacy = jp.privacy.map(g => ({
           id: g.id, label: g.label,
@@ -1231,7 +1274,7 @@
         let s = '';
         const items = [
           [
-            '⚠️ कार्यक्षेत्रमा तनाव तथा अनावश्यक दौडधुप',
+            '⚠️ कार्यक्षेत्रमा तनाव तथा अनावश्यक चुनौती',
             'कर्मक्षेत्रमा अचानक कार्यभार थपिने, सहकर्मीसँग असमझदारी वा ढिलासुस्ती हुन सक्ने सम्भावना।',
             '✨ शास्त्रीय समाधान: प्रत्येक शनिबार पीपलमा जल चढाउने, कुलदेवताको नियमित स्मरण र नित्य बिहान सूर्यलाई तामाको लोटाबाट अर्घ्य अर्पण गर्नुहोस्।'
           ],
@@ -1248,23 +1291,20 @@
         ];
 
         items.forEach((it, idx) => {
-          const iy = 196 + idx * 242;
-          s += '<rect x="' + L + '" y="' + iy + '" width="' + W + '" height="226" rx="16" fill="#0d1830" stroke="' + BAD + '" stroke-opacity=".45" stroke-width="1.3"/>';
-          s += '<rect x="' + L + '" y="' + (iy + 14) + '" width="5" height="198" rx="2.5" fill="' + BAD + '"/>';
-          s += T(L + 24, iy + 34, it[0], 18, '#ffb4bd', 700);
-          s += P(L + 24, iy + 64, it[1], 52, 14.5, 21, MUT, 2);
-          s += '<line x1="' + (L + 20) + '" y1="' + (iy + 116) + '" x2="' + (R - 20) + '" y2="' + (iy + 116) + '" stroke="#223052" stroke-width="1"/>';
-          s += T(L + 24, iy + 140, 'वैदिक समाधान (उपाय):', 16, GOOD, 700);
-          s += P(L + 24, iy + 168, it[2], 52, 14.5, 21, '#b9f6d9', 3);
+          const iy = 176 + idx * 316;
+          s += cosmicCardBg(L, iy, W, 302, BAD, 18);
+          s += T(L + 28, iy + 42, it[0], 23, '#ff8a98', 700);
+          s += P(L + 28, iy + 78, it[1], 50, 18.5, 27, '#f4f6fb', 2);
+          s += '<line x1="' + (L + 24) + '" y1="' + (iy + 144) + '" x2="' + (R - 24) + '" y2="' + (iy + 144) + '" stroke="#2b3e6b" stroke-width="1.3"/>';
+          s += T(L + 28, iy + 180, 'वैदिक समाधान (शास्त्रीय उपाय):', 21, GOOD, 700);
+          s += P(L + 28, iy + 216, it[2], 50, 19, 28, '#b9f6d9', 3);
         });
         return s;
       })();
 
       push(no, title, 'कठिनाइ र उपाय', [
-        header(no, title, 'यो वर्ष आइपर्ने कठिनाइहरू र तिनका वैदिक समाधान'),
-        el(no, title, 'report', 'कठिनाइ समाधान सूची', [L, 192, W, 740], remediesBox, 9.4),
-        note(no, title, 'उपाय नोट', [L, 946, W, 68], 'यी उपायहरू पराशर संहिता अनुसार निष्ठा र श्रद्धापूर्वक गर्नाले ग्रहजन्य अनिष्ट शान्त भई शुभ फल प्राप्त हुन्छ।', { size: 14, lh: 21, lines: 2 }),
-        footer(no, title)
+        header(no, title),
+        el(no, title, 'report', 'कठिनाइ समाधान सूची', [L, 172, W, 960], remediesBox, 9.4)
       ], { priority: ORDER.remedies, key: 'card-08' });
     }
 
@@ -1278,26 +1318,24 @@
         if (goodYogas.length) {
           const shown = goodYogas.slice(0, 4);
           shown.forEach((yg, idx) => {
-            const yy = 196 + idx * 178;
-            s += '<rect x="' + L + '" y="' + yy + '" width="' + W + '" height="164" rx="16" fill="#0d1830" stroke="' + (idx % 2 ? GOOD : GOLD2) + '" stroke-opacity=".4" stroke-width="1.3"/>';
-            s += '<rect x="' + L + '" y="' + (yy + 14) + '" width="5" height="136" rx="2.5" fill="' + (idx % 2 ? GOOD : GOLD2) + '"/>';
-            s += T(L + 24, yy + 34, ne(idx + 1) + '. ' + (yg.nepali || yg.name || 'शुभ योग'), 19, GOLD, 700);
-            s += T(R - 24, yy + 34, String(yg.category || 'राजयोग').toUpperCase(), 13, DIM, 600, 'end');
-            s += P(L + 24, yy + 66, yg.result_ne || yg.result || yg.cause_ne || 'शुभ फल प्राप्त हुनेछ।', 52, 14.5, 21, INK, 4);
+            const yy = 176 + idx * 236;
+            const accent = idx % 2 ? GOOD : GOLD2;
+            s += cosmicCardBg(L, yy, W, 222, accent, 18);
+            s += T(L + 28, yy + 44, ne(idx + 1) + '. ' + (yg.nepali || yg.name || 'शुभ योग'), 26, GOLD, 700);
+            s += T(R - 28, yy + 44, String(yg.category || 'राजयोग').toUpperCase(), 17, accent, 700, 'end');
+            s += P(L + 28, yy + 88, yg.result_ne || yg.result || yg.cause_ne || 'शुभ फल प्राप्त हुनेछ।', 50, 19.5, 29, '#ffffff', 4);
           });
         } else {
-          s += '<rect x="' + L + '" y="240" width="' + W + '" height="220" rx="16" fill="#0d1830" stroke="' + GOLD2 + '" stroke-opacity=".4"/>';
-          s += T(360, 330, 'कुण्डलीमा विशेष ग्रह बल उपस्थित छ', 22, GOLD, 700, 'middle');
-          s += P(360, 370, 'यस कुण्डलीमा ग्रहहरूको पारस्परिक दृष्टि र केन्द्र-त्रिकोण सम्बन्धले सामान्य जीवनमा प्रगति र उन्नति सुनिश्चित गर्दछ।', 48, 15, 22, MUT, 3);
+          s += cosmicCardBg(L, 260, W, 300, GOLD, 20);
+          s += T(360, 360, 'कुण्डलीमा विशेष ग्रह बल उपस्थित छ', 28, GOLD, 700, 'middle');
+          s += P(360, 410, 'यस कुण्डलीमा ग्रहहरूको पारस्परिक दृष्टि र केन्द्र-त्रिकोण सम्बन्धले सामान्य जीवनमा प्रगति, उन्नति र यश सुनिश्चित गर्दछ।', 46, 20, 30, '#ffffff', 4);
         }
         return s;
       })();
 
       push(no, title, 'शुभ योगहरू', [
-        header(no, title, 'कुण्डलीमा भएका शुभ योगहरू र प्राप्त हुने शुभ फल'),
-        el(no, title, 'report', 'शुभ योग सूची', [L, 192, W, 740], yogasBox, 9.2),
-        note(no, title, 'योग नोट', [L, 946, W, 68], 'पराशर ज्योतिषका अनुसार शुभ योगले जीवनको उपयुक्त समयमा राजयोग, धन र कीर्ति प्रदान गर्दछ।', { size: 14, lh: 21, lines: 2 }),
-        footer(no, title)
+        header(no, title),
+        el(no, title, 'report', 'शुभ योग सूची', [L, 172, W, 960], yogasBox, 9.2)
       ], { priority: ORDER.yogas, key: 'card-09' });
     }
 
@@ -1324,20 +1362,17 @@
           ['💰 ५. मेरो आर्थिक स्थिति र धन सम्पत्ति कस्तो रहला?', q5Ans, '#c4b5fd']
         ];
         qList.forEach((q, idx) => {
-          const qy = 196 + idx * 148;
-          s += '<rect x="' + L + '" y="' + qy + '" width="' + W + '" height="136" rx="16" fill="#0d1830" stroke="' + q[2] + '" stroke-opacity=".4" stroke-width="1.3"/>';
-          s += '<rect x="' + L + '" y="' + (qy + 14) + '" width="5" height="108" rx="2.5" fill="' + q[2] + '"/>';
-          s += T(L + 24, qy + 34, q[0], 17, q[2], 700);
-          s += P(L + 24, qy + 66, '👉 उत्तर: ' + q[1], 52, 14.5, 21, INK, 3);
+          const qy = 176 + idx * 190;
+          s += cosmicCardBg(L, qy, W, 178, q[2], 18);
+          s += T(L + 28, qy + 40, q[0], 22, q[2], 700);
+          s += P(L + 28, qy + 76, '👉 उत्तर: ' + q[1], 50, 19.5, 28, '#ffffff', 3);
         });
         return s;
       })();
 
       push(no, title, 'युवा प्रश्नोत्तर', [
-        header(no, title, 'युवा पुस्ताका ५ मुख्य प्रश्न र कुण्डली अनुसार उत्तर'),
-        el(no, title, 'report', 'युवा प्रश्नोत्तर सूची', [L, 192, W, 760], qaBox, 9.6),
-        note(no, title, 'युवा नोट', [L, 956, W, 58], 'सोसल मिडियामा सर्वाधिक सोधिने यी प्रश्नहरूको उत्तर जातकको वास्तविक कुण्डलीका आधारमा दिइएको हो।', { size: 14, lh: 20, lines: 2 }),
-        footer(no, title)
+        header(no, title),
+        el(no, title, 'report', 'युवा प्रश्नोत्तर सूची', [L, 172, W, 960], qaBox, 9.6)
       ], { priority: ORDER.youthQA, key: 'card-10' });
     }
 
@@ -1349,86 +1384,77 @@
       const numText = waRaw ? ne(waRaw) : '९८४७४५२९०६';
       const waDigits = waRaw.replace(/\D/g, '') || '9847452906';
       const waUrl = 'https://wa.me/' + (waDigits.length === 10 ? '977' + waDigits : waDigits);
-      const nameFs = astroName.length <= 30 ? 26 : astroName.length <= 38 ? 23 : 20;
+      const nameFs = astroName.length <= 26 ? 34 : astroName.length <= 34 ? 29 : 25;
 
-      const idY = 190, idH = 92;
-      let ident = '<rect x="' + L + '" y="' + idY + '" width="' + W + '" height="' + idH + '" rx="16" fill="#0c1930" stroke="' + GOLD + '" stroke-opacity=".38" stroke-width="1.3"/>';
-      ident += '<rect x="' + (L + 10) + '" y="' + (idY + 10) + '" width="' + (W - 20) + '" height="' + (idH - 20) + '" rx="11" fill="none" stroke="' + GOLD + '" stroke-opacity=".14"/>';
-      ident += '<circle cx="100" cy="236" r="28" fill="#12233f" stroke="' + GOLD + '" stroke-opacity=".5" stroke-width="1.3"/>';
-      ident += T(100, 236, 'ॐ', 28, GOLD, 700, 'middle');
-      ident += T(142, 220, astroName, nameFs, GOLD, 700);
-      ident += T(142, 253, 'वैदिक ज्योतिष · कुण्डली विश्लेषण · प्रत्यक्ष परामर्श', 14, MUT, 500);
+      const idY = 170, idH = 120;
+      let ident = cosmicCardBg(L, idY, W, idH, GOLD, 20);
+      ident += '<circle cx="116" cy="230" r="34" fill="#132446" stroke="' + GOLD + '" stroke-opacity=".8" stroke-width="1.6"/>';
+      ident += T(116, 230, 'ॐ', 34, GOLD, 700, 'middle');
+      ident += T(168, 218, astroName, nameFs, GOLD, 700);
+      ident += T(168, 258, 'वैदिक ज्योतिष · कुण्डली विश्लेषण · प्रत्यक्ष परामर्श', 18, MUT, 500);
 
-      const chipY = 330, chipH = 68, chipW = 194, chipGap = 11;
+      const chipY = 306, chipH = 82, chipW = 194, chipGap = 11;
       const chipDefs = [
         ['०१', 'कुण्डली निर्माण'],
-        ['०२', 'ग्रह दशा विश्लेषण'],
+        ['०२', 'दशा विश्लेषण'],
         ['०३', 'शास्त्रीय उपाय']
       ];
       let chips = '';
       chipDefs.forEach((c, i) => {
         const cx = L + i * (chipW + chipGap);
-        chips += '<rect x="' + cx + '" y="' + chipY + '" width="' + chipW + '" height="' + chipH + '" rx="14" fill="#0d1830" stroke="' + GOLD + '" stroke-opacity=".3" stroke-width="1.2"/>';
-        chips += '<circle cx="' + (cx + 33) + '" cy="' + (chipY + chipH / 2) + '" r="17" fill="#12233f" stroke="' + GOLD + '" stroke-opacity=".38" stroke-width="1.1"/>';
-        chips += T(cx + 33, chipY + chipH / 2, c[0], 13.5, GOLD, 700, 'middle');
-        chips += T(cx + 59, chipY + chipH / 2, c[1], 14.5, INK, 600);
+        chips += cosmicCardBg(cx, chipY, chipW, chipH, GOLD, 16);
+        chips += '<circle cx="' + (cx + 36) + '" cy="' + (chipY + chipH / 2) + '" r="20" fill="#132446" stroke="' + GOLD + '" stroke-opacity=".5" stroke-width="1.2"/>';
+        chips += T(cx + 36, chipY + chipH / 2, c[0], 16, GOLD, 700, 'middle');
+        chips += T(cx + 66, chipY + chipH / 2, c[1], 18, '#ffffff', 600);
       });
 
-      let wa = '<defs><linearGradient id="waGrad14" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12452c"/><stop offset="1" stop-color="#0a2317"/></linearGradient></defs>';
-      wa += '<rect x="110" y="416" width="500" height="124" rx="62" fill="url(#waGrad14)" stroke="#25D366" stroke-opacity=".6" stroke-width="1.8"/>';
-      wa += '<rect x="120" y="426" width="480" height="104" rx="52" fill="none" stroke="#ffffff" stroke-opacity=".05" stroke-width="1.2"/>';
-      wa += '<circle cx="178" cy="478" r="40" fill="#25D366"/>';
-      wa += '<g transform="translate(178,478) scale(1.2) translate(-58,-52)">';
+      let wa = '<defs><linearGradient id="waGrad14" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#145233"/><stop offset="1" stop-color="#0a2a1a"/></linearGradient></defs>';
+      wa += '<rect x="90" y="404" width="540" height="156" rx="78" fill="url(#waGrad14)" stroke="#25D366" stroke-opacity=".7" stroke-width="2"/>';
+      wa += '<rect x="100" y="414" width="520" height="136" rx="68" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="1.2"/>';
+      wa += '<circle cx="170" cy="482" r="48" fill="#25D366"/>';
+      wa += '<g transform="translate(170,482) scale(1.4) translate(-58,-52)">';
       wa += '<path d="M46 68l4-12a22 22 0 1 1 8 8l-12 4z" fill="#0b2418" opacity=".18"/>';
       wa += '<path d="M58 33c-10.5 0-19 8.5-19 19 0 3.6 1 7 2.8 9.9L39 72l10.4-2.7A19 19 0 1 0 58 33zm0 34.4c-8.5 0-15.4-6.9-15.4-15.4S49.5 36.6 58 36.6 73.4 43.5 73.4 52 66.5 67.4 58 67.4z" fill="#ffffff"/>';
       wa += '<path d="M65.5 56.2c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.3-.7.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.5-1.7-1.7-2-.1-.3 0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-1-2.3c-.3-.7-.6-.6-.9-.6h-.8c-.3 0-.7.1-1 .5-.3.3-1.3 1.3-1.3 3.2s1.3 3.7 1.5 4c.2.2 2.6 4 6.3 5.5 2.2.9 3.1 1 4.2.8.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.2-.6-.4z" fill="#ffffff"/>';
       wa += '</g>';
-      wa += '<circle cx="576" cy="478" r="17" fill="none" stroke="#ffffff" stroke-opacity=".25" stroke-width="1.2"/>';
-      wa += '<path d="M572 471l7 7-7 7" fill="none" stroke="#ffffff" stroke-opacity=".85" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>';
-      wa += T(238, 452, 'WhatsApp मा सम्पर्क गर्नुहोस्', 15, '#9fe8bd', 600);
-      wa += T(238, 490, numText, 32, '#ffffff', 700);
-      wa += T(238, 524, 'छिटो जवाफ · सिधै म्यासेज पठाउनुहोस्', 14, '#bfe9cd', 500);
+      wa += '<circle cx="586" cy="482" r="20" fill="none" stroke="#ffffff" stroke-opacity=".3" stroke-width="1.4"/>';
+      wa += '<path d="M582 473l8 9-8 9" fill="none" stroke="#ffffff" stroke-opacity=".95" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      wa += T(236, 452, 'WhatsApp मा सम्पर्क गर्नुहोस्', 19, '#bbf7d0', 600);
+      wa += T(236, 496, numText, 40, '#ffffff', 700);
+      wa += T(236, 534, 'छिटो जवाफ · सिधै म्यासेज पठाउनुहोस्', 16, '#86efac', 500);
 
-      const adBox = [82, 554, 556, 314];
-      let adInner = '<defs><radialGradient id="heroGlow14"><stop offset="0" stop-color="' + GOLD + '" stop-opacity=".16"/><stop offset="1" stop-color="' + GOLD + '" stop-opacity="0"/></radialGradient></defs>';
-      adInner += '<rect x="' + adBox[0] + '" y="' + adBox[1] + '" width="' + adBox[2] + '" height="' + adBox[3] + '" rx="18" fill="#0a1726" stroke="' + GOLD + '" stroke-opacity=".48" stroke-width="1.4"/>';
-      adInner += '<rect x="' + (adBox[0] + 10) + '" y="' + (adBox[1] + 10) + '" width="' + (adBox[2] - 20) + '" height="' + (adBox[3] - 20) + '" rx="13" fill="none" stroke="' + GOLD + '" stroke-opacity=".16"/>';
-      adInner += '<circle cx="360" cy="642" r="118" fill="url(#heroGlow14)"/>';
-      adInner += '<circle cx="360" cy="642" r="78" fill="none" stroke="' + GOLD + '" stroke-opacity=".18"/>';
-      adInner += '<circle cx="360" cy="642" r="54" fill="none" stroke="' + GOLD + '" stroke-opacity=".26"/>';
+      const adBox = [L, 580, W, 490];
+      let adInner = '<defs><radialGradient id="heroGlow14"><stop offset="0" stop-color="' + GOLD + '" stop-opacity=".22"/><stop offset="1" stop-color="' + GOLD + '" stop-opacity="0"/></radialGradient></defs>';
+      adInner += '<rect x="' + adBox[0] + '" y="' + adBox[1] + '" width="' + adBox[2] + '" height="' + adBox[3] + '" rx="20" fill="#0b1730" fill-opacity=".94" stroke="' + GOLD + '" stroke-opacity=".55" stroke-width="1.6"/>';
+      adInner += '<rect x="' + (adBox[0] + 12) + '" y="' + (adBox[1] + 12) + '" width="' + (adBox[2] - 24) + '" height="' + (adBox[3] - 24) + '" rx="15" fill="none" stroke="' + GOLD + '" stroke-opacity=".18"/>';
+      adInner += '<circle cx="360" cy="700" r="140" fill="url(#heroGlow14)"/>';
+      adInner += '<circle cx="360" cy="700" r="92" fill="none" stroke="' + GOLD + '" stroke-opacity=".22"/>';
+      adInner += '<circle cx="360" cy="700" r="64" fill="none" stroke="' + GOLD + '" stroke-opacity=".3"/>';
       for (let d = 0; d < 12; d++) {
         const a = d * Math.PI / 6;
-        adInner += '<circle cx="' + (360 + Math.cos(a) * 78).toFixed(1) + '" cy="' + (642 + Math.sin(a) * 78).toFixed(1) + '" r="' + (d % 3 === 0 ? 3.2 : 2) + '" fill="' + GOLD + '" fill-opacity=".55"/>';
+        adInner += '<circle cx="' + (360 + Math.cos(a) * 92).toFixed(1) + '" cy="' + (700 + Math.sin(a) * 92).toFixed(1) + '" r="' + (d % 3 === 0 ? 3.6 : 2.2) + '" fill="' + GOLD + '" fill-opacity=".65"/>';
       }
-      adInner += '<path d="M360 603l10 29 29 11-29 10-10 30-10-30-29-10 29-11z" fill="' + GOLD + '" fill-opacity=".92"/>';
-      adInner += '<path d="M286 642h-14M434 642h14" stroke="' + GOLD + '" stroke-opacity=".5" stroke-width="1.6"/>';
-      adInner += T(360, 758, 'ज्योतिषीय परामर्श केन्द्र', 28, GOLD, 700, 'middle');
-      adInner += '<line x1="284" y1="780" x2="436" y2="780" stroke="' + GOLD + '" stroke-opacity=".5" stroke-width="1.4"/>';
-      adInner += T(360, 807, 'कुण्डली निर्माण · ग्रह बल · दशा विश्लेषण', 15, MUT, 500, 'middle');
-      adInner += T(360, 838, 'वैदिक ज्योतिषको शास्त्रीय मार्गदर्शन', 14, DIM, 500, 'middle');
+      adInner += '<path d="M360 655l12 34 34 11-34 12-12 34-12-34-34-12 34-11z" fill="' + GOLD + '" fill-opacity=".95"/>';
+      adInner += '<path d="M265 700h-16M455 700h16" stroke="' + GOLD + '" stroke-opacity=".55" stroke-width="1.8"/>';
+      adInner += T(360, 836, 'ज्योतिषीय परामर्श केन्द्र', 34, GOLD, 700, 'middle');
+      adInner += '<line x1="260" y1="860" x2="460" y2="860" stroke="' + GOLD + '" stroke-opacity=".5" stroke-width="1.6"/>';
+      adInner += T(360, 894, 'कुण्डली निर्माण · ग्रह बल · दशा विश्लेषण', 19, '#f4f8ff', 600, 'middle');
+      adInner += T(360, 930, 'जीवनका महत्त्वपूर्ण निर्णयहरूमा शास्त्रीय वैदिक मार्गदर्शन', 17, MUT, 500, 'middle');
+      adInner += T(360, 978, '॥ सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः ॥', 18, GOLD2, 600, 'middle');
 
-      let trust = '<rect x="' + L + '" y="' + 882 + '" width="' + W + '" height="40" rx="20" fill="#0b2418" stroke="#25D366" stroke-opacity=".22" stroke-width="1.1"/>';
-      trust += '<circle cx="88" cy="902" r="5" fill="' + GOOD + '"/>';
-      trust += T(360, 902, '१००% गोपनीयता · विश्वास · शास्त्र · अनुभव', 14.5, '#9fe8bd', 600, 'middle');
-
-      const noteTxt = 'बटन थिच्नुहोस् — WhatsApp सिधै खुल्छ';
-      const noteEl = el(no, title, 'note', 'सम्पर्क नोट', [L, 936, W, 44], T(360, 958, noteTxt, 14.5, MUT, 500, 'middle'), 6.4, {
-        editable: true,
-        textStyle: { x: 360, y: 958, size: 14.5, color: MUT, weight: 500, single: true, anchor: 'middle', max: 42 },
-        defaultText: noteTxt
-      });
+      const trust = '<rect x="' + L + '" y="1084" width="' + W + '" height="52" rx="26" fill="#0b2418" stroke="#25D366" stroke-opacity=".35" stroke-width="1.3"/>' +
+        '<circle cx="86" cy="1110" r="6" fill="' + GOOD + '"/>' +
+        T(360, 1110, '१००% गोपनीयता · शास्त्रीय प्रमाण · प्रत्यक्ष अनुभव', 17, '#9fe8bd', 600, 'middle');
 
       push(no, title, 'परामर्श', [
-        header(no, title, 'ज्योतिषीय परामर्श र सम्पर्क'),
+        header(no, title),
         el(no, title, 'heading', 'ज्योतिषीय परिचय', [L, idY, W, idH], ident, 6.4),
         el(no, title, 'cards', 'सेवा सूची', [L, chipY, W, chipH], chips, 7),
-        el(no, title, 'banner', 'WhatsApp सम्पर्क', [110, 416, 500, 124], wa, 7.4),
+        el(no, title, 'banner', 'WhatsApp सम्पर्क', [90, 404, 540, 156], wa, 7.4),
         el(no, title, 'art', 'ज्योतिषीको फोटो', adBox, adInner, 7.4, { ad: true, adSrc: '' }),
-        el(no, title, 'note', 'विश्वास पट्टी', [L, 882, W, 40], trust, 6.4),
-        noteEl,
-        footer(no, title)
+        el(no, title, 'note', 'विश्वास पट्टी', [L, 1084, W, 52], trust, 6.4)
       ], { priority: ORDER.consult, key: 'card-11' });
-      items[items.length - 1].hotspot = [110, 416 + TOP_SAFE + (items[items.length - 1].autoShift || 0), 500, 124];
+      items[items.length - 1].hotspot = [90, 404 + TOP_SAFE + (items[items.length - 1].autoShift || 0), 540, 156];
       items[items.length - 1].hotspotUrl = waUrl;
       const adEl = items[items.length - 1].els.find(e => e.el.ad);
       if (adEl) adEl.adSrc = '';

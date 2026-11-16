@@ -21,8 +21,8 @@
     cosmic: {
       id: 'cosmic', name: 'Cosmic 3D', ne: 'कस्मिक ३डी', tag: 'SPACE · DEPTH',
       desc: 'ब्रह्माण्ड, कक्षा र गहिराइमा आधारित सिनेम्याटिक 3D.',
-      bg: ['#040814', '#0b1b3a', '#02040a'], accent: '#f6d365', accent2: '#6ee7ff',
-      ink: '#f8fbff', mut: '#9fb0d0', card: 'rgba(10,24,52,.72)', line: 'rgba(246,211,101,.35)',
+      bg: ['#050816', '#0e1c3e', '#040713'], accent: '#f6d365', accent2: '#6ee7ff',
+      ink: '#f8fbff', mut: '#a5b5d6', card: 'rgba(12,25,54,.88)', line: 'rgba(246,211,101,.48)',
       font: 'Mukta', display: 'Rozha One', motion: 'cosmic', radius: 24, seed: 11
     },
     nebula: {
@@ -249,9 +249,9 @@
     Rahu: 'राहु', Ketu: 'केतु'
   };
   const KB_JP_VIM = [
-    ['Sun', 'सूर्य', 6], ['Moon', 'चन्द्र', 10], ['Mars', 'मङ्गल', 7],
-    ['Rahu', 'राहु', 18], ['Jupiter', 'गुरु', 16], ['Saturn', 'शनि', 19],
-    ['Mercury', 'बुध', 17], ['Ketu', 'केतु', 7], ['Venus', 'शुक्र', 20]
+    ['Ketu', 'केतु', 7], ['Venus', 'शुक्र', 20], ['Sun', 'सूर्य', 6],
+    ['Moon', 'चन्द्र', 10], ['Mars', 'मङ्गल', 7], ['Rahu', 'राहु', 18],
+    ['Jupiter', 'गुरु', 16], ['Saturn', 'शनि', 19], ['Mercury', 'बुध', 17]
   ];
   const KB_JP_YOGINI = [
     ['Mangala', 'मङ्गला', 1], ['Pingala', 'पिङ्गला', 2],
@@ -372,6 +372,32 @@
     const years = Math.floor(months / 12), rem = months % 12;
     const out = [kbJpNe(years) + ' वर्ष'];
     if (rem) out.push(kbJpNe(rem) + ' महिना');
+    return out;
+  }
+  /* Cumulative age for the antardasha grid, matching the desktop's
+     _dasha_cell_value: a sub-month period keeps its days instead of
+     collapsing to "० वर्ष". */
+  function kbJpCellValue(startValue, endValue) {
+    const a = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(startValue || ''));
+    const b = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(endValue || ''));
+    if (!a || !b) return ['—'];
+    const start = Date.UTC(+a[1], +a[2] - 1, +a[3]);
+    const end = Date.UTC(+b[1], +b[2] - 1, +b[3]);
+    if (end <= start) return ['—'];
+    let years = +b[1] - +a[1];
+    let months = +b[2] - +a[2];
+    let days = +b[3] - +a[3];
+    if (days < 0) {
+      months -= 1;
+      days += new Date(Date.UTC(+b[1], +b[2] - 1, 0)).getUTCDate();
+    }
+    if (months < 0) { years -= 1; months += 12; }
+    years = Math.max(0, years);
+    months = Math.max(0, months);
+    days = Math.max(0, days);
+    if (years === 0 && months === 0) return [kbJpNe(days) + ' दिन'];
+    const out = [kbJpNe(years) + ' वर्ष'];
+    if (months) out.push(kbJpNe(months) + ' महिना');
     return out;
   }
   function kbJpText(x, y, text, size, color, weight, anchor, font) {
@@ -752,12 +778,19 @@
   }
   function kbJpDashaSpec(periods) {
     const first = periods[0] || {};
-    const isYogini = !!(first.name || first.nepali) && !first.lord_nepali;
+    const isYogini = !!(first.yogini || first.yogini_nepali) ||
+      (!!(first.name || first.nepali) && !first.lord_nepali);
     return isYogini ? { spec: KB_JP_YOGINI, heading: 'योगिनी' } : { spec: KB_JP_VIM, heading: 'ग्रह' };
+  }
+  function kbJpDashaLord(node) {
+    if (!node) return KB_JP_UNAVAILABLE;
+    if (node.yogini) return kbJpFirst(node.yogini, node.name);
+    if (!node.lord_nepali && (node.name || node.nepali)) return kbJpFirst(node.name, node.nepali);
+    return kbJpFirst(node.lord, node.name);
   }
   function kbJpOrdered(periods, spec) {
     if (!periods || !periods.length) return [];
-    const first = kbJpFirst(periods[0].lord, periods[0].name);
+    const first = kbJpDashaLord(periods[0]);
     const names = spec.map(x => x[0]);
     let start = names.indexOf(first);
     if (start < 0) start = 0;
@@ -765,12 +798,12 @@
     const remaining = periods.slice();
     const out = [];
     expected.forEach(name => {
-      const i = remaining.findIndex(n => kbJpFirst(n.lord, n.name) === name);
+      const i = remaining.findIndex(n => kbJpDashaLord(n) === name);
       if (i >= 0) { out.push(remaining[i]); remaining.splice(i, 1); }
     });
     return out.length ? out : periods.slice(0, spec.length);
   }
-  function kbJpDashaTable(periods, childrenKey, x, y, w) {
+  function kbJpDashaTable(periods, childrenKey, x, y, w, birthDate) {
     if (!periods || !periods.length) return null;
     const meta = kbJpDashaSpec(periods);
     const cycle = kbJpOrdered(periods, meta.spec);
@@ -778,18 +811,56 @@
     meta.spec.forEach(s => { durationByName[s[0]] = s[2]; });
     let s = '', H = 0;
     if (childrenKey) {
-      const rows = cycle.map(p => ({ p: p, nodes: p[childrenKey] || [] })).filter(r => r.nodes.length);
+      /* The antardasha grid follows the desktop Janmapatrika: every row is a
+         mahadasha, every column an antardasha lord, and every cell counts the
+         native's age at that antardasha's end — from the real birth date, not
+         from each mahadasha's start. */
+      const timeline = periods.slice().sort((a, b) => String(a.start || '').localeCompare(String(b.start || '')));
+      const rows = timeline.map(p => ({ p: p, nodes: p[childrenKey] || [] })).filter(r => r.nodes.length);
       if (!rows.length) return null;
-      const shown = rows.slice(0, 3);
-      const maxRow = rows.reduce((a, b) => b.nodes.length > a.nodes.length ? b : a, rows[0]);
-      const headerNodes = kbJpOrdered(maxRow.nodes, meta.spec).slice(0, meta.spec.length);
-      const n = headerNodes.length + 1, cw = w / n;
+
+      let fromDate = String(birthDate || '');
+      if (!/^\d{4}-\d{2}-\d{2}/.test(fromDate)) fromDate = String((timeline[0] || {}).start || '');
+      fromDate = /^\d{4}-\d{2}-\d{2}/.test(fromDate) ? fromDate.slice(0, 10) : '';
+
+      const birthLord = kbJpDashaLord(timeline[0]);
+      const specNames = meta.spec.map(sp => sp[0]);
+      let rot = specNames.indexOf(birthLord);
+      if (rot < 0) rot = 0;
+      const rotatedSpec = meta.spec.slice(rot).concat(meta.spec.slice(0, rot));
+
+      const tableRows = [];
+      rows.forEach(row => {
+        const nodeByLord = new Map();
+        row.nodes.forEach(node => {
+          const key = kbJpDashaLord(node);
+          if (!nodeByLord.has(key)) nodeByLord.set(key, node);
+        });
+        const values = [];
+        let hasVisible = false;
+        rotatedSpec.forEach(sp => {
+          const node = nodeByLord.get(sp[0]);
+          if (!node || node.is_before_birth) { values.push('—'); return; }
+          const end = String(node.end || '').slice(0, 10);
+          if (!fromDate || !/^\d{4}-\d{2}-\d{2}/.test(end) || end <= fromDate) {
+            values.push('—');
+            return;
+          }
+          values.push(kbJpCellValue(fromDate, end));
+          hasVisible = true;
+        });
+        if (hasVisible) tableRows.push({ p: row.p, values: values });
+      });
+      if (!tableRows.length) return null;
+
+      const shown = tableRows.slice(0, 3);
+      const n = rotatedSpec.length + 1, cw = w / n;
       const headH = 26, rowH = 54;
       H = headH + shown.length * rowH;
       s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + H + '" fill="none" stroke="' + KB_JP.gray + '" stroke-width="1"/>';
       s += kbJpText(x + cw / 2, y + headH / 2 + 4, 'दशा', 12, KB_JP.red, 800, 'middle');
-      headerNodes.forEach((node, i) => {
-        const name = kbJpFirst(node.lord_nepali, node.nepali, node.lord, node.name);
+      rotatedSpec.forEach((sp, i) => {
+        const name = sp[1];
         const fs = kbJpFitSize(name, 12, cw - 4, 700);
         s += kbJpText(x + cw * (i + 1.5), y + headH / 2 + 4, name, fs, KB_JP.red, 700, 'middle');
       });
@@ -799,19 +870,17 @@
         const parent = kbJpFirst(row.p.lord_nepali, row.p.nepali, row.p.lord, row.p.name);
         const pfs = kbJpFitSize(parent, 11, cw - 4, 700);
         s += kbJpText(x + cw / 2, cy + 7, parent, pfs, KB_JP.red, 700, 'middle');
-        const nodes = kbJpOrdered(row.nodes, meta.spec).slice(0, meta.spec.length);
-        for (let i = 0; i < headerNodes.length; i++) {
-          const node = nodes[i];
+        row.values.forEach((lines, i) => {
           const cx = x + cw * (i + 1.5);
-          if (!node) { s += kbJpText(cx, cy + 4, '—', 12, KB_JP.red, 600, 'middle'); continue; }
-          const lines = kbJpElapsed(row.p.start, node.end);
-          if (lines.length > 1) {
+          if (lines === '—' || !lines || !lines.length) {
+            s += kbJpText(cx, cy + 4, '—', 12, KB_JP.red, 600, 'middle');
+          } else if (lines.length > 1) {
             s += kbJpText(cx, cy - 3, lines[0], 11, KB_JP.red, 600, 'middle');
             s += kbJpText(cx, cy + 10, lines[1], 11, KB_JP.red, 600, 'middle');
           } else {
             s += kbJpText(cx, cy + 4, lines[0], 11, KB_JP.red, 600, 'middle');
           }
-        }
+        });
       });
       for (let r = 1; r <= shown.length; r++) {
         const yy = y + headH + (r - 1) * rowH;
@@ -836,7 +905,7 @@
     });
     s += kbJpText(x + cw / 2, y + headH + yearH / 2 + 4, 'वर्ष', 11, KB_JP.red, 700, 'middle');
     columns.forEach((node, i) => {
-      const years = kbJpFirst(node.total_years, durationByName[kbJpFirst(node.lord, node.name)]);
+      const years = kbJpFirst(node.total_years, durationByName[kbJpDashaLord(node)]);
       const text = kbJpNe(years) + ' वर्ष';
       const fs = kbJpFitSize(text, 12, cw - 4, 600);
       s += kbJpText(x + cw * (i + 1.5), y + headH + yearH / 2 + 4, text, fs, KB_JP.red, 600, 'middle');
@@ -861,12 +930,144 @@
     }
     return { svg: s, height: H };
   }
-  function kbJpDashaSection(title, periods, childrenKey, x, y, w) {
-    const table = kbJpDashaTable(periods, childrenKey, x, y + 28, w);
+  function kbJpDashaSection(title, periods, childrenKey, x, y, w, birthDate) {
+    const table = kbJpDashaTable(periods, childrenKey, x, y + 28, w, birthDate);
     if (!table) return null;
     let s = kbJpText(x + w / 2, y + 18, title, 18, KB_JP.red, 800, 'middle');
     s += table.svg;
     return { svg: s, height: 28 + table.height };
+  }
+
+  /* ── exact desktop Janmapatrika page ─────────────────────────────
+     The desktop page is built from QWidgets, QTextDocument dasha tables and
+     QPainter charts. It cannot be re-created faithfully in SVG, so the Python
+     engine renders the real desktop page to a PNG and this cache serves that
+     exact bitmap to the builder and the Timeline. */
+  const kbJpPages = new Map();
+  const KB_JP_IDENTITY = [
+    'full_name', 'father_name', 'mother_name', 'gotra', 'surname', 'kula',
+    'kuladevata', 'spouse_name', 'marital_status', 'caste', 'religion',
+    'family_details', 'birth_place', 'country', 'timezone_id'
+  ];
+  function kbJpPick() {
+    for (let i = 0; i < arguments.length; i++) {
+      const v = arguments[i];
+      if (v != null && String(v).trim() !== '') return v;
+    }
+    return '';
+  }
+  function kbJpParams(data, meta) {
+    const md = (data && data.metadata) || {};
+    const m = meta || {};
+    const name = kbJpPick(md.name, m.name, m.full_name, md.full_name);
+    const birthDate = kbJpPick(md.birth_date, m.birth_date);
+    const birthTime = kbJpPick(md.birth_time, m.birth_time);
+    const out = {
+      name: name,
+      birth_date: String(birthDate || '').slice(0, 10),
+      birth_time: birthTime,
+      latitude: parseFloat(kbJpPick(md.latitude, m.latitude)),
+      longitude: parseFloat(kbJpPick(md.longitude, m.longitude)),
+      timezone: parseFloat(kbJpPick(md.timezone, m.timezone)),
+      ayanamsha_type: kbJpPick(md.ayanamsha_type, m.ayanamsha_type, 'LAHIRI'),
+      node_type: kbJpPick(md.node_type, m.node_type, 'MEAN'),
+      house_system: kbJpPick(md.house_system, m.house_system, 'WHOLE_SIGN'),
+      city: kbJpPick(md.city, m.city, m.birth_place),
+      timezone_id: kbJpPick(md.timezone_id, m.timezone_id),
+      gender: kbJpPick(m.gender, md.gender)
+    };
+    for (let i = 0; i < KB_JP_IDENTITY.length; i++) {
+      const k = KB_JP_IDENTITY[i];
+      out[k] = kbJpPick(m[k], md[k]);
+    }
+    if (!name || !out.birth_date || !out.birth_time ||
+        !isFinite(out.latitude) || !isFinite(out.longitude) || !isFinite(out.timezone)) {
+      return null;
+    }
+    out.include_yogini_tree = false;
+    out.include_comprehensive_book = false;
+    return out;
+  }
+  function kbJpKey(data, meta) {
+    const params = kbJpParams(data, meta);
+    return params ? JSON.stringify(params) : '';
+  }
+  function kbJpEnsure(data, meta) {
+    const key = kbJpKey(data, meta);
+    if (!key) return Promise.resolve(null);
+    const hit = kbJpPages.get(key);
+    if (hit) return hit.promise;
+
+    const rec = { key: key, data: '', w: 0, h: 0, error: '', promise: null };
+    rec.promise = (async () => {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 300000);
+      try {
+        const resp = await fetch('/api/kundali/janmapatrika', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: key,
+          signal: ctl.signal
+        });
+        if (!resp.ok) {
+          let detail = '';
+          try {
+            const j = await resp.json();
+            detail = (j && (j.error || j.detail)) || '';
+          } catch (e) { }
+          throw new Error(detail || ('जन्मपत्रिका पेज बनाइएन (' + resp.status + ')'));
+        }
+        const headerW = parseInt(resp.headers.get('X-Janmapatrika-Width') || '0', 10) || 0;
+        const headerH = parseInt(resp.headers.get('X-Janmapatrika-Height') || '0', 10) || 0;
+        const blob = await resp.blob();
+        const dataUri = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ''));
+          reader.onerror = () => reject(new Error('जन्मपत्रिका पेज पढ्न सकिएन।'));
+          reader.readAsDataURL(blob);
+        });
+        const dims = await new Promise((resolve, reject) => {
+          const im = new Image();
+          im.decoding = 'async';
+          im.onload = () => resolve([im.naturalWidth || headerW, im.naturalHeight || headerH]);
+          im.onerror = () => reject(new Error('जन्मपत्रिका पेज खोल्न सकिएन।'));
+          im.src = dataUri;
+        });
+        rec.w = dims[0] || headerW;
+        rec.h = dims[1] || headerH;
+        if (!rec.w || !rec.h) throw new Error('जन्मपत्रिका पेजको आकार अज्ञात छ।');
+        rec.data = dataUri;
+        return rec;
+      } catch (err) {
+        rec.error = (err && err.message) || String(err);
+        kbJpPages.delete(key);
+        try { console.warn('Janmapatrika desktop page:', rec.error); } catch (e) { }
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
+    })();
+    kbJpPages.set(key, rec);
+    return rec.promise;
+  }
+  function kbJpPageFor(data, meta) {
+    const key = kbJpKey(data, meta);
+    if (!key) return null;
+    const rec = kbJpPages.get(key);
+    return rec && rec.data ? rec : null;
+  }
+  function kbJpApply(el, page) {
+    if (el && page && page.pngSrc) {
+      el.pngSrc = page.pngSrc;
+      el.pngKey = page.pngKey || '';
+    }
+    return el;
+  }
+  function kbJpReady() {
+    if (!kb.data || !window.KunJanmapatrika || !window.KunJanmapatrika.prepare) {
+      return Promise.resolve(null);
+    }
+    return Promise.resolve(window.KunJanmapatrika.prepare(kb.data, kb.meta)).catch(() => null);
   }
 
   function kbJanmapatrika(data, meta, opts) {
@@ -875,6 +1076,15 @@
     const y0 = opts.y != null ? +opts.y : 170;
     const W = opts.w != null ? +opts.w : 604;
     const model = kbJpModel(data, meta);
+    const exact = kbJpPageFor(data, meta);
+    if (exact) {
+      const pageHeight = Math.max(240, Math.round(W * exact.h / exact.w));
+      return {
+        inner: '', pngSrc: exact.data, pngKey: exact.key,
+        height: pageHeight, width: W, model: model, privacy: [], exact: true
+      };
+    }
+    const birthDate = (data.metadata && data.metadata.birth_date) || meta.birth_date || '';
     const parts = [];
     const cx = x0 + W / 2;
     const padX = Math.round(W * 0.111);
@@ -925,7 +1135,7 @@
       ['योगिनी अन्तरदशा चक्रम्', data.yogini_dasha || [], 'antardashas']
     ];
     dashaSections.forEach(d => {
-      const sec = kbJpDashaSection(d[0], d[1], d[2], contentX, y, contentW);
+      const sec = kbJpDashaSection(d[0], d[1], d[2], contentX, y, contentW, birthDate);
       if (sec) { parts.push(sec.svg); y += sec.height + 10; }
     });
 
@@ -969,7 +1179,15 @@
     return { inner: bg + parts.join(''), height: H, width: W, model: model, privacy: privacy };
   }
 
-  window.KunJanmapatrika = { build: kbJanmapatrika, model: kbJpModel, prose: kbJpProse };
+  window.KunJanmapatrika = {
+    build: kbJanmapatrika,
+    model: kbJpModel,
+    prose: kbJpProse,
+    /* Render/fetch the exact desktop page once and reuse it everywhere. */
+    prepare: function (data, meta) { return kbJpEnsure(data, meta); },
+    page: function (data, meta) { return kbJpPageFor(data, meta); },
+    apply: function (el, page) { return kbJpApply(el, page); }
+  };
 
   function kbCatalog(data, meta) {
     kbSeq = 0;
@@ -2435,6 +2653,7 @@
       const no = pages.length + 1, title = 'जन्मपत्रिका (कुण्डली निर्माण)';
       const jp = kbJanmapatrika(data, meta, { x: 58, y: 170, w: 604 });
       const jpEl = kbEl(no, title, 'report', 'जन्मपत्रिका (कुण्डली निर्माण) — पूर्ण दस्तावेज', [58, 170, 604, 1052], jp.inner, 18);
+      kbJpApply(jpEl, jp);
       jpEl.privacy = (jp.privacy || []).map(g => ({ id: g.id, label: g.label, rects: (g.rects || []).map(r => ({ x: r.x, y: r.y, w: r.w, h: r.h })) }));
       jpEl.scroll = true;
       jpEl.scrollBbox = [58, 170, 604, jp.height];
@@ -2449,18 +2668,30 @@
      screenshot: the inner SVG is the live chart/table/report component. */
   function kbElSvg(el) {
     const b = el.scrollBbox || el.bbox || [0, 0, 720, 1280];
+    if (el.pngSrc) {
+      /* The Janmapatrika page is the exact desktop-app PNG. Keeping it as a
+         direct bitmap avoids wrapping a 600 KB data URL in an SVG data URL
+         on every decode. */
+      return '<svg xmlns="http://www.w3.org/2000/svg" width="' + b[2] + '" height="' + b[3] + '" viewBox="' + b[0] + ' ' + b[1] + ' ' + b[2] + ' ' + b[3] + '">' +
+        '<image x="' + b[0] + '" y="' + b[1] + '" width="' + b[2] + '" height="' + b[3] + '" preserveAspectRatio="none" href="' + el.pngSrc + '"/></svg>';
+    }
     const font = KB_FONT.replace(/"/g, "'");
     return '<svg xmlns="http://www.w3.org/2000/svg" width="' + b[2] + '" height="' + b[3] + '" viewBox="' + b[0] + ' ' + b[1] + ' ' + b[2] + ' ' + b[3] + '">' +
       '<rect x="' + b[0] + '" y="' + b[1] + '" width="' + b[2] + '" height="' + b[3] + '" fill="none"/>' +
       '<g font-family="' + font + '">' + el.inner + '</g></svg>';
   }
   function kbElDataUri(el) {
+    if (el.pngSrc) return el.pngSrc;
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(kbElSvg(el));
   }
 
   const kbImgCache = new Map();
   const kbImgPending = new Set();
-  function kbImgKey(el) { return 'e:' + (el.id || '') + ':' + (el.bbox || []).join(',') + ':' + (el.scrollBbox || []).join(',') + ':' + (el.inner || '').length + ':' + kbHash(el.inner || ''); }
+  function kbImgKey(el) {
+    const shape = 'e:' + (el.id || '') + ':' + (el.bbox || []).join(',') + ':' + (el.scrollBbox || []).join(',');
+    if (el.pngSrc) return shape + ':p:' + (el.pngKey || '') + ':' + el.pngSrc.length;
+    return shape + ':i:' + (el.inner || '').length + ':' + kbHash(el.inner || '');
+  }
   function kbImgFor(el) {
     const k = kbImgKey(el);
     const hit = kbImgCache.get(k);
@@ -2476,15 +2707,24 @@
       ws.forEach(fn => { try { fn(img) } catch (e) { } });
     };
     im.onload = () => {
-      /* Wait for the browser's decode before the first paint. Drawings of a
-         large Janmapatrika SVG otherwise start as an empty paper card while
-         the bitmap is still being decoded. */
+      /* Wait briefly for the browser's decode before the first paint. A large
+         Janmapatrika bitmap can keep decode() pending for a long time when the
+         tab is not painting (background/offscreen), which used to leave the
+         page as its paper fallback. Loaded pixels are already usable, so a
+         short decode wait keeps normal rendering smooth without ever blocking
+         the page indefinitely. */
+      let done = false;
       const finish = () => {
+        if (done) return;
+        done = true;
         settle(im);
         if (typeof draw === 'function' && !playing && !exporting) { try { draw(cur) } catch (e) { } }
         if (typeof kbPreviewRedraw === 'function') { try { kbPreviewRedraw() } catch (e) { } }
       };
-      if (im.decode) im.decode().then(finish, finish); else finish();
+      if (im.decode) {
+        im.decode().then(finish, finish);
+        setTimeout(finish, 300);
+      } else finish();
     };
     im.onerror = () => settle(null);
     im.src = kbElDataUri(el);
@@ -2780,9 +3020,9 @@
   }
   function kbCosmicSky(g, w, h, def, t, k) {
     const B = KB_BG_BUDGET.cosmic;
-    kbCosNebula(g, w * (.18 + Math.sin(t * .03) * .02), h * .20, w * .60, w, h, 'rgba(86,74,208,.30)', 'rgba(44,92,202,.11)');
-    kbCosNebula(g, w * .86, h * (.40 + Math.cos(t * .025) * .02), w * .52, w, h, 'rgba(110,231,255,.15)', 'rgba(38,120,180,.06)');
-    kbCosNebula(g, w * .46, h * .88, w * .58, w, h, 'rgba(246,211,101,.12)', 'rgba(150,96,26,.05)');
+    kbCosNebula(g, w * (.22 + Math.sin(t * .03) * .02), h * .22, w * .68, w, h, 'rgba(99,102,241,.32)', 'rgba(44,92,202,.12)');
+    kbCosNebula(g, w * .84, h * (.42 + Math.cos(t * .025) * .02), w * .58, w, h, 'rgba(34,211,238,.20)', 'rgba(20,80,160,.08)');
+    kbCosNebula(g, w * .48, h * .85, w * .65, w, h, 'rgba(246,211,101,.18)', 'rgba(180,110,30,.06)');
     kbCosGalaxy(g, w * .80, h * .12, w * .26, -.42, t, k, def.seed + 17, B.galaxy);
     const rnd = kbSeed(def.seed);
     for (let i = 0; i < B.stars; i++) {
@@ -6498,6 +6738,7 @@
       kb.auto = true;
       kb.autoOpts = Object.assign({}, kb.autoOpts || {}, { model: m.key });
       kb.autoFp = KunAutoBuild.fingerprint(kb.data, kb.meta, m.key);
+      await kbJpReady();
       if (!kb.transit) kb.transit = await kbFetchTransit(kb.data, kb.meta);
       const base = KunAutoBuild.build(kb.data, kb.meta, { transit: kb.transit, model: m.key });
       if (!base.length) throw new Error('कार्ड बनाउन डेटा पर्याप्त छैन।');
@@ -6586,6 +6827,7 @@
       kb.autoOpts = Object.assign({}, opts || {}, { model: modelKey });
       kb.autoFp = KunAutoBuild.fingerprint(kb.data, kb.meta, modelKey);
       kb.baseEls = new Map();
+      await kbJpReady();
       kb.transit = await kbFetchTransit(kb.data, kb.meta);
       const base = KunAutoBuild.build(kb.data, kb.meta, { transit: kb.transit, model: modelKey });
       if (!base.length) throw new Error('कार्ड बनाउन डेटा पर्याप्त छैन।');
@@ -6640,10 +6882,11 @@
     return true;
   }
 
-  function kbAutoReset() {
+  async function kbAutoReset() {
     if (!window.KunAutoBuild) return;
     const modelKey = KunAutoBuild.modelByKey(kb.model || 'cosmic').key;
     kb.autoFp = KunAutoBuild.fingerprint(kb.data, kb.meta, modelKey);
+    await kbJpReady();
     const base = KunAutoBuild.build(kb.data, kb.meta, { transit: kb.transit, model: modelKey });
     if (!base.length) return;
     kbSnap();
@@ -8054,6 +8297,9 @@
       }
       kb.meta = meta;
       try { KUN_META = meta; } catch (e) { }
+      const stPrep = q('st');
+      if (stPrep) stPrep.textContent = 'जन्मपत्रिका (डेस्कटप) पेज तयार हुँदैछ…';
+      await kbJpReady();
       kb.catalog = KunBuilderCatalog.build(data, meta);
       kb.byId = new Map();
       kb.catalog.pages.forEach(p => p.elements.forEach(el => kb.byId.set(el.id, { el: el, page: p })));

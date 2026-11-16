@@ -169,6 +169,65 @@ function proxyKundaliCalculate(req, res) {
   });
 }
 
+function proxyKundaliJanmapatrika(req, res) {
+  const MAX_BODY = 2 * 1024 * 1024;
+  let size = 0, chunks = [], tooLarge = false;
+  req.on("data", chunk => {
+    if (tooLarge) return;
+    size += chunk.length;
+    if (size > MAX_BODY) {
+      tooLarge = true;
+      kundaliJson(res, 413, { error: "Request body too large" });
+      req.destroy();
+      return;
+    }
+    chunks.push(chunk);
+  });
+  req.on("error", () => { if (!res.headersSent) kundaliJson(res, 400, { error: "Request failed" }); });
+  req.on("end", async () => {
+    if (tooLarge) return;
+    const ok = await ensureKundaliBackend();
+    if (!ok) {
+      return kundaliJson(res, 502, { error: "Kundali backend could not be started. Check that Python dependencies are installed in Kundali-Desktop/backend." });
+    }
+    // Drawing the real desktop page with Qt takes longer than a calculation,
+    // especially while the free Render instance is warming up.  Keep this
+    // timeout separate from the calculation proxy.
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 330000);
+    try {
+      const resp = await fetch(KUNDALI_BASE + "/api/janmapatrika/page", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: Buffer.concat(chunks),
+        signal: ctl.signal
+      });
+      clearTimeout(timer);
+      const buf = Buffer.from(await resp.arrayBuffer());
+      if (!resp.ok) {
+        let data = null;
+        try { data = JSON.parse(buf.toString("utf8")); } catch (e) { }
+        return kundaliJson(res, resp.status, data || { error: buf.toString("utf8").slice(0, 1200) || "Janmapatrika render failed" });
+      }
+      res.writeHead(200, {
+        "Content-Type": resp.headers.get("content-type") || "image/png",
+        "Content-Length": buf.length,
+        "Cache-Control": "private, max-age=86400",
+        "X-Janmapatrika-Width": resp.headers.get("x-janmapatrika-width") || "",
+        "X-Janmapatrika-Height": resp.headers.get("x-janmapatrika-height") || ""
+      });
+      res.end(buf);
+    } catch (e) {
+      clearTimeout(timer);
+      kundaliJson(res, 502, {
+        error: e && e.name === "AbortError"
+          ? "Janmapatrika page render timed out."
+          : "Janmapatrika backend unavailable: " + (e && e.message ? e.message : e)
+      });
+    }
+  });
+}
+
 async function proxyKundaliCities(req, res, url) {
   const ok = await ensureKundaliBackend();
   if (!ok) return kundaliJson(res, 502, { error: "Kundali backend could not be started." });
@@ -906,6 +965,11 @@ const server = http.createServer((req, res) => {
 
   if (url.pathname === "/api/tts") {
     serveTts(req, res);
+    return;
+  }
+
+  if (url.pathname === "/api/kundali/janmapatrika" && req.method === "POST") {
+    proxyKundaliJanmapatrika(req, res);
     return;
   }
 

@@ -82,6 +82,7 @@
       fx: ['Neon Glow + Pulse', 'Cyber 3D Charts', 'Dynamic Life Radar']
     }
   };
+  MODELS.nebula = MODELS.modern;
   const MODEL_KEYS = ['cosmic', 'modern'];
 
   /* Playback order — EXACT 12 CARDS SEQUENCE */
@@ -1085,11 +1086,13 @@
   }
 
   function getGenZDashaChapter(data) {
-    const v = activeVim(data);
-    const mLord = v.mahadasha_lord || 'बृहस्पति';
-    const aLord = v.antardasha_lord || 'शनि';
-    const sDate = bsOf(v.start_bs, v.start_date);
-    const eDate = bsOf(v.end_bs, v.end_date);
+    const v = activeVim(data) || [];
+    const md = v.find(x => +x.level === 1) || v[0] || {};
+    const ad = v.find(x => +x.level === 2) || v[1] || {};
+    const mLord = md.lordNe || pName(md.lord) || 'बृहस्पति';
+    const aLord = ad.lordNe || pName(ad.lord) || 'शनि';
+    const sDate = bsOf(md.startBs, md.start) || 'हाल';
+    const eDate = bsOf(md.endBs, md.end) || 'आगामी';
     return {
       lordText: mLord + ' महादशा / ' + aLord + ' अन्तर्दशा',
       dates: sDate + ' देखि ' + eDate + ' सम्म',
@@ -1161,10 +1164,13 @@
         chrome: false,
         autoShift: autoShift,
         dur: 8.2,
+        gap: (extra && extra.gap != null) ? extra.gap : ((MODEL.set && MODEL.set.gap != null) ? MODEL.set.gap : .55),
+        tpl: (extra && extra.tpl) || 'nebula',
         modelKey: 'modern',
-        modelNe: MODEL.ne,
-        tpl: 'nebula',
-        modelDesc: MODEL.desc
+        modelName: MODEL.ne,
+        privacyStyle: (extra && extra.privacyStyle) || '',
+        flow: (extra && extra.flow) || null,
+        set: autoSet('modern')
       };
       items.push(it);
       return it;
@@ -1637,7 +1643,8 @@
       it.autoNo = i + 1;
       it.seq = i;
       it.title = it.title || ('कार्ड ' + (i + 1));
-      it.set = autoSet('nebula');
+      if (it.gap == null) it.gap = (MODEL.set && MODEL.set.gap != null) ? MODEL.set.gap : .55;
+      it.set = it.set || autoSet('modern');
       it.dur = readDuration(it, modelByKey('modern'));
     });
     return items;
@@ -2455,13 +2462,14 @@
   }
 
   function autoSet(tpl) {
-    const m = MODELS[tpl] ? MODELS[tpl] : modelByKey(MODEL.key);
+    const m = (tpl && MODELS[tpl]) ? MODELS[tpl] : (tpl === 'nebula' || tpl === 'modern' ? MODELS.modern : modelByKey(MODEL.key));
+    const s = (m && m.set) || (MODELS.cosmic && MODELS.cosmic.set) || {};
     return {
-      speed: m.set.speed, entry: m.set.entry, anim: 'none', exit: m.set.exit,
-      trans: m.set.trans, depth: m.set.depth, rotX: 0, rotY: 0, scale: 1,
+      speed: s.speed != null ? s.speed : 1, entry: s.entry || 'fade', anim: 'none', exit: s.exit || 'none',
+      trans: s.trans || 'smooth', depth: s.depth != null ? s.depth : 24, rotX: 0, rotY: 0, scale: 1,
       persp: 900, shadow: true, border: false, visible: true, bg: 'glass',
-      align: 'center', pad: 22, radius: m.set.radius, stagger: m.set.stagger,
-      animDur: m.set.animDur
+      align: 'center', pad: 22, radius: s.radius != null ? s.radius : 20, stagger: s.stagger != null ? s.stagger : .08,
+      animDur: s.animDur != null ? s.animDur : .8
     };
   }
 

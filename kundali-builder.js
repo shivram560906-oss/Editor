@@ -5814,7 +5814,9 @@
       const en = it.enabled !== false;
       const elCount = it.els && it.els.length ? it.els.length : 1;
       const label = it.title || it.el.name;
-      const small = it.autoNo ? ('कार्ड ' + neNum(it.autoNo) + ' · ' + elCount + ' तत्व · ' + it.dur.toFixed(1) + 's') : ('पृष्ठ ' + kbNum(it.el.page) + ' · ' + (KB_TYPE_NE[it.el.type] || it.el.type) + ' · ' + it.dur.toFixed(1) + 's + ' + it.gap.toFixed(1) + 's');
+      const durSec = (it.dur != null && !isNaN(it.dur)) ? (+it.dur).toFixed(1) : '8.0';
+      const gapSec = (it.gap != null && !isNaN(it.gap)) ? (+it.gap).toFixed(1) : '0.5';
+      const small = it.autoNo ? ('कार्ड ' + neNum(it.autoNo) + ' · ' + elCount + ' तत्व · ' + durSec + 's') : ('पृष्ठ ' + kbNum(it.el.page) + ' · ' + (KB_TYPE_NE[it.el.type] || it.el.type) + ' · ' + durSec + 's + ' + gapSec + 's');
       h += '<div class="kb-orow' + (on ? ' on' : '') + (en ? '' : ' off') + '" data-row="' + i + '">' +
         '<span class="grip" title="तानेर क्रम बदल्नुहोस्">⠿</span>' +
         '<input class="kb-oen" type="checkbox" data-order-enable="' + i + '"' + (en ? ' checked' : '') + ' title="Enable / disable this card" aria-label="Enable card">' +
@@ -6096,27 +6098,27 @@
       (it.autoNo ? '<div class="kb-field"><label>कार्ड शीर्षक (क्रम सूचीमा)</label><input type="text" data-card-title="1" value="' + kbAttr(it.title || '') + '"></div>' : '') +
       '<div class="kb-field"><label>तत्व</label><div style="font-size:11px;line-height:1.45;padding:6px 7px;border:1px solid var(--kb-line);border-radius:7px;background:var(--kb-panel2)">' + kbEsc(it.el.name) + '<br><span style="color:var(--kb-dim);font-size:9.5px">' + (KB_TYPE_NE[it.el.type] || it.el.type) + ' · पृष्ठ ' + kbNum(it.el.page) + '</span></div></div>' +
       '<div class="kb-grid2" style="margin-top:7px">' +
-      '<div class="kb-field"><label>Display duration (s)</label><input type="number" min="1" max="60" step="0.1" data-item="dur" value="' + it.dur.toFixed(1) + '"></div>' +
-      '<div class="kb-field"><label>Spacing (s)</label><input type="number" min="0" max="4" step="0.1" data-item="gap" value="' + it.gap.toFixed(1) + '"></div>' +
+      '<div class="kb-field"><label>Display duration (s)</label><input type="number" min="1" max="60" step="0.1" data-item="dur" value="' + ((it.dur != null && !isNaN(it.dur)) ? (+it.dur).toFixed(1) : '8.0') + '"></div>' +
+      '<div class="kb-field"><label>Spacing (s)</label><input type="number" min="0" max="4" step="0.1" data-item="gap" value="' + ((it.gap != null && !isNaN(it.gap)) ? (+it.gap).toFixed(1) : '0.5') + '"></div>' +
       '</div>' +
-      '<div class="kb-field" style="margin-top:7px"><label>Animation speed <b data-live="speed">' + s.speed.toFixed(2) + '×</b></label><input type="range" min="0.5" max="2" step="0.05" data-set="speed" value="' + s.speed + '"></div>' +
+      '<div class="kb-field" style="margin-top:7px"><label>Animation speed <b data-live="speed">' + ((s && s.speed != null && !isNaN(s.speed)) ? (+s.speed).toFixed(2) : '1.00') + '×</b></label><input type="range" min="0.5" max="2" step="0.05" data-set="speed" value="' + (s && s.speed != null ? s.speed : 1) + '"></div>' +
       '</div>';
     h += kbPrivacyHTML(it);
     h += '<div class="kb-section"><div class="kb-section-title">एनिमेसन</div><div class="kb-grid2">' +
-      '<div class="kb-field"><label>Entry</label><select data-set="entry">' + kbOpts(KB_ENTRY, s.entry) + '</select></div>' +
-      '<div class="kb-field"><label>Emphasis</label><select data-set="anim">' + kbOpts(KB_ANIM, s.anim) + '</select></div>' +
-      '<div class="kb-field"><label>Exit</label><select data-set="exit">' + kbOpts(KB_EXIT, s.exit) + '</select></div>' +
-      '<div class="kb-field"><label>Transition</label><select data-set="trans">' + kbOpts(KB_TRANS, s.trans) + '</select></div>' +
+      '<div class="kb-field"><label>Entry</label><select data-set="entry">' + kbOpts(KB_ENTRY, (s && s.entry) || 'fade') + '</select></div>' +
+      '<div class="kb-field"><label>Emphasis</label><select data-set="anim">' + kbOpts(KB_ANIM, (s && s.anim) || 'none') + '</select></div>' +
+      '<div class="kb-field"><label>Exit</label><select data-set="exit">' + kbOpts(KB_EXIT, (s && s.exit) || 'none') + '</select></div>' +
+      '<div class="kb-field"><label>Transition</label><select data-set="trans">' + kbOpts(KB_TRANS, (s && s.trans) || 'smooth') + '</select></div>' +
       '</div></div>';
     h += '<div class="kb-section"><div class="kb-section-title">3D + प्रकाश</div>' +
-      '<div class="kb-field"><label>3D depth <b data-live="depth">' + s.depth + '</b></label><input type="range" min="0" max="90" step="1" data-set="depth" value="' + s.depth + '"></div>' +
+      '<div class="kb-field"><label>3D depth <b data-live="depth">' + ((s && s.depth != null) ? s.depth : 24) + '</b></label><input type="range" min="0" max="90" step="1" data-set="depth" value="' + ((s && s.depth != null) ? s.depth : 24) + '"></div>' +
       '<div class="kb-grid2">' +
-      '<div class="kb-field"><label>Rotate X <b data-live="rotX">' + s.rotX + '°</b></label><input type="range" min="-25" max="25" step="1" data-set="rotX" value="' + s.rotX + '"></div>' +
-      '<div class="kb-field"><label>Rotate Y <b data-live="rotY">' + s.rotY + '°</b></label><input type="range" min="-25" max="25" step="1" data-set="rotY" value="' + s.rotY + '"></div>' +
+      '<div class="kb-field"><label>Rotate X <b data-live="rotX">' + ((s && s.rotX != null) ? s.rotX : 0) + '°</b></label><input type="range" min="-25" max="25" step="1" data-set="rotX" value="' + ((s && s.rotX != null) ? s.rotX : 0) + '"></div>' +
+      '<div class="kb-field"><label>Rotate Y <b data-live="rotY">' + ((s && s.rotY != null) ? s.rotY : 0) + '°</b></label><input type="range" min="-25" max="25" step="1" data-set="rotY" value="' + ((s && s.rotY != null) ? s.rotY : 0) + '"></div>' +
       '</div>' +
       '<div class="kb-grid2" style="margin-top:7px">' +
-      '<div class="kb-field"><label>Scale <b data-live="scale">' + s.scale.toFixed(2) + '×</b></label><input type="range" min="0.6" max="1.5" step="0.01" data-set="scale" value="' + s.scale + '"></div>' +
-      '<div class="kb-field"><label>Perspective <b data-live="persp">' + s.persp + '</b></label><input type="range" min="400" max="1600" step="10" data-set="persp" value="' + s.persp + '"></div>' +
+      '<div class="kb-field"><label>Scale <b data-live="scale">' + ((s && s.scale != null && !isNaN(s.scale)) ? (+s.scale).toFixed(2) : '1.00') + '×</b></label><input type="range" min="0.6" max="1.5" step="0.01" data-set="scale" value="' + ((s && s.scale != null) ? s.scale : 1) + '"></div>' +
+      '<div class="kb-field"><label>Perspective <b data-live="persp">' + ((s && s.persp != null) ? s.persp : 900) + '</b></label><input type="range" min="400" max="1600" step="10" data-set="persp" value="' + ((s && s.persp != null) ? s.persp : 900) + '"></div>' +
       '</div>' +
       '<div class="kb-grid2" style="margin-top:7px">' +
       '<label class="kb-check"><input type="checkbox" data-set="shadow"' + (s.shadow ? ' checked' : '') + '> Shadow</label>' +
@@ -6881,7 +6883,9 @@
       if (!base.length) throw new Error('कार्ड बनाउन डेटा पर्याप्त छैन।');
       kb.items = base;
       kb.items.forEach(it => {
-        it.set = KunAutoBuild.set(it.tpl || 'cosmic');
+        if (!it.set) it.set = KunAutoBuild.set(it.tpl || it.modelKey || modelKey);
+        if (it.gap == null || isNaN(it.gap)) it.gap = .55;
+        if (it.dur == null || isNaN(it.dur)) it.dur = 8.2;
         (it.els || []).forEach(e => { if (e.el && e.el.id) kb.baseEls.set(e.el.id, e.el); });
       });
       const lay = kbAutoLoad();
@@ -8134,7 +8138,7 @@
     if (scrub && document.activeElement !== scrub) scrub.value = total ? (t / total) * 1000 : 0;
     const time = q('kb-time'); if (time) time.textContent = kbFmtTime(t) + ' / ' + kbFmtTime(total);
     const info = q('kb-stage-info');
-    if (info) info.textContent = (at.i + 1) + '/' + items.length + ' · ' + (KB_TYPE_NE[scene.el.type] || scene.el.type) + ' · ' + scene.dur.toFixed(1) + 's';
+    if (info) info.textContent = (at.i + 1) + '/' + items.length + ' · ' + (KB_TYPE_NE[scene.el.type] || scene.el.type) + ' · ' + ((scene && scene.dur != null && !isNaN(scene.dur)) ? (+scene.dur).toFixed(1) : '8.0') + 's';
     const nm = q('kb-stage-name');
     if (nm) nm.textContent = kb.tplPreview ? ('टेम्प्लेट प्रिभ्यू · ' + kbTplDef(kb.tplPreview).name) : 'Live 3D preview';
     document.querySelectorAll('#kb-scenes [data-scene]').forEach(b => b.classList.toggle('on', +b.dataset.scene === at.i));

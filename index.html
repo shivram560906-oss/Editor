@@ -8276,13 +8276,13 @@ ${dateLine}
       const [x, y] = cpt(ev);
       const pt = kunPt(x, y);
       if (pt.x >= 35 && pt.x <= 685 && pt.y >= 500 && pt.y <= 620) {
-        const targetClip = clips.find(k => k && k.kun && (String(k.kun.title || '').includes('जन्मपत्रिका') || String(k.kun.title || '').includes('कुण्डली निर्माण')));
+        const targetClip = clips.find(k => k && k.kun && (String(k.kun.title || '').includes('जन्मपत्रिका') || String(k.kun.title || '').includes('कुण्डली निर्माण') || String(k.kun.title || '').includes('लग्न कुण्डली')));
         if (targetClip) {
           cur = targetClip.start + 0.1;
           selC = clips.indexOf(targetClip); selT = 'c';
           if (targetClip.kun) kunExpanded.add(targetClip.id);
           draw(cur); renderTL(); renderEd();
-          $('st').textContent = 'जन्मपत्रिका (कुण्डली निर्माण) कार्ड खोलियो।';
+          $('st').textContent = 'कुण्डली कार्ड खोलियो (' + targetClip.kun.title + ')।';
         }
       }
     });

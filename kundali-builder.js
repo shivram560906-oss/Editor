@@ -6717,11 +6717,12 @@
         '<i class="kbs-orbit o1"></i><i class="kbs-orbit o2"></i><i class="kbs-planet"></i>' +
         '<span class="kbs-card kbs-card-cosmic"><em class="kbs-kicker">COSMIC GOLD</em>' + bars + '</span></span>';
     }
-    if (key === 'nebula') {
+    if (key === 'modern' || key === 'nebula') {
       return '<span class="kbs-scene kbs-nebula">' +
-        '<i class="kbs-blob b1"></i><i class="kbs-blob b2"></i><i class="kbs-blob b3"></i>' +
-        '<span class="kbs-pane p1"></span><span class="kbs-pane p2"></span>' +
-        '<span class="kbs-card kbs-card-nebula"><em class="kbs-kicker">NEBULA GLASS</em>' + bars + '</span></span>';
+        '<i class="kbs-blob b1" style="background:#00f2fe;filter:blur(14px);opacity:.45;"></i>' +
+        '<i class="kbs-blob b2" style="background:#ec4899;filter:blur(18px);opacity:.4;"></i>' +
+        '<span class="kbs-pane p1"></span>' +
+        '<span class="kbs-card kbs-card-nebula" style="border-color:#00f2fe;box-shadow:0 0 15px rgba(0,242,254,.3);"><em class="kbs-kicker" style="color:#00f2fe;">GEN-Z NEON</em>' + bars + '</span></span>';
     }
     if (key === 'vedic') {
       return '<span class="kbs-scene kbs-vedic">' +

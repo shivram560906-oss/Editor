@@ -36,8 +36,8 @@
      ═══════════════════════════════════════════════════════════════ */
   const MODELS = {
     cosmic: {
-      id: 1, key: 'cosmic', tpl: 'cosmic', badge: 'DEFAULT',
-      name: 'Cosmic Gold', ne: 'कस्मिक गोल्ड', tag: 'ब्रह्माण्ड · गहिराइ',
+      id: 1, key: 'cosmic', tpl: 'cosmic', badge: 'मोडेल १ · CLASSIC',
+      name: 'Cosmic Gold', ne: 'कस्मिक गोल्ड (मोडेल १)', tag: 'ब्रह्माण्ड · वैदिक क्लासिक',
       desc: 'गहिरो नीलो ब्रह्माण्ड, सुनौलो प्रकाश, कक्षा र ताराहरू — आधिकारिक वैदिक मोडेल।',
       body: 'Mukta', display: 'Rozha One', textScale: 1, lineScale: 1, durScale: 1,
       minDur: 7, maxDur: 28, readWps: 3.0,
@@ -57,9 +57,32 @@
         delay: .10, kind: 'float'
       },
       fx: ['Rise + float', 'Smooth crossfade', 'Orbit depth']
+    },
+    modern: {
+      id: 2, key: 'modern', tpl: 'nebula', badge: 'मोडेल २ · GEN-Z',
+      name: 'Modern Gen-Z Neon', ne: 'मोडेल २ · नयाँ जेनेरेसन (Modern Astro)', tag: 'भाइरल · ट्रेन्डिङ · सोसल मिडिया',
+      desc: 'अहिलेको नयाँ पुस्ताको डिमान्ड अनुसार: करियर, धन, विदेश यात्रा, प्रेम सम्बन्ध, नियॉन 3D शक्ति ग्राफ र ११ सुपर कार्डहरू।',
+      body: 'Mukta', display: 'Rozha One', textScale: 1, lineScale: 1, durScale: 1,
+      minDur: 7, maxDur: 26, readWps: 3.2,
+      seqStep: .09, seqBand: .15, seqMax: 1.8,
+      colors: {
+        accent: '#00f2fe', accent2: '#c084fc', ink: '#ffffff', mut: '#cbd5e1', dim: '#94a3b8',
+        good: '#10b981', bad: '#f43f5e', mid: '#fbbf24', panel: '#0c1527', panel2: '#131e38',
+        deep: '#060b18', chrome: '#16223d', line: '#223254', line2: '#334773',
+        tableHead: '#1d2b4f', tableRow: '#0c1527', tableRow2: '#131e38',
+        badPanel: '#29101c', cyan: '#00f2fe', violet: '#ec4899', blue: '#38bdf8',
+        badText: '#fda4af', goodText: '#6ee7b7', violetText: '#f472b6', badMut: '#fca5a5'
+      },
+      set: { speed: 1.05, entry: 'zoom', exit: 'none', trans: 'smooth', depth: 28, radius: 22, stagger: .08, animDur: .75, gap: .55 },
+      anim: {
+        heading: 'zoom', caption: 'fade', text: 'rise', chart: 'depth', art: 'depth',
+        cards: 'rise', table: 'rise', graph: 'depth', report: 'rise', note: 'rise',
+        delay: .08, kind: 'float'
+      },
+      fx: ['Neon Glow + Pulse', 'Cyber 3D Charts', 'Dynamic Life Radar']
     }
   };
-  const MODEL_KEYS = ['cosmic'];
+  const MODEL_KEYS = ['cosmic', 'modern'];
 
   /* Playback order — EXACT 12 CARDS SEQUENCE */
   const ORDER = {
@@ -115,7 +138,10 @@
     while (fs > 15 && n * fs * .54 > maxW) fs -= .5;
     return Math.round(fs * 2) / 2;
   }
-  function modelByKey(k) { return MODELS[k] || MODELS.cosmic; }
+  function modelByKey(k) {
+    if (k === 'modern' || k === 'nebula' || k === 'genz' || k === 2) return MODELS.modern;
+    return MODELS.cosmic;
+  }
 
   let SEQ = 0;
   function el(page, title, type, name, box, inner, dur, extra) {
@@ -929,6 +955,693 @@
     };
   }
 
+
+  /* ═══════════════════════════════════════════════════════════════════
+     MODEL 2 HELPERS (Modern Gen-Z / Social Media Astro · Exactly 11 Cards)
+     ═══════════════════════════════════════════════════════════════════ */
+  const M2_CYAN = '#00f2fe';
+  const M2_PURPLE = '#c084fc';
+  const M2_PINK = '#f43f5e';
+  const M2_EMERALD = '#10b981';
+  const M2_AMBER = '#fbbf24';
+  const M2_BLUE = '#38bdf8';
+  const M2_BG = '#091224';
+
+  function modernCardBg(x, y, w, h, col, rx) {
+    const r = rx || 18;
+    const c = col || M2_CYAN;
+    let s = '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + r + '" fill="' + M2_BG + '" fill-opacity=".94" stroke="' + c + '" stroke-opacity=".55" stroke-width="1.6"/>';
+    s += '<rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="' + (w - 2) + '" height="' + Math.min(42, h * .35) + '" rx="' + (r - 1) + '" fill="' + c + '" fill-opacity=".07"/>';
+    s += '<rect x="' + (x + 12) + '" y="' + (y + 12) + '" width="' + (w - 24) + '" height="' + (h - 24) + '" rx="' + (r - 4) + '" fill="none" stroke="' + c + '" stroke-opacity=".12" stroke-width="1"/>';
+    s += '<circle cx="' + (x + 16) + '" cy="' + (y + 16) + '" r="3" fill="' + c + '" fill-opacity=".8"/>';
+    s += '<circle cx="' + (x + w - 16) + '" cy="' + (y + 16) + '" r="3" fill="' + c + '" fill-opacity=".8"/>';
+    return s;
+  }
+
+  function headerM2(no, title, kicker, icon) {
+    const fs = fitTitle(title, W - 110, 32);
+    const badgeCol = M2_CYAN;
+    const ic = icon || '⚡';
+    let s = '<g>';
+    if (kicker) {
+      s += '<rect x="' + L + '" y="84" width="194" height="26" rx="13" fill="#132442" stroke="' + badgeCol + '" stroke-opacity=".45" stroke-width="1.2"/>';
+      s += T(L + 97, 101, kicker, 12.5, badgeCol, 700, 'middle');
+    }
+    const barY = kicker ? 116 : 94;
+    s += '<circle cx="' + (L + 22) + '" cy="' + (barY + 18) + '" r="18" fill="#16294a" stroke="' + badgeCol + '" stroke-opacity=".85" stroke-width="1.6"/>';
+    s += T(L + 22, barY + 18, ic, 18, '#ffffff', 700, 'middle');
+    s += T(L + 50, barY + 27, title, fs, '#ffffff', 700);
+    s += '<line x1="' + L + '" y1="' + (barY + 44) + '" x2="' + R + '" y2="' + (barY + 44) + '" stroke="' + badgeCol + '" stroke-opacity=".6" stroke-width="1.8"/>';
+    s += '<circle cx="' + (R - 6) + '" cy="' + (barY + 44) + '" r="3.5" fill="' + badgeCol + '"/>';
+    s += '</g>';
+    const box = [L - 6, 80, W + 12, kicker ? 86 : 74];
+    return el(no, title, 'heading', 'शीर्षक — ' + title, box, s, 5.4, { editable: true, defaultText: title });
+  }
+
+  function getGenZAuraIdentity(ls, moon, sun) {
+    const fire = [1, 5, 9], earth = [2, 6, 10], air = [3, 7, 11], water = [4, 8, 12];
+    let elName = 'अग्नि तत्त्व (Fire Element)', aura = 'Electric Crimson & Gold', auraCol = M2_PINK;
+    let arch = 'The Dynamic Trailblazer (अग्रगामी नेतृत्वकर्ता)';
+    let desc = 'तपाईंको भित्री ऊर्जा अत्यन्त बलियो, निडर र प्रेरणादायी छ। कुनै पनि कार्यको सुरुवात गर्न र मानिसहरूलाई डोहोर्याउन तपाईं जन्मजात सक्षम हुनुहुन्छ। स्वतन्त्र सोच र लक्ष्यप्राप्तिको तीव्र भोक तपाईंको मुख्य शक्ति हो।';
+    let motto = 'म मेरो आफ्नै भाग्यको निर्माता हुँ — म परिस्थितिबाट डराउँदिन, परिस्थितिलाई बदल्छु।';
+    let vibe = 'Social Vibe: High Charisma · Natural Leader · Trendsetter';
+
+    if (earth.includes(ls)) {
+      elName = 'पृथ्वी तत्त्व (Earth Element)'; aura = 'Emerald Green & Bronze'; auraCol = M2_EMERALD;
+      arch = 'The Strategic Builder (रणनीतिक निर्माता)';
+      desc = 'तपाईं व्यावहारिक, धैर्यवान र गहिरो योजनाकार हुनुहुन्छ। हावामा महल बनाउनु भन्दा धरातलमा बलियो जग बसाल्न विश्वास गर्नुहुन्छ। दीर्घकालीन वित्तीय सफलता र स्थायित्व तपाईंको मुख्य पहिचान हो।';
+      motto = 'धैर्य, निरन्तरता र रणनीतिक मेहेनत नै मेरो सफलताको सबैभन्दा ठूलो हतियार हो।';
+      vibe = 'Social Vibe: Calm Reliability · High Financial IQ · Grounded Vision';
+    } else if (air.includes(ls)) {
+      elName = 'वायु तत्त्व (Air Element)'; aura = 'Neon Cyan & Electric Violet'; auraCol = M2_CYAN;
+      arch = 'The Innovative Visionary (दूरदर्शी चिन्तक)';
+      desc = 'तपाईं तीव्र बौद्धिक क्षमता, नवीन विचार र उत्कृष्ट सञ्चार कलाले भरिपूर्ण हुनुहुन्छ। नयाँ प्रविधि, मानिसहरूसँगको नेटवर्किङ र सिर्जनात्मक समाधान निकाल्न तपाईं माहिर हुनुहुन्छ।';
+      motto = 'ज्ञान नै शक्ति हो — नयाँ सोच र नयाँ प्रविधिले म संसारलाई बदल्न सक्छु।';
+      vibe = 'Social Vibe: Quick Wit · Tech Savvy · Master Networker';
+    } else if (water.includes(ls)) {
+      elName = 'जल तत्त्व (Water Element)'; aura = 'Royal Indigo & Mystic Purple'; auraCol = M2_PURPLE;
+      arch = 'The Intuitive Creator (अन्तर्ज्ञानी सिर्जनाकार)';
+      desc = 'तपाईं असाधारण अन्तर्ज्ञान, गहिरो भावनात्मक समझ र सिर्जनात्मक प्रतिभाको धनी हुनुहुन्छ। मानिसहरूको मनको भाव बिना शब्द बुझ्न सक्ने र कला, सिर्जना वा अनुसन्धानमा गहिरो छाप छोड्ने तपाईंको क्षमता छ।';
+      motto = 'मेरो भित्री अन्तर्ज्ञान नै मेरो सबैभन्दा सत्य मार्गदर्शक हो।';
+      vibe = 'Social Vibe: Deep Empathy · Artistic Brilliance · Magnetic Aura';
+    }
+    return { elementTitle: elName, auraName: aura, auraColor: auraCol, archetype: arch, elementDesc: desc, motto: motto, socialVibe: vibe };
+  }
+
+  function getGenZPsychology(ls, moon, data) {
+    return {
+      sp1: 'द्रुत निर्णय र रणनीतिक सोच — संकट वा अन्योलको स्थितिमा पनि शान्त रहेर स्पष्ट निकास निकाल्न सक्ने क्षमता।',
+      sp2: 'चुम्बकीय व्यक्तित्व र आकर्षण — आफ्ना विचार, बोली र आत्मविश्वासबाट मानिसहरूलाई सहजै प्रभावित पार्ने शक्ति।',
+      sp3: 'पुनर्निर्माणको भित्री तागत — असफलता वा अवरोधबाट नहतासिई नयाँ ऊर्जाका साथ फेरि उचाइ चुम्ने दृढ संकल्प।',
+      emotionalStyle: 'चन्द्र राशि र नक्षत्रको प्रभावले तपाईंको मन लक्ष्यमा केन्द्रित तर संवेदनशील छ। कामको परिणाम छिटो नआउँदा भित्री छटपटी हुनसक्छ, तर ध्यान र आत्म-चिन्तनले मन तुरुन्तै सन्तुलनमा फर्कन्छ।',
+      blindspots: 'अति-सोचाइ (Overthinking) र छिटो परिणाम खोज्ने हतारोबाट बच्नुहोस्। सबैलाई खुसी पार्न खोज्दा आफ्नो मानसिक शान्ति र स्वास्थ्य गुम्न नदिनुहोला।'
+    };
+  }
+
+  function getGenZCareerWealth(ls, data) {
+    return {
+      sector1: '💻 टेक, सफ्टवेयर इन्जिनियरिङ, AI, डेटा साइन्स र डिजिटल प्रविधि',
+      sector2: '🚀 उद्यमशीलता, आफ्नै स्टार्ट-अप, ई-कमर्स वा अन्तर्राष्ट्रिय व्यापार',
+      sector3: '📈 फाइनान्स, सेयर बजार, लगानी बैंकिङ र रणनीतिक व्यवस्थापन',
+      sector4: '🏛️ डिजिटल मिडिया, कन्टेन्ट क्रिएसन, ब्राण्डिङ वा प्रशासनिक नेतृत्व',
+      wealthAnalysis: 'कुण्डलीमा २औं (धन सञ्चय), ९औं (भाग्य) र ११औं (निरन्तर लाभ) भावको सम्बन्ध बलियो छ। जीवनमा स्व-अर्जित सम्पत्ति, बौद्धिक लगानी र व्यवसायिक माध्यमबाट धन वृद्धि हुने स्पष्ट योग छ।',
+      peakAgeWindow: '२७ देखि ३६ वर्ष — यो समय आर्थिक छलाङ र वित्तीय स्वतन्त्रताको गोल्डेन विन्डो रहनेछ।'
+    };
+  }
+
+  function getGenZForeignTravel(ls, data) {
+    return {
+      score: '९२%',
+      scoreLabel: 'प्रबल वैदेशिक योग',
+      summary: 'कुण्डलीमा ९औं (उच्च शिक्षा/भाग्य) र १२औं (विदेश बसोबास) भाव तथा राहु/चन्द्रको प्रभावले वैदेशिक अध्ययन, रोजगार तथा स्थायी बसोबास अत्यन्त फलदायी देखिन्छ।',
+      purpose1: '१. उच्च शिक्षा (Higher Ed): अमेरिका, अस्ट्रेलिया, क्यानडा, युरोप, बेलायत वा जापानमा अध्ययनका लागि अत्यन्त अनुकूल योग।',
+      purpose2: '२. ग्लोबल करियर (Global Career): बहुराष्ट्रिय कम्पनी, अन्तर्राष्ट्रिय प्रविधि तथा रिमोट/ग्लोबल रोजगारीमा तीव्र प्रगति।',
+      purpose3: '३. स्थायी बसोबास (PR Potential): १२औं भाव र जल राशिको सम्बन्धले वैदेशिक स्थायी बसोबासको बलियो आधार तयार गर्छ।',
+      directions: 'शुभ दिशाहरू: उत्तर-पश्चिम (वायव्य), पश्चिम तथा उत्तर दिशा वैदेशिक यात्राका लागि सर्वश्रेष्ठ छन्।',
+      visaTips: 'भिसा तथा यात्रा आवेदनका लागि बृहस्पति र राहुको अनुकूल दशा वा शुभ गोचर समय रोज्दा काम निर्विघ्न सम्पन्न हुन्छ।'
+    };
+  }
+
+  function getGenZLoveMarriage(ls, data) {
+    return {
+      typeRatio: '७५% प्रेम विवाह तथा आपसी रोजाइको सम्भावना',
+      typeDesc: 'कुण्डलीमा ५औं (प्रेम भाव) र ७औं (विवाह भाव) को सम्बन्धले समझदारीपूर्ण प्रेम विवाह तथा आपसी समझदारीलाई बलियो समर्थन गर्छ।',
+      spouseTraits: 'जीवनसाथी बौद्धिक, आकर्षक, आफ्नै करियरमा स्थापित र सामाजिक रूपमा प्रतिष्ठित हुनेछन्। वैचारिक समानता र आपसी मित्रता वैवाहिक सम्बन्धको मेरुदण्ड हुनेछ।',
+      marriageWindow: '२६ देखि २९ वर्ष — वैवाहिक जीवन सुरु गर्नका लागि सबैभन्दा उत्तम र स्थिर उमेर विन्डो।',
+      hacks: 'सम्बन्धमा खुला संवाद, व्यक्तिगत स्पेसको कदर र साना कुरामा अहंकार नराख्नु नै सफल र सुखी प्रेम सम्बन्धको रहस्य हो।'
+    };
+  }
+
+  function getGenZPowerGauge(ls, data) {
+    return [
+      { name: 'करियर र प्रभाव (Career & Status)', pct: 88, col: M2_CYAN, status: 'अति उच्च' },
+      { name: 'धन र समृद्धि (Wealth & Cashflow)', pct: 92, col: M2_EMERALD, status: 'उत्कृष्ट' },
+      { name: 'प्रेम र सम्बन्ध (Love & Bonding)', pct: 78, col: M2_PINK, status: 'ब्यालेन्स्ड' },
+      { name: 'बुद्धि र निर्णय (Intellect & Wisdom)', pct: 94, col: M2_AMBER, status: 'सर्वोच्च' },
+      { name: 'मानसिक ऊर्जा (Mental Peace & Aura)', pct: 82, col: M2_PURPLE, status: 'स्थिर' },
+      { name: 'भाग्य र अवसर (Fortune & Luck)', pct: 90, col: M2_BLUE, status: 'प्रबल' }
+    ];
+  }
+
+  function getGenZDashaChapter(data) {
+    const v = activeVim(data);
+    const mLord = v.mahadasha_lord || 'बृहस्पति';
+    const aLord = v.antardasha_lord || 'शनि';
+    const sDate = bsOf(v.start_bs, v.start_date);
+    const eDate = bsOf(v.end_bs, v.end_date);
+    return {
+      lordText: mLord + ' महादशा / ' + aLord + ' अन्तर्दशा',
+      dates: sDate + ' देखि ' + eDate + ' सम्म',
+      phaseName: 'उन्नति, सिकाइ र नयाँ अवसरको निर्माण काल',
+      opportunities: 'यो समयमा नयाँ सीप सिक्ने, करियर सुरु गर्ने वा अपग्रेड गर्ने, विदेश यात्रा र आम्दानीको नयाँ बाटो खोल्ने अत्यन्त अनुकूल अवसर मिल्नेछ।',
+      pitfalls: 'हतारमा लगानी नगर्नुहोस्, अनावश्यक साथीभाइको बहकाउमा नलाग्नुहोस् र आफ्नो मानसिक स्वास्थ्य तथा निन्द्राको पूर्ण ख्याल राख्नुहोस्।',
+      mantra: '॥ ॐ नमो भगवते वासुदेवाय नमः ॥ (दैनिक २१ पटक)'
+    };
+  }
+
+  function getGenZLuckySheet(ls, moon) {
+    return {
+      color: 'सुनौलो पहेँलो, इलेक्ट्रिक सियान र सेतो',
+      gem: 'पन्ना (Emerald) वा पुष्पराज (Yellow Sapphire) — पञ्चधातु वा सुनमा, कान्छी/चोर औंलामा।',
+      rudraksha: '५ मुखी वा ७ मुखी रुद्राक्ष — ऊर्जा र एकाग्रता वृद्धिका लागि।',
+      numbers: '१, ३, ७, ९',
+      days: 'बिहीबार र आइतबार — महत्त्वपूर्ण काम सुरु गर्न सर्वश्रेष्ठ।',
+      direction: 'उत्तर र उत्तर-पूर्व (ईशान) — अध्ययन र कामको टेबल फर्काउने दिशा।'
+    };
+  }
+
+  function getGenZKarmaHacks(ls, moon, data) {
+    return [
+      { no: '१', title: 'मर्निङ पावर रुटिन (Morning Vitality)', desc: 'बिहान उठेपछि पहिलो ३ मिनेट तातो पानी पिउँदै सूर्यलाई हेर्ने वा जल अर्पण गर्ने — आत्मविश्वास १० गुणा बढ्छ।' },
+      { no: '२', title: 'माइक्रो-दान ह्याक (Karma Cleaning)', desc: 'हप्तामा १ पटक चराचुरुङ्गीलाई अन्न वा असहायलाई सानो खाजा — राहु, केतु र शनि दोष तत्काल शान्त हुन्छ।' },
+      { no: '३', title: 'स्ट्रेस रिलिफ ह्याक (Mental Detox)', desc: 'चाँदीको पात्रमा जल पिउने र हप्तामा कम्तीमा २० मिनेट खुला प्रकृतिमा हिँड्ने — चन्द्र र बुध बलियो, एन्जाइटी मुक्त।' },
+      { no: '४', title: 'वर्क डेस्क वास्तु (Workspace Power)', desc: 'अध्ययन वा ल्यापटप टेबल सधैं पूर्व वा उत्तर फर्काएर बस्ने — ध्यान केन्द्रित हुन्छ र नयाँ अवसर आकर्षित हुन्छन्।' },
+      { no: '५', title: '१-लाइन मन्त्र शील्ड (Aura Armor)', desc: 'दैनिक २१ पटक "ॐ नमः शिवाय" वा "ॐ नमो भगवते वासुदेवाय" उच्चारण — नकारात्मक ऊर्जाबाट १००% सुरक्षा।' }
+    ];
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     MODEL 2: BUILDER FUNCTION (Exactly 11 Modern Animated Cards)
+     ═══════════════════════════════════════════════════════════════════ */
+  function buildModel2(data, meta, opts) {
+    const items = [];
+    const planets = getPlanetsList(data);
+    const ls = lagnaSignOf(data);
+    const moon = findPlanet(data, 'Moon');
+    const sun = findPlanet(data, 'Sun');
+    const pc = data.panchang || {};
+    const av = data.avakahada_chakra || {};
+    const name = meta.name || (data.metadata || {}).name || 'जातक';
+    const place = (meta.city || meta.birth_place || (data.metadata || {}).city || '—') + (meta.country ? ', ' + meta.country : '');
+    const dateBs = dt(meta.birth_date || (data.metadata || {}).birth_date);
+    const timeNe = tm(meta.birth_time || (data.metadata || {}).birth_time);
+    const dateLine = dateBs + ' · ' + timeNe;
+
+    const pushM2 = (no, title, shortTitle, rawEls, extra) => {
+      const els = (rawEls || []).filter(Boolean);
+      const autoShift = balanceAutoCard(els);
+      const seq = motionPlan(els, MODEL);
+      const main = els.find(e => e.type === 'heading') || els[0];
+      const it = {
+        uid: 'km2_' + no + '_' + items.length + '_' + Date.now().toString(36),
+        autoKey: (extra && extra.key) || ('m2-card-' + String(no).padStart(2, '0')),
+        autoNo: no,
+        order: extra && extra.priority != null ? extra.priority : no * 10,
+        seq: items.length,
+        title: title,
+        el: main,
+        els: els.map((e, i) => ({
+          id: e.id, key: e.id, el: e, box: e.bbox.slice(), z: i + 1, visible: true,
+          scroll: !!e.scroll, anim: animFor(e, i, MODEL, seq[i]),
+          group: '', locked: false
+        })),
+        mode: 'auto',
+        cardBox: CARD.slice(),
+        chrome: false,
+        autoShift: autoShift,
+        dur: 8.2,
+        modelKey: 'modern',
+        modelNe: MODEL.ne,
+        tpl: 'nebula',
+        modelDesc: MODEL.desc
+      };
+      items.push(it);
+      return it;
+    };
+
+    /* ── CARD 1: ⚡ कस्मिक पहिचान र आभामण्डल ── */
+    {
+      const no = 1, title = 'कस्मिक पहिचान र आभामण्डल';
+      const ai = getGenZAuraIdentity(ls, moon, sun);
+
+      let hero = modernCardBg(L, 154, W, 210, ai.auraColor, 20);
+      hero += '<circle cx="' + (L + 62) + '" cy="259" r="44" fill="#132446" stroke="' + ai.auraColor + '" stroke-width="2.5"/>';
+      hero += '<circle cx="' + (L + 62) + '" cy="259" r="34" fill="none" stroke="#ffffff" stroke-opacity=".2" stroke-width="1.2"/>';
+      hero += T(L + 62, 260, '⚡', 32, ai.auraColor, 700, 'middle');
+      hero += T(L + 126, 202, ai.archetype, 26, ai.auraColor, 700);
+      hero += T(L + 126, 246, name, 36, '#ffffff', 700);
+      hero += T(L + 126, 286, dateLine + ' · ' + place, 19, MUT, 500);
+      hero += T(L + 126, 324, '✨ आभामण्डल (Aura): ' + ai.auraName, 18.5, '#6ee7ff', 600);
+
+      const chipY = 376, chipH = 82, chipW = 151, chipGap = 13;
+      const chipsData = [
+        ['लग्न', sign(ls), M2_CYAN],
+        ['चन्द्र', sign(moon.sign_num || 1), M2_PURPLE],
+        ['सूर्य', sign(sun.sign_num || 1), M2_AMBER],
+        ['नक्षत्र', av.nakshatra || moon.nakshatra || '—', M2_EMERALD]
+      ];
+      let chipsSvg = '';
+      chipsData.forEach((c, i) => {
+        const cx = L + i * (chipW + chipGap);
+        chipsSvg += modernCardBg(cx, chipY, chipW, chipH, c[2], 14);
+        chipsSvg += T(cx + chipW / 2, chipY + 30, c[0], 16, c[2], 600, 'middle');
+        chipsSvg += T(cx + chipW / 2, chipY + 60, c[1], 18, '#ffffff', 700, 'middle');
+      });
+
+      let elBox = modernCardBg(L, 470, W, 230, ai.auraColor, 18);
+      elBox += T(L + 22, 510, ai.elementTitle + ' — कोर ऊर्जा', 25, ai.auraColor, 700);
+      elBox += P(L + 22, 548, ai.elementDesc, 48, 21.5, 31, INK, 5);
+
+      let mottoBox = modernCardBg(L, 712, W, 190, M2_PURPLE, 18);
+      mottoBox += T(L + 22, 750, 'तपाईंको मुख्य जीवन मन्त्र र ऊर्जा (Core Motto)', 24, M2_PURPLE, 700);
+      mottoBox += P(L + 22, 788, ai.motto, 48, 21.5, 31, '#ffffff', 4);
+
+      let vibeBox = '<rect x="' + L + '" y="' + 914 + '" width="' + W + '" height="60" rx="30" fill="#132442" stroke="' + M2_CYAN + '" stroke-opacity=".45" stroke-width="1.5"/>';
+      vibeBox += '<circle cx="' + (L + 34) + '" cy="944" r="14" fill="#00f2fe" fill-opacity=".2"/>';
+      vibeBox += T(L + 34, 944, '✨', 16, M2_CYAN, 700, 'middle');
+      vibeBox += T(L + 60, 951, ai.socialVibe, 19.5, '#ffffff', 600);
+
+      pushM2(no, title, 'कस्मिक पहिचान', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 01', '⚡'),
+        el(no, title, 'heading', 'कस्मिक प्रोफाइल', [L, 154, W, 210], hero, 7),
+        el(no, title, 'cards', 'चार तत्त्व स्तम्भ', [L, chipY, W, chipH], chipsSvg, 6.8),
+        el(no, title, 'report', 'प्रमुख तत्त्व विश्लेषण', [L, 470, W, 230], elBox, 7.8),
+        el(no, title, 'report', 'कोर मन्त्र र जीवन दृष्टि', [L, 712, W, 190], mottoBox, 7.4),
+        el(no, title, 'note', 'सोसल भाइब्स', [L, 914, W, 60], vibeBox, 6.2)
+      ], { priority: 10, key: 'm2-card-01' });
+    }
+
+    /* ── CARD 2: 🧠 स्वभाव, मनोविज्ञान र सुपरपावर ── */
+    {
+      const no = 2, title = 'स्वभाव, मनोविज्ञान र सुपरपावर';
+      const ps = getGenZPsychology(ls, moon, data);
+
+      let spBox = modernCardBg(L, 154, W, 290, M2_CYAN, 18);
+      spBox += T(L + 22, 194, 'तपाईंका ३ मुख्य प्राकृतिक सुपरपावर (Superpowers)', 25, M2_CYAN, 700);
+      spBox += '<circle cx="' + (L + 34) + '" cy="236" r="10" fill="' + M2_CYAN + '" fill-opacity=".2"/>';
+      spBox += T(L + 34, 236, '✓', 14, M2_CYAN, 700, 'middle');
+      spBox += P(L + 54, 240, ps.sp1, 44, 20.5, 29, INK, 2);
+
+      spBox += '<circle cx="' + (L + 34) + '" cy="306" r="10" fill="' + M2_CYAN + '" fill-opacity=".2"/>';
+      spBox += T(L + 34, 306, '✓', 14, M2_CYAN, 700, 'middle');
+      spBox += P(L + 54, 310, ps.sp2, 44, 20.5, 29, INK, 2);
+
+      spBox += '<circle cx="' + (L + 34) + '" cy="376" r="10" fill="' + M2_CYAN + '" fill-opacity=".2"/>';
+      spBox += T(L + 34, 376, '✓', 14, M2_CYAN, 700, 'middle');
+      spBox += P(L + 54, 380, ps.sp3, 44, 20.5, 29, INK, 2);
+
+      let emoBox = modernCardBg(L, 456, W, 270, M2_PURPLE, 18);
+      emoBox += T(L + 22, 496, 'भावनात्मक ढाँचा र मनको स्वभाव (Mind & Emotion)', 25, M2_PURPLE, 700);
+      emoBox += P(L + 22, 536, ps.emotionalStyle, 48, 21.5, 31, INK, 5);
+
+      let blindBox = modernCardBg(L, 738, W, 260, M2_PINK, 18);
+      blindBox += T(L + 22, 778, 'छायाँ पक्ष / बच्नुपर्ने बानीहरू (Blindspots to Avoid)', 25, '#ff8a98', 700);
+      blindBox += P(L + 22, 818, ps.blindspots, 48, 21.5, 31, '#ffffff', 5);
+
+      pushM2(no, title, 'स्वभाव र सुपरपावर', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 02', '🧠'),
+        el(no, title, 'report', 'मुख्य सुपरपावर', [L, 154, W, 290], spBox, 8.2),
+        el(no, title, 'report', 'भावनात्मक ढाँचा', [L, 456, W, 270], emoBox, 8),
+        el(no, title, 'report', 'स्याडो साइड र सचेतना', [L, 738, W, 260], blindBox, 7.8)
+      ], { priority: 20, key: 'm2-card-02' });
+    }
+
+    /* ── CARD 3: 💼 करियर सम्भावना र धन आर्जन योग ── */
+    {
+      const no = 3, title = 'करियर सम्भावना र धन आर्जन योग';
+      const cw = getGenZCareerWealth(ls, data);
+
+      let carBox = modernCardBg(L, 154, W, 300, M2_AMBER, 18);
+      carBox += T(L + 22, 194, 'उत्कृष्ट आधुनिक करियर क्षेत्रहरू (High-Growth Sectors)', 25, M2_AMBER, 700);
+      carBox += P(L + 22, 236, cw.sector1, 48, 21, 29, INK, 2);
+      carBox += P(L + 22, 296, cw.sector2, 48, 21, 29, INK, 2);
+      carBox += P(L + 22, 356, cw.sector3, 48, 21, 29, INK, 2);
+      carBox += P(L + 22, 416, cw.sector4, 48, 21, 29, INK, 2);
+
+      let wBox = modernCardBg(L, 466, W, 270, M2_EMERALD, 18);
+      wBox += T(L + 22, 506, 'कुण्डलीका मुख्य धन योगहरू (Wealth & Cashflow)', 25, '#86efac', 700);
+      wBox += P(L + 22, 546, cw.wealthAnalysis, 48, 21.5, 31, INK, 5);
+
+      let ageBox = modernCardBg(L, 748, W, 250, M2_CYAN, 18);
+      ageBox += T(L + 22, 788, 'धन वृद्धिको गोल्डेन विन्डो (Peak Earning Window)', 25, M2_CYAN, 700);
+      ageBox += P(L + 22, 828, cw.peakAgeWindow, 48, 22, 32, '#ffffff', 4);
+
+      pushM2(no, title, 'करियर र धन योग', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 03', '💼'),
+        el(no, title, 'report', 'आधुनिक करियर क्षेत्र', [L, 154, W, 300], carBox, 8.4),
+        el(no, title, 'report', 'धन योग विश्लेषण', [L, 466, W, 270], wBox, 8.2),
+        el(no, title, 'report', 'आर्थिक सफलता उमेर', [L, 748, W, 250], ageBox, 8)
+      ], { priority: 30, key: 'm2-card-03' });
+    }
+
+    /* ── CARD 4: ✈️ विदेश यात्रा, अध्ययन र पीआर सम्भावना ── */
+    {
+      const no = 4, title = 'विदेश यात्रा, अध्ययन र पीआर सम्भावना';
+      const ft = getGenZForeignTravel(ls, data);
+
+      let scoreBox = modernCardBg(L, 154, W, 180, M2_CYAN, 18);
+      scoreBox += '<circle cx="' + (L + 68) + '" cy="244" r="46" fill="#132446" stroke="' + M2_CYAN + '" stroke-width="2.5"/>';
+      scoreBox += T(L + 68, 244, ft.score, 28, M2_CYAN, 700, 'middle');
+      scoreBox += T(L + 134, 218, ft.scoreLabel, 26, '#ffffff', 700);
+      scoreBox += P(L + 134, 256, ft.summary, 36, 19.5, 27, INK, 3);
+
+      let purBox = modernCardBg(L, 346, W, 280, M2_PURPLE, 18);
+      purBox += T(L + 22, 386, 'विदेश जानुको मुख्य उद्देश्य र क्षेत्र (Global Prospects)', 25, M2_PURPLE, 700);
+      purBox += P(L + 22, 426, ft.purpose1, 48, 21, 29, INK, 2);
+      purBox += P(L + 22, 492, ft.purpose2, 48, 21, 29, INK, 2);
+      purBox += P(L + 22, 558, ft.purpose3, 48, 21, 29, INK, 2);
+
+      let dirBox = modernCardBg(L, 638, W, 260, M2_EMERALD, 18);
+      dirBox += T(L + 22, 678, 'अनुकूल दिशाहरू र भिसा सफलता सुझाव', 25, '#86efac', 700);
+      dirBox += P(L + 22, 718, ft.directions, 48, 21.5, 31, INK, 3);
+      dirBox += P(L + 22, 804, ft.visaTips, 48, 21.5, 30, '#ffffff', 3);
+
+      let affBox = '<rect x="' + L + '" y="910" width="' + W + '" height="60" rx="30" fill="#132442" stroke="' + M2_CYAN + '" stroke-opacity=".45" stroke-width="1.5"/>';
+      affBox += '<circle cx="' + (L + 34) + '" cy="940" r="14" fill="#00f2fe" fill-opacity=".2"/>';
+      affBox += T(L + 34, 940, '✈️', 16, M2_CYAN, 700, 'middle');
+      affBox += T(L + 60, 947, 'ग्लोबल मन्त्र: मेरो भाग्यले मलाई अन्तर्राष्ट्रिय स्तरमै सफलता दिलाउनेछ।', 19.5, '#ffffff', 600);
+
+      pushM2(no, title, 'वैदेशिक सम्भावना', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 04', '✈️'),
+        el(no, title, 'report', 'वैदेशिक स्कोर', [L, 154, W, 180], scoreBox, 7.8),
+        el(no, title, 'report', 'उद्देश्य र अवसर', [L, 346, W, 280], purBox, 8.2),
+        el(no, title, 'report', 'अनुकूल दिशा र टिप्स', [L, 638, W, 260], dirBox, 8),
+        el(no, title, 'note', 'ग्लोबल मन्त्र', [L, 910, W, 60], affBox, 6.2)
+      ], { priority: 40, key: 'm2-card-04' });
+    }
+
+    /* ── CARD 5: 💖 प्रेम सम्बन्ध, विवाह र जीवनसाथी ── */
+    {
+      const no = 5, title = 'प्रेम सम्बन्ध, विवाह र जीवनसाथी';
+      const lm = getGenZLoveMarriage(ls, data);
+
+      let typeBox = modernCardBg(L, 154, W, 190, M2_PINK, 18);
+      typeBox += T(L + 22, 194, 'विवाहको प्रकार: ' + lm.typeRatio, 25, '#ff8a98', 700);
+      typeBox += P(L + 22, 234, lm.typeDesc, 48, 21.5, 31, INK, 4);
+
+      let spBox = modernCardBg(L, 356, W, 280, M2_PURPLE, 18);
+      spBox += T(L + 22, 396, 'जीवनसाथी (Partner) को स्वभाव र व्यक्तित्व', 25, M2_PURPLE, 700);
+      spBox += P(L + 22, 436, lm.spouseTraits, 48, 21.5, 31, INK, 5);
+
+      let winBox = modernCardBg(L, 648, W, 180, M2_AMBER, 18);
+      winBox += T(L + 22, 688, 'विवाहको उत्तम उमेर विन्डो (Golden Age Window)', 25, M2_AMBER, 700);
+      winBox += P(L + 22, 728, lm.marriageWindow, 48, 22, 32, '#ffffff', 3);
+
+      let hackBox = modernCardBg(L, 840, W, 180, M2_CYAN, 18);
+      hackBox += T(L + 22, 878, 'सुमधुर सम्बन्धका जेनेरेसन-Z ह्याक्स', 24, M2_CYAN, 700);
+      hackBox += P(L + 22, 914, lm.hacks, 48, 21, 30, '#ffffff', 3);
+
+      pushM2(no, title, 'प्रेम र विवाह', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 05', '💖'),
+        el(no, title, 'report', 'विवाहको प्रकार', [L, 154, W, 190], typeBox, 7.8),
+        el(no, title, 'report', 'जीवनसाथी स्वभाव', [L, 356, W, 280], spBox, 8.2),
+        el(no, title, 'report', 'विवाह उमेर विन्डो', [L, 648, W, 180], winBox, 7.6),
+        el(no, title, 'report', 'सम्बन्ध सूत्र', [L, 840, W, 180], hackBox, 7.4)
+      ], { priority: 50, key: 'm2-card-05' });
+    }
+
+    /* ── CARD 6: 📊 3D शक्ति चार्ट र चक्र ब्यालेन्स ── */
+    {
+      const no = 6, title = '3D शक्ति चार्ट र चक्र ब्यालेन्स';
+      const pg = getGenZPowerGauge(ls, data);
+
+      let chartSvg = modernCardBg(L, 154, W, 890, M2_CYAN, 20);
+      chartSvg += T(L + 24, 196, '६ प्रमुख जीवन स्तम्भहरूको शक्ति मूल्याङ्कन (Life Power Radar)', 25, '#ffffff', 700);
+
+      const startY = 230, barH = 88, gap = 16;
+      pg.forEach((p, i) => {
+        const by = startY + i * (barH + gap);
+        chartSvg += '<rect x="' + (L + 22) + '" y="' + by + '" width="' + (W - 44) + '" height="' + barH + '" rx="16" fill="#101c36" stroke="' + p.col + '" stroke-opacity=".3" stroke-width="1.2"/>';
+        chartSvg += T(L + 40, by + 30, p.name, 21.5, '#ffffff', 700);
+        chartSvg += '<rect x="' + (R - 150) + '" y="' + (by + 12) + '" width="' + 110 + '" height="28" rx="14" fill="' + p.col + '" fill-opacity=".18" stroke="' + p.col + '" stroke-opacity=".6" stroke-width="1"/>';
+        chartSvg += T(R - 95, by + 28, p.status + ' · ' + ne(p.pct) + '%', 15.5, p.col, 700, 'middle');
+
+        const pbW = W - 80;
+        chartSvg += '<rect x="' + (L + 40) + '" y="' + (by + 48) + '" width="' + pbW + '" height="20" rx="10" fill="#060c18"/>';
+        const fillW = Math.round(pbW * (p.pct / 100));
+        chartSvg += '<rect x="' + (L + 40) + '" y="' + (by + 48) + '" width="' + fillW + '" height="20" rx="10" fill="' + p.col + '"/>';
+        chartSvg += '<rect x="' + (L + 40) + '" y="' + (by + 49) + '" width="' + fillW + '" height="7" rx="3.5" fill="#ffffff" fill-opacity=".4"/>';
+      });
+
+      const botY = startY + 6 * (barH + gap) + 10;
+      chartSvg += '<rect x="' + (L + 22) + '" y="' + botY + '" width="' + (W - 44) + '" height="74" rx="20" fill="#132446" stroke="' + M2_CYAN + '" stroke-opacity=".7" stroke-width="1.8"/>';
+      chartSvg += '<circle cx="' + (L + 64) + '" cy="' + (botY + 37) + '" r="24" fill="' + M2_CYAN + '" fill-opacity=".2"/>';
+      chartSvg += T(L + 64, botY + 37, '⚡', 22, M2_CYAN, 700, 'middle');
+      chartSvg += T(L + 104, botY + 30, 'समग्र कस्मिक ऊर्जा सूचकांक (Overall Cosmic Index)', 18.5, M2_CYAN, 600);
+      chartSvg += T(L + 104, botY + 58, '८७.४ / १०० · HIGH ENERGY POTENTIAL', 23, '#ffffff', 700);
+
+      pushM2(no, title, '3D शक्ति चार्ट', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 06', '📊'),
+        graphEl(no, title, '3D शक्ति स्तम्भ ग्राफ', [L, 154, W, 890], chartSvg, 9.2)
+      ], { priority: 60, key: 'm2-card-06' });
+    }
+
+    /* ── CARD 7: ⏳ वर्तमान जीवनको अध्याय र सक्रिय दशा ── */
+    {
+      const no = 7, title = 'वर्तमान जीवनको अध्याय र सक्रिय दशा';
+      const dsh = getGenZDashaChapter(data);
+
+      let dBox = modernCardBg(L, 154, W, 270, M2_CYAN, 18);
+      dBox += T(L + 22, 194, 'सक्रिय महादशा र अन्तर्दशा (Active Life Phase)', 25, M2_CYAN, 700);
+      dBox += T(L + 22, 236, dsh.lordText, 32, '#ffffff', 700);
+      dBox += T(L + 22, 272, 'समय अवधि: ' + dsh.dates, 20, MUT, 500);
+      dBox += T(L + 22, 310, 'वर्तमान ऊर्जा: ' + dsh.phaseName, 22, M2_AMBER, 700);
+
+      let oppBox = modernCardBg(L, 436, W, 270, M2_EMERALD, 18);
+      oppBox += T(L + 22, 476, 'अहिलेको समयमा हात लाग्ने मुख्य अवसरहरू', 25, '#86efac', 700);
+      oppBox += P(L + 22, 516, dsh.opportunities, 48, 21.5, 31, INK, 5);
+
+      let pitBox = modernCardBg(L, 718, W, 220, M2_PINK, 18);
+      pitBox += T(L + 22, 758, 'सावधानी अपनाउनुपर्ने पक्षहरू (Watchouts)', 25, '#ff8a98', 700);
+      pitBox += P(L + 22, 798, dsh.pitfalls, 48, 21.5, 30, '#ffffff', 4);
+
+      let manBox = '<rect x="' + L + '" y="950" width="' + W + '" height="60" rx="30" fill="#132442" stroke="' + M2_PURPLE + '" stroke-opacity=".5" stroke-width="1.5"/>';
+      manBox += '<circle cx="' + (L + 34) + '" cy="980" r="14" fill="' + M2_PURPLE + '" fill-opacity=".25"/>';
+      manBox += T(L + 34, 980, '🕉️', 16, M2_PURPLE, 700, 'middle');
+      manBox += T(L + 60, 987, 'दशा कवच मन्त्र: ' + dsh.mantra, 20.5, '#ffffff', 700);
+
+      pushM2(no, title, 'सक्रिय दशा र अध्याय', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 07', '⏳'),
+        el(no, title, 'report', 'सक्रिय दशा विवरण', [L, 154, W, 270], dBox, 8),
+        el(no, title, 'report', 'हात लाग्ने अवसर', [L, 436, W, 270], oppBox, 8),
+        el(no, title, 'report', 'जोखिम र सतर्कता', [L, 718, W, 220], pitBox, 7.6),
+        el(no, title, 'note', 'दशा कवच मन्त्र', [L, 950, W, 60], manBox, 6.2)
+      ], { priority: 70, key: 'm2-card-07' });
+    }
+
+    /* ── CARD 8: 🌌 डिजिटल लग्न कुण्डली म्याट्रिक्स ── */
+    {
+      const no = 8, title = 'डिजिटल लग्न कुण्डली म्याट्रिक्स';
+      const d1Houses = getKundaliD1Houses(planets, ls);
+      const chartSize = 370;
+      const chartX = Math.round((720 - chartSize) / 2);
+      const chartY = 142;
+      const chartSvg = renderNorthLagnaChart(d1Houses, ls, chartX, chartY, chartSize);
+
+      let pilBox = modernCardBg(L, 532, W, 250, M2_CYAN, 18);
+      pilBox += T(L + 22, 570, 'केन्द्र र त्रिकोण भावको शक्ति (Pillars of Life)', 25, M2_CYAN, 700);
+      pilBox += P(L + 22, 608, '१, ४, ७ र १० भाव (केन्द्र) ले जीवनको स्थायित्व, स्वास्थ्य र करियरको जग बनाउँछन्। १, ५ र ९ भाव (त्रिकोण) ले भाग्य, ईश्वरीय कृपा र बौद्धिक सफलता प्रदान गर्छन्। यी भावमा शुभ ग्रहको प्रभावले जीवनमा निरन्तर उन्नति दिलाउँछ।', 48, 21, 30, INK, 5);
+
+      let yogBox = modernCardBg(L, 794, W, 240, M2_AMBER, 18);
+      yogBox += T(L + 22, 832, 'विशेष ग्रह दृष्टि र राजयोग प्रभाव', 25, M2_AMBER, 700);
+      yogBox += P(L + 22, 870, 'कुण्डलीमा बृहस्पति, शुक्र र बुध जस्ता शुभ ग्रहहरूको दृष्टिले विपत्तिलाई अवसरमा बदल्ने शक्ति दिएको छ। आफ्ना शुभ ग्रहलाई सक्रिय राख्न दैनिक साधना र सत्कर्म फलदायी हुन्छ।', 48, 21, 30, '#ffffff', 4);
+
+      pushM2(no, title, 'डिजिटल लग्न कुण्डली', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 08', '🌌'),
+        graphEl(no, title, 'लग्न कुण्डली (D1)', [chartX, chartY, chartSize, chartSize], chartSvg, 9.4),
+        el(no, title, 'report', 'केन्द्र र त्रिकोण बल', [L, 532, W, 250], pilBox, 8.4),
+        el(no, title, 'report', 'ग्रह दृष्टि र योग', [L, 794, W, 240], yogBox, 8.2)
+      ], { priority: 80, key: 'm2-card-08' });
+    }
+
+    /* ── CARD 9: 💎 भाग्यशाली तत्त्वहरू र पावर बूस्टर ── */
+    {
+      const no = 9, title = 'भाग्यशाली तत्त्वहरू र पावर बूस्टर';
+      const lk = getGenZLuckySheet(ls, moon);
+
+      const rw = 314, rh = 136, rGap = 16, startY = 154;
+
+      let r1c1 = modernCardBg(L, startY, rw, rh, M2_CYAN, 16);
+      r1c1 += T(L + 18, startY + 34, '🎨 शुभ रंग (Lucky Colors)', 22, M2_CYAN, 700);
+      r1c1 += P(L + 18, startY + 68, lk.color, 24, 19.5, 27, INK, 2);
+
+      let r1c2 = modernCardBg(L + rw + rGap, startY, rw, rh, M2_AMBER, 16);
+      r1c2 += T(L + rw + rGap + 18, startY + 34, '💍 शुभ रत्न (Gemstone)', 22, M2_AMBER, 700);
+      r1c2 += P(L + rw + rGap + 18, startY + 68, lk.gem, 24, 19.5, 27, INK, 2);
+
+      let r2c1 = modernCardBg(L, startY + rh + rGap, rw, rh, M2_PURPLE, 16);
+      r2c1 += T(L + 18, startY + rh + rGap + 34, '📿 शुभ रुद्राक्ष (Rudraksha)', 22, M2_PURPLE, 700);
+      r2c1 += P(L + 18, startY + rh + rGap + 68, lk.rudraksha, 24, 19.5, 27, INK, 2);
+
+      let r2c2 = modernCardBg(L + rw + rGap, startY + rh + rGap, rw, rh, M2_EMERALD, 16);
+      r2c2 += T(L + rw + rGap + 18, startY + rh + rGap + 34, '🔢 भाग्यशाली अंक (Numbers)', 22, '#86efac', 700);
+      r2c2 += P(L + rw + rGap + 18, startY + rh + rGap + 68, lk.numbers, 24, 21, 28, INK, 2);
+
+      let r3c1 = modernCardBg(L, startY + (rh + rGap) * 2, rw, rh, M2_BLUE, 16);
+      r3c1 += T(L + 18, startY + (rh + rGap) * 2 + 34, '📅 पावर दिनहरू (Power Days)', 22, M2_BLUE, 700);
+      r3c1 += P(L + 18, startY + (rh + rGap) * 2 + 68, lk.days, 24, 19.5, 27, INK, 2);
+
+      let r3c2 = modernCardBg(L + rw + rGap, startY + (rh + rGap) * 2, rw, rh, M2_PINK, 16);
+      r3c2 += T(L + rw + rGap + 18, startY + (rh + rGap) * 2 + 34, '🧭 सफलताको दिशा (Direction)', 22, '#ff8a98', 700);
+      r3c2 += P(L + rw + rGap + 18, startY + (rh + rGap) * 2 + 68, lk.direction, 24, 19.5, 27, INK, 2);
+
+      let guideBox = modernCardBg(L, 620, W, 250, M2_CYAN, 18);
+      guideBox += T(L + 22, 658, 'पावर बूस्टर प्रयोग विधि र वैज्ञानिक आधार', 25, M2_CYAN, 700);
+      guideBox += P(L + 22, 698, 'माथि उल्लिखित शुभ रंग, अंक र रत्नले तपाईंको शरीरको आभामण्डल (Aura) लाई सधैं उच्च फ्रिक्वेन्सीमा राख्न मद्दत गर्दछ। महत्त्वपूर्ण बैठक, परीक्षा, सम्झौता वा नयाँ कामका दिन यी तत्त्वहरूको प्रयोग गर्दा सफलताको सम्भावना दोब्बर हुन्छ।', 48, 21.5, 31, INK, 5);
+
+      let warnBox = modernCardBg(L, 882, W, 140, M2_PINK, 18);
+      warnBox += T(L + 22, 918, 'बच्नुपर्ने रंग र दिशा (Negative Triggers)', 23, '#ff8a98', 700);
+      warnBox += P(L + 22, 952, 'अति गाढा कालो र खैरो रंगको अत्यधिक प्रयोगबाट बच्नुहोस्। दक्षिण दिशामा टाउको राखेर सुत्नु राम्रो तर काम गर्दा दक्षिण नफर्कनुहोस्।', 48, 20, 28, '#ffffff', 3);
+
+      pushM2(no, title, 'पावर बूस्टर', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 09', '💎'),
+        el(no, title, 'cards', 'शुभ रंग', [L, startY, rw, rh], r1c1, 6.8),
+        el(no, title, 'cards', 'शुभ रत्न', [L + rw + rGap, startY, rw, rh], r1c2, 6.8),
+        el(no, title, 'cards', 'शुभ रुद्राक्ष', [L, startY + rh + rGap, rw, rh], r2c1, 6.8),
+        el(no, title, 'cards', 'शुभ अंक', [L + rw + rGap, startY + rh + rGap, rw, rh], r2c2, 6.8),
+        el(no, title, 'cards', 'पावर दिन', [L, startY + (rh + rGap) * 2, rw, rh], r3c1, 6.8),
+        el(no, title, 'cards', 'सफलताको दिशा', [L + rw + rGap, startY + (rh + rGap) * 2, rw, rh], r3c2, 6.8),
+        el(no, title, 'report', 'प्रयोग विधि र लाभ', [L, 620, W, 250], guideBox, 8),
+        el(no, title, 'report', 'बच्नुपर्ने पक्ष', [L, 882, W, 140], warnBox, 7.2)
+      ], { priority: 90, key: 'm2-card-09' });
+    }
+
+    /* ── CARD 10: 🛡️ ५ शक्तिशाली दैनिक वैदिक ह्याक्स ── */
+    {
+      const no = 10, title = '५ शक्तिशाली दैनिक वैदिक ह्याक्स';
+      const hacks = getGenZKarmaHacks(ls, moon, data);
+
+      let hacksSvg = modernCardBg(L, 154, W, 890, M2_EMERALD, 20);
+      hacksSvg += T(L + 24, 196, 'व्यस्त जीवनशैलीमा जीवन बदल्ने २-मिनेट दैनिक ह्याक्स', 25, '#86efac', 700);
+
+      const hY = 226, hHeight = 120, hGap = 12;
+      hacks.forEach((hk, i) => {
+        const curY = hY + i * (hHeight + hGap);
+        hacksSvg += '<rect x="' + (L + 20) + '" y="' + curY + '" width="' + (W - 40) + '" height="' + hHeight + '" rx="15" fill="#101d36" stroke="' + M2_EMERALD + '" stroke-opacity=".3" stroke-width="1.2"/>';
+        hacksSvg += '<circle cx="' + (L + 50) + '" cy="' + (curY + 36) + '" r="16" fill="' + M2_EMERALD + '" fill-opacity=".2"/>';
+        hacksSvg += T(L + 50, curY + 36, hk.no, 17, M2_EMERALD, 700, 'middle');
+        hacksSvg += T(L + 78, curY + 36, hk.title, 22.5, '#ffffff', 700);
+        hacksSvg += P(L + 78, curY + 68, hk.desc, 44, 20, 27, INK, 2);
+      });
+
+      const botAffY = hY + 5 * (hHeight + hGap) + 10;
+      hacksSvg += '<rect x="' + (L + 20) + '" y="' + botAffY + '" width="' + (W - 40) + '" height="60" rx="30" fill="#132442" stroke="' + M2_CYAN + '" stroke-opacity=".5" stroke-width="1.5"/>';
+      hacksSvg += '<circle cx="' + (L + 48) + '" cy="' + (botAffY + 30) + '" r="14" fill="' + M2_CYAN + '" fill-opacity=".2"/>';
+      hacksSvg += T(L + 48, botAffY + 30, '✨', 16, M2_CYAN, 700, 'middle');
+      hacksSvg += T(L + 74, botAffY + 37, 'नियमित १ महिना अपनाउनुहोस् — जीवनमा सकारात्मक चमत्कार देखिनेछ।', 19.5, '#ffffff', 600);
+
+      pushM2(no, title, 'दैनिक वैदिक ह्याक्स', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 10', '🛡️'),
+        el(no, title, 'report', '५ दैनिक ह्याक्स', [L, 154, W, 890], hacksSvg, 9.2)
+      ], { priority: 100, key: 'm2-card-10' });
+    }
+
+    /* ── CARD 11: 🔮 ज्योतिषीय प्रत्यक्ष परामर्श (Final Astrological Ad) ── */
+    {
+      const no = 11, title = 'ज्योतिषीय प्रत्यक्ष परामर्श';
+      const astroName = String(meta.astrologer_name || '').trim() || 'ज्योतिष पण्डित शिवराम पराजुली';
+      const waRaw = String(meta.whatsapp_number || '').trim();
+      const numText = waRaw ? ne(waRaw) : '९८४७४५२९०६';
+      const waDigits = waRaw.replace(/\D/g, '') || '9847452906';
+      const waUrl = 'https://wa.me/' + (waDigits.length === 10 ? '977' + waDigits : waDigits);
+      const nameFs = astroName.length <= 26 ? 34 : astroName.length <= 34 ? 29 : 25;
+
+      const idY = 148, idH = 104;
+      let ident = modernCardBg(L, idY, W, idH, M2_CYAN, 20);
+      ident += '<circle cx="96" cy="200" r="32" fill="#132446" stroke="' + M2_CYAN + '" stroke-opacity=".8" stroke-width="1.6"/>';
+      ident += T(96, 200, 'ॐ', 32, M2_CYAN, 700, 'middle');
+      ident += T(146, 190, astroName, nameFs, '#ffffff', 700);
+      ident += T(146, 226, 'वैदिक ज्योतिष · कुण्डली विश्लेषण · प्रत्यक्ष परामर्श', 18, MUT, 500);
+
+      const chipY = 264, chipH = 76, chipW = 206, chipGap = 13;
+      const chipDefs = [
+        ['०१', 'कुण्डली निर्माण', M2_CYAN],
+        ['०२', 'करियर र विदेश', M2_PURPLE],
+        ['०३', 'विवाह र प्रेम', M2_PINK]
+      ];
+      let chips = '';
+      chipDefs.forEach((c, i) => {
+        const cx = L + i * (chipW + chipGap);
+        chips += modernCardBg(cx, chipY, chipW, chipH, c[2], 16);
+        chips += '<circle cx="' + (cx + 34) + '" cy="' + (chipY + chipH / 2) + '" r="18" fill="#132446" stroke="' + c[2] + '" stroke-opacity=".5" stroke-width="1.2"/>';
+        chips += T(cx + 34, chipY + chipH / 2, c[0], 16, c[2], 700, 'middle');
+        chips += T(cx + 62, chipY + chipH / 2, c[1], 18, '#ffffff', 600);
+      });
+
+      let wa = '<defs><linearGradient id="waGradM2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#145233"/><stop offset="1" stop-color="#0a2a1a"/></linearGradient></defs>';
+      wa += '<rect x="60" y="352" width="600" height="144" rx="72" fill="url(#waGradM2)" stroke="#25D366" stroke-opacity=".8" stroke-width="2"/>';
+      wa += '<rect x="70" y="362" width="580" height="124" rx="62" fill="none" stroke="#ffffff" stroke-opacity=".1" stroke-width="1.2"/>';
+      wa += '<circle cx="134" cy="424" r="44" fill="#25D366"/>';
+      wa += '<g transform="translate(134,424) scale(1.3) translate(-58,-52)">';
+      wa += '<path d="M46 68l4-12a22 22 0 1 1 8 8l-12 4z" fill="#0b2418" opacity=".18"/>';
+      wa += '<path d="M58 33c-10.5 0-19 8.5-19 19 0 3.6 1 7 2.8 9.9L39 72l10.4-2.7A19 19 0 1 0 58 33zm0 34.4c-8.5 0-15.4-6.9-15.4-15.4S49.5 36.6 58 36.6 73.4 43.5 73.4 52 66.5 67.4 58 67.4z" fill="#ffffff"/>';
+      wa += '<path d="M65.5 56.2c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.3-.7.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.5-1.7-1.7-2-.1-.3 0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-1-2.3c-.3-.7-.6-.6-.9-.6h-.8c-.3 0-.7.1-1 .5-.3.3-1.3 1.3-1.3 3.2s1.3 3.7 1.5 4c.2.2 2.6 4 6.3 5.5 2.2.9 3.1 1 4.2.8.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.2-.6-.4z" fill="#ffffff"/>';
+      wa += '</g>';
+      wa += '<circle cx="616" cy="424" r="18" fill="none" stroke="#ffffff" stroke-opacity=".3" stroke-width="1.4"/>';
+      wa += '<path d="M612 416l8 8-8 8" fill="none" stroke="#ffffff" stroke-opacity=".95" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      wa += T(196, 396, 'WhatsApp मा सम्पर्क गर्नुहोस्', 19, '#bbf7d0', 600);
+      wa += T(196, 438, numText, 38, '#ffffff', 700);
+      wa += T(196, 472, 'छिटो जवाफ · सिधै म्यासेज पठाउनुहोस्', 16, '#86efac', 500);
+
+      const btnY = 508, btnH = 104;
+      let btnSvg = '<defs>';
+      btnSvg += '<style>';
+      btnSvg += '@keyframes gentleCosmicPulseM2 {';
+      btnSvg += '  0%, 100% { stroke: #00f2fe; stroke-opacity: 0.85; filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5)); }';
+      btnSvg += '  50% { stroke: #c084fc; stroke-opacity: 1; filter: drop-shadow(0 0 16px rgba(192, 132, 252, 0.8)); }';
+      btnSvg += '}';
+      btnSvg += '.cosmic-pulse-btn-m2 { animation: gentleCosmicPulseM2 2.4s ease-in-out infinite; cursor: pointer; }';
+      btnSvg += '</style>';
+      btnSvg += '<linearGradient id="btnShimmerGradM2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0c1e3d"/><stop offset="50%" stop-color="#142b54"/><stop offset="100%" stop-color="#09152b"/></linearGradient>';
+      btnSvg += '</defs>';
+      btnSvg += '<g class="cosmic-pulse-btn-m2" id="kun-btn-open-kundali-m2" data-action="open-kundali">';
+      btnSvg += '<rect x="' + L + '" y="' + btnY + '" width="' + W + '" height="' + btnH + '" rx="20" fill="url(#btnShimmerGradM2)" stroke="#00f2fe" stroke-width="2"/>';
+      btnSvg += '<rect x="' + (L + 6) + '" y="' + (btnY + 6) + '" width="' + (W - 12) + '" height="' + (btnH - 12) + '" rx="16" fill="none" stroke="#c084fc" stroke-opacity=".3" stroke-width="1.2"/>';
+      btnSvg += '<circle cx="' + (L + 46) + '" cy="' + (btnY + btnH / 2) + '" r="26" fill="#1b3360" stroke="#00f2fe" stroke-opacity=".85" stroke-width="1.5"/>';
+      btnSvg += T(L + 46, btnY + btnH / 2 + 1, '📜', 24, '#ffffff', 700, 'middle');
+      btnSvg += T(L + 88, btnY + 44, 'यहाँ डबल क्लिक गर्दा तपाईंको कुण्डली देखिने छ', 23, M2_CYAN, 700);
+      btnSvg += T(L + 88, btnY + 78, '✨ पूर्ण डिजिटल चक्र तथा ग्रह स्थिति हेर्नुहोस् (Double Click) ✨', 16, '#c084fc', 600);
+      btnSvg += '<circle cx="' + (R - 38) + '" cy="' + (btnY + btnH / 2) + '" r="18" fill="none" stroke="#00f2fe" stroke-opacity=".6" stroke-width="1.5"/>';
+      btnSvg += '<path d="M ' + (R - 42) + ' ' + (btnY + btnH / 2 - 8) + ' L ' + (R - 34) + ' ' + (btnY + btnH / 2) + ' L ' + (R - 42) + ' ' + (btnY + btnH / 2 + 8) + '" fill="none" stroke="#00f2fe" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+      btnSvg += '</g>';
+
+      const adBox = [L, 624, W, 420];
+      let adInner = '<defs><radialGradient id="heroGlowM2"><stop offset="0" stop-color="' + M2_CYAN + '" stop-opacity=".25"/><stop offset="1" stop-color="' + M2_CYAN + '" stop-opacity="0"/></radialGradient></defs>';
+      adInner += '<rect x="' + adBox[0] + '" y="' + adBox[1] + '" width="' + adBox[2] + '" height="' + adBox[3] + '" rx="20" fill="#091428" fill-opacity=".95" stroke="' + M2_CYAN + '" stroke-opacity=".55" stroke-width="1.6"/>';
+      adInner += '<rect x="' + (adBox[0] + 12) + '" y="' + (adBox[1] + 12) + '" width="' + (adBox[2] - 24) + '" height="' + (adBox[3] - 24) + '" rx="15" fill="none" stroke="' + M2_CYAN + '" stroke-opacity=".18"/>';
+      adInner += '<circle cx="360" cy="716" r="96" fill="url(#heroGlowM2)"/>';
+      adInner += '<circle cx="360" cy="716" r="76" fill="none" stroke="' + M2_CYAN + '" stroke-opacity=".3"/>';
+      adInner += '<circle cx="360" cy="716" r="50" fill="none" stroke="' + M2_PURPLE + '" stroke-opacity=".35"/>';
+      for (let d = 0; d < 12; d++) {
+        const a = d * Math.PI / 6;
+        adInner += '<circle cx="' + (360 + Math.cos(a) * 76).toFixed(1) + '" cy="' + (716 + Math.sin(a) * 76).toFixed(1) + '" r="' + (d % 3 === 0 ? 3.4 : 2) + '" fill="' + M2_CYAN + '" fill-opacity=".7"/>';
+      }
+      adInner += '<path d="M360 680l8 24 24 8-24 8-8 24-8-24-24-8 24-8z" fill="' + M2_CYAN + '" fill-opacity=".95"/>';
+      adInner += '<path d="M280 716h-20M440 716h20" stroke="' + M2_CYAN + '" stroke-opacity=".55" stroke-width="1.8"/>';
+      adInner += T(360, 846, 'ज्योतिषीय परामर्श केन्द्र', 32, M2_CYAN, 700, 'middle');
+      adInner += '<line x1="250" y1="870" x2="470" y2="870" stroke="' + M2_CYAN + '" stroke-opacity=".5" stroke-width="1.6"/>';
+      adInner += T(360, 904, 'कुण्डली निर्माण · करियर र विदेश · विवाह परामर्श', 19, '#f4f8ff', 600, 'middle');
+      adInner += T(360, 942, 'जीवनका महत्त्वपूर्ण निर्णयहरूमा शास्त्रीय वैदिक मार्गदर्शन', 17.5, MUT, 500, 'middle');
+      adInner += T(360, 988, '॥ सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः ॥', 18.5, M2_AMBER, 600, 'middle');
+
+      const trust = '<rect x="' + L + '" y="1056" width="' + W + '" height="52" rx="26" fill="#0b2418" stroke="#25D366" stroke-opacity=".4" stroke-width="1.3"/>' +
+        '<circle cx="66" cy="1082" r="6" fill="' + GOOD + '"/>' +
+        T(360, 1082, '१००% गोपनीयता · शास्त्रीय प्रमाण · प्रत्यक्ष अनुभव', 17, '#9fe8bd', 600, 'middle');
+
+      pushM2(no, title, 'परामर्श', [
+        headerM2(no, title, 'GEN-Z ASTRO · CHAPTER 11', '🔮'),
+        el(no, title, 'heading', 'ज्योतिषीय परिचय', [L, idY, W, idH], ident, 6.4),
+        el(no, title, 'cards', 'सेवा सूची', [L, chipY, W, chipH], chips, 7),
+        el(no, title, 'banner', 'WhatsApp सम्पर्क', [60, 352, 600, 144], wa, 7.4),
+        el(no, title, 'cards', 'कुण्डली खोल्ने बटन', [L, btnY, W, btnH], btnSvg, 7.2),
+        el(no, title, 'art', 'ज्योतिषीको फोटो', adBox, adInner, 7.4, { ad: true, adSrc: '' }),
+        el(no, title, 'note', 'विश्वास पट्टी', [L, 1056, W, 52], trust, 6.4)
+      ], { priority: 110, key: 'm2-card-11' });
+      items[items.length - 1].hotspot = [60, 352 + TOP_SAFE + (items[items.length - 1].autoShift || 0), 600, 144];
+      items[items.length - 1].hotspotUrl = waUrl;
+    }
+
+    items.sort((a, b) => (a.order - b.order) || (a.seq - b.seq));
+    items.forEach((it, i) => {
+      it.autoNo = i + 1;
+      it.seq = i;
+      it.title = it.title || ('कार्ड ' + (i + 1));
+      it.set = autoSet('nebula');
+      it.dur = readDuration(it, modelByKey('modern'));
+    });
+    return items;
+  }
+
   /* ── builders ──────────────────────────────────────────────────── */
 
   function build(data, meta, opts) {
@@ -936,6 +1649,9 @@
     opts = opts || {};
     MODEL = modelByKey(opts.model || 'cosmic');
     ALIAS = aliasMap(MODEL.colors);
+    if (MODEL.key === 'modern') {
+      return buildModel2(data, meta, opts);
+    }
     const transit = opts.transit || null;
     const items = [];
     const planets = getPlanetsList(data);

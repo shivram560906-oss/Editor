@@ -4103,6 +4103,331 @@
       }
     }
 
+    /* ============================ Rashi poster modal ============================ */
+    #zr .zr-back {
+      background: radial-gradient(80% 70% at 50% 0%, rgba(8,58,78,.62), rgba(0, 0, 0, .82));
+    }
+
+    #zr .zr-card {
+      width: min(640px, 96vw);
+      padding: 22px 22px 18px;
+      border-radius: 26px;
+      border: 1px solid rgba(120, 235, 255, .32);
+      color: #eaf7ff;
+      background-color: #051322;
+      background-image:
+        radial-gradient(1.6px 1.6px at 16% 18%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 62%),
+        radial-gradient(1.4px 1.4px at 71% 12%, rgba(190, 240, 255, .75), rgba(190, 240, 255, 0) 62%),
+        radial-gradient(1.7px 1.7px at 87% 31%, rgba(255, 241, 200, .8), rgba(255, 241, 200, 0) 62%),
+        radial-gradient(1.2px 1.2px at 37% 9%, rgba(255, 255, 255, .65), rgba(255, 255, 255, 0) 62%),
+        radial-gradient(1.5px 1.5px at 55% 26%, rgba(150, 240, 255, .6), rgba(150, 240, 255, 0) 62%),
+        radial-gradient(1.2px 1.2px at 8% 42%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 62%),
+        radial-gradient(1.4px 1.4px at 93% 58%, rgba(255, 230, 170, .6), rgba(255, 230, 170, 0) 62%),
+        radial-gradient(120% 78% at 50% -12%, rgba(0, 222, 188, .30), rgba(0, 222, 188, 0) 62%),
+        radial-gradient(85% 55% at 108% 106%, rgba(255, 150, 60, .15), rgba(255, 150, 60, 0) 62%),
+        linear-gradient(165deg, #081c31, #061426 55%, #040f1c);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(255, 255, 255, .12);
+      scrollbar-color: rgba(120, 220, 255, .35) transparent;
+    }
+
+    #zr .zr-head {
+      margin-bottom: 14px;
+      gap: 12px;
+    }
+
+    #zr .zr-head b {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.01em;
+      background: linear-gradient(92deg, #ffd76a 0%, #fff4d6 46%, #45e9ff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: #fff4d6;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 10px rgba(0, 0, 0, .45));
+    }
+
+    #zr .zr-head span {
+      margin-top: 5px;
+      color: #a8c9db;
+      font-size: 14.5px;
+      line-height: 1.45;
+    }
+
+    #zr .zr-x {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(140, 225, 255, .22);
+      background: rgba(255, 255, 255, .06);
+      color: #d7eef9;
+      font-size: 26px;
+    }
+
+    #zr .zr-x:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .13);
+      border-color: rgba(140, 225, 255, .5);
+    }
+
+    #zr .zr-step {
+      margin-top: 16px;
+    }
+
+    #zr .zr-label {
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f2fbff;
+    }
+
+    #zr .zr-label i {
+      width: 26px;
+      height: 26px;
+      background: linear-gradient(135deg, #ffc542, #38e8ff);
+      color: #061827;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(56, 232, 255, .28);
+    }
+
+    #zr .zr-signs {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    #zr .zr-sign {
+      min-height: 74px;
+      padding: 9px 7px;
+      border-radius: 15px;
+      border: 1px solid rgba(140, 225, 255, .22);
+      background: linear-gradient(160deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .028));
+      color: #eaf9ff;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    #zr .zr-sign b {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    #zr .zr-sign span {
+      font-size: 11.5px;
+      color: #8fb8cc;
+      line-height: 1.3;
+    }
+
+    #zr .zr-sign:hover {
+      border-color: rgba(120, 235, 255, .62);
+      background: rgba(255, 255, 255, .11);
+      transform: translateY(-1px);
+    }
+
+    #zr .zr-sign.on {
+      border-color: transparent;
+      background: linear-gradient(135deg, #ffd76a, #ffc542 38%, #38e8ff);
+      color: #052033;
+      box-shadow: 0 9px 26px rgba(56, 232, 255, .34);
+    }
+
+    #zr .zr-sign.on b,
+    #zr .zr-sign.on span {
+      color: #052033;
+    }
+
+    #zr .zr-sign.on span {
+      color: rgba(5, 32, 51, .72);
+    }
+
+    #zr .zr-types {
+      gap: 9px;
+    }
+
+    #zr .zr-type {
+      min-height: 66px;
+      padding: 9px 12px;
+      border-radius: 15px;
+      border: 1px solid rgba(140, 225, 255, .22);
+      background: linear-gradient(160deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .028));
+      color: #eaf9ff;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    #zr .zr-type b {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    #zr .zr-type span {
+      font-size: 11.5px;
+      color: #8fb8cc;
+    }
+
+    #zr .zr-type:hover {
+      border-color: rgba(120, 235, 255, .62);
+      background: rgba(255, 255, 255, .11);
+      transform: translateY(-1px);
+    }
+
+    #zr .zr-type.on {
+      border-color: transparent;
+      background: linear-gradient(135deg, #ffd76a, #ffc542 38%, #38e8ff);
+      color: #052033;
+      box-shadow: 0 9px 26px rgba(56, 232, 255, .34);
+    }
+
+    #zr .zr-type.on b,
+    #zr .zr-type.on span {
+      color: #052033;
+    }
+
+    #zr .zr-type.on span {
+      color: rgba(5, 32, 51, .72);
+    }
+
+    #zr .zr-when {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(140, 225, 255, .22);
+      background: rgba(255, 255, 255, .045);
+    }
+
+    #zr .zr-when label {
+      margin-bottom: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #9fc5d8;
+    }
+
+    #zr .zr-hint {
+      margin-top: 9px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #93b9cc;
+    }
+
+    #zr select {
+      min-height: 42px;
+      border-radius: 10px;
+      border-color: rgba(140, 225, 255, .28);
+      background-color: #0a2136;
+      color: #eaf7ff;
+      font-size: 15px;
+    }
+
+    #zr .zr-cal {
+      max-width: 380px;
+    }
+
+    #zr .zr-cal .rcal-nav {
+      margin-bottom: 10px;
+    }
+
+    #zr .zr-cal .rcal-week span {
+      font-size: 12.5px;
+      color: #8fb8cc;
+    }
+
+    #zr .zr-cal .rcal-day {
+      font-size: 15px;
+      border-radius: 10px;
+      min-height: 38px;
+    }
+
+    #zr .rcal-navb {
+      width: 38px;
+      height: 38px;
+      font-size: 22px;
+      border-radius: 10px;
+    }
+
+    #zr_pick {
+      font-size: 15px;
+      line-height: 1.55;
+      color: #b9d8e8;
+      margin-bottom: 10px;
+    }
+
+    #zr .zr-foot {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(140, 225, 255, .18);
+    }
+
+    #zr .rcal-actions {
+      gap: 10px;
+    }
+
+    #zr .btn {
+      min-height: 50px;
+      font-size: 17px;
+      border-radius: 14px;
+    }
+
+    #zr .btn:not(.btn-primary) {
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(140, 225, 255, .24);
+      color: #d7eef9;
+    }
+
+    #zr .btn-primary {
+      border: 0;
+      background: linear-gradient(135deg, #ffd76a, #ff9a3d 44%, #38e8ff);
+      color: #041526;
+      font-weight: 800;
+      box-shadow: 0 10px 30px rgba(56, 232, 255, .28);
+    }
+
+    #zr .btn-primary:hover:not(:disabled) {
+      filter: brightness(1.06);
+    }
+
+    #zr .btn:disabled {
+      opacity: .48;
+      box-shadow: none;
+    }
+
+    #zr .rcal-msg {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 430px) {
+      #zr .zr-card {
+        padding: 16px 14px 14px;
+        border-radius: 22px;
+      }
+
+      #zr .zr-head b {
+        font-size: 26px;
+      }
+
+      #zr .zr-signs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      #zr .zr-types {
+        grid-template-columns: 1fr;
+      }
+
+      #zr .zr-sign {
+        min-height: 66px;
+      }
+
+      #zr .zr-sign b {
+        font-size: 18px;
+      }
+
+      #zr .btn {
+        font-size: 16px;
+      }
+    }
+
     /* ==================== Kundali CapCut-style inspector (Phase 9 redesign) ==================== */
 
     /* ── Layer-row helpers (kept for timeline sub-tracks) ── */
@@ -5560,8 +5885,8 @@ g|Emerald Calm|dust|emerald|M|v|none|center|vrfg|shadow`.split('\n').map(l => l.
     function layout() {
       const pc = +$('pace').value; let t = 0;
       slides.forEach(s => {
-        let d = s.dur || Math.max(3.5, 2.2 + slen(s) / 12) / pc;
-        if (!s.dur && (s.an || S.an) == 'type') d = Math.max(d, .3 + slen(s) / 28 + 1.6);
+        let d = s.dur || (s.zr ? zrCardSeconds(s.zr) : Math.max(3.5, 2.2 + slen(s) / 12)) / pc;
+        if (!s.dur && !s.zr && (s.an || S.an) == 'type') d = Math.max(d, .3 + slen(s) / 28 + 1.6);
         const v = voices.get(s.id);
         if (v && v.dur) d = Math.max(d, v.dur + .35);
         s.d = d; s.s = t; t += d
@@ -7192,15 +7517,494 @@ ${adEl ? `<div class="kli-info" style="border-top:none;padding-top:4px">
       const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, th.bg[0]); g.addColorStop(.5, th.bg[1]); g.addColorStop(1, th.bg[2]);
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); safe(() => BG[S.bg](t, th));
       clips.filter(c => c.pos == 'full').forEach(c => safe(() => drawClip(c, t)));
-      const s = slides.find(x => t >= x.s && t < x.s + x.d); if (s && !s.noText) safe(() => drawText(s, t - s.s, th));
+      const s = slides.find(x => t >= x.s && t < x.s + x.d); if (s && !s.noText) safe(() => s.zr ? drawZrPoster(s, t - s.s, th, t) : drawText(s, t - s.s, th));
       clips.filter(c => c.pos != 'full').forEach(c => safe(() => drawClip(c, t)));
       ctx.globalAlpha = 1; ctx.shadowBlur = 0;
       if ($('pg').checked) { ctx.fillStyle = `rgba(${th.l},.85)`; ctx.fillRect(0, H - 7 * U, W * clamp(t / total), 7 * U) }
-      safe(() => drawWM(t));
+      if ($('wm').checked && !(s && s.zr)) safe(() => drawWM(t));
       if (!playing && !exporting) safe(drawSel);
     }
 
-    /* audio, playback, recording */
+    /* ===================== Rashi poster renderer (one-sign deck) =====================
+       Generated Rashi slides carry a s.zr metadata object. They are painted as
+       full poster cards, so the normal slide template stays untouched. */
+    const ZR_VIS = {
+      gold: '#FFC542', goldDeep: '#E88916', cream: '#FFF6DE', cyan: '#45E9FF',
+      teal: '#2FE7C8', pink: '#FF6FDC', green: '#6DF7A8', ink: '#0B1D2C',
+      ink2: '#24445C', white: '#F4FBFF'
+    };
+    const ZR_TONE = ['#3FE6FF', '#FFF1C9', '#FFC542', '#FF76D8', '#6EF7A8', '#A99BFF'];
+    const ZR_H_COLORS = [
+      [[0, '#FFE28A'], [.45, '#FFC542'], [1, '#F0891F']],
+      [[0, '#FFFFFF'], [.5, '#FFF4D6'], [1, '#FFD98A']],
+      [[0, '#9CF5FF'], [.5, '#38E8FF'], [1, '#2D8CFF']]
+    ];
+    const ZR_TITLE_COLORS = [
+      [[0, '#FFFFFF'], [.55, '#FFF6D8'], [1, '#FFC542']],
+      [[0, '#B7F8FF'], [.55, '#38E8FF'], [1, '#2D8CFF']]
+    ];
+    const ZR_SIGN_COLORS = [
+      [[0, '#FFFDF2'], [.45, '#FFE9A8'], [1, '#FFB13B']],
+      [[0, '#FFFFFF'], [.55, '#FFF4D6'], [1, '#FFC542']]
+    ];
+    const ZR_ARTS = new Map();
+    function zrCardSeconds(z) {
+      if (!z) return 6;
+      if (z.kind === 'cover') return 5.2;
+      if (z.kind === 'summary') return 10.5;
+      if (z.kind === 'advice') return 7.6;
+      if (z.kind === 'note') return 6.6;
+      const n = String(z.body || '').length + (z.points || []).join(' ').length;
+      return clamp(5.4 + n / 80, 5.4, 9.5);
+    }
+    const zrHash = (i, s) => { const x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453123; return x - Math.floor(x) };
+    const zrFont = (size, weight) => (weight || 700) + ' ' + Math.max(8, Math.round(size)) + 'px "Mukta","Noto Sans Devanagari",sans-serif';
+    const zrAlpha = (lt, d) => clamp((lt - (d || 0)) / .5);
+    function zrArt(no) {
+      const key = String(no || 0);
+      let it = ZR_ARTS.get(key);
+      if (it) return it;
+      it = { c: null, im: null, ok: false };
+      ZR_ARTS.set(key, it);
+      const im = new Image();
+      im.onload = () => {
+        it.im = im;
+        try {
+          const c = document.createElement('canvas'); c.width = iw(im); c.height = ih_(im);
+          const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+          const d = x.getImageData(0, 0, c.width, c.height); rmBg(d, 'white', .12); x.putImageData(d, 0, 0);
+          it.c = c;
+        } catch (e) { it.c = im }
+        it.ok = true;
+        if (typeof draw === 'function' && typeof cur === 'number' && !playing && !exporting && !document.hidden) { try { draw(cur) } catch (e) { } }
+      };
+      im.onerror = () => { it.ok = true; it.c = null };
+      im.src = 'Rashi/' + encodeURIComponent(key + '.png');
+      return it;
+    }
+    function zrDrawArt(no, cx, cy, boxW, boxH, alpha, glow, cool) {
+      const it = zrArt(no);
+      if (glow) {
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(boxW, boxH) * .78);
+        if (cool) {
+          g.addColorStop(0, 'rgba(150,235,255,' + glow + ')');
+          g.addColorStop(.55, 'rgba(80,190,255,' + (glow * .35) + ')');
+          g.addColorStop(1, 'rgba(80,180,255,0)');
+        } else {
+          g.addColorStop(0, 'rgba(255,190,90,' + glow + ')');
+          g.addColorStop(.55, 'rgba(255,150,50,' + (glow * .35) + ')');
+          g.addColorStop(1, 'rgba(255,140,40,0)');
+        }
+        ctx.fillStyle = g; ctx.fillRect(cx - boxW * .8, cy - boxH * .8, boxW * 1.6, boxH * 1.6);
+      }
+      if (!it || !it.c) return;
+      const c = it.c, ar = iw(c) / (ih_(c) || 1) || 1;
+      let dw = boxW, dh = dw / ar;
+      if (dh > boxH) { dh = boxH; dw = dh * ar }
+      ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha;
+      if (cool) {
+        try { ctx.filter = 'hue-rotate(188deg) saturate(.96) brightness(1.3)' } catch (e) { }
+        ctx.shadowColor = 'rgba(150,235,255,.6)';
+      } else {
+        ctx.shadowColor = 'rgba(255,168,60,.55)';
+      }
+      ctx.shadowBlur = 24 * U;
+      ctx.drawImage(c, cx - dw / 2, cy - dh / 2, dw, dh);
+      ctx.restore();
+    }
+    function zrWrap(text, font, maxW) {
+      const words = String(text || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+      if (!words.length) return [];
+      ctx.font = font;
+      const lines = []; let cur = '';
+      for (const w of words) {
+        const test = cur ? cur + ' ' + w : w;
+        if (cur && ctx.measureText(test).width > maxW) { lines.push(cur); cur = w }
+        else cur = test;
+      }
+      if (cur) lines.push(cur);
+      return lines;
+    }
+    function zrFitText(text, maxW, maxLines, base, min, weight) {
+      const t = String(text || '').replace(/\s+/g, ' ').trim();
+      let size = Math.round(base), lines = [], font = '';
+      if (!t) return { size: base, font: zrFont(base, weight), lines: [] };
+      for (; size >= min; size -= 2) {
+        font = zrFont(size, weight); lines = zrWrap(t, font, maxW);
+        if (lines.length <= maxLines) return { size: size, font: font, lines: lines };
+      }
+      size = min; font = zrFont(size, weight); ctx.font = font;
+      lines = zrWrap(t, font, maxW).slice(0, maxLines);
+      if (lines.length) {
+        let last = lines[lines.length - 1];
+        while (last && ctx.measureText(last + '…').width > maxW && gcs(last).length > 1) last = gcs(last).slice(0, -1).join('');
+        lines[lines.length - 1] = last + '…';
+      }
+      return { size: size, font: font, lines: lines };
+    }
+    function zrFitBody(text, maxW, maxH, base, min, weight, lhm) {
+      const t = String(text || '').replace(/\s+/g, ' ').trim();
+      lhm = lhm || 1.42;
+      let size = Math.round(base), lines = [], lh = size * lhm, font = zrFont(size, weight);
+      if (!t) return { size: size, font: font, lines: [], lh: lh };
+      for (; size >= min; size -= 2) {
+        font = zrFont(size, weight); lines = zrWrap(t, font, maxW); lh = size * lhm;
+        if (lines.length * lh <= maxH) return { size: size, font: font, lines: lines, lh: lh };
+      }
+      size = min; font = zrFont(size, weight); lh = size * lhm; ctx.font = font;
+      lines = zrWrap(t, font, maxW);
+      const maxLines = Math.max(1, Math.floor(maxH / lh));
+      if (lines.length > maxLines) lines = lines.slice(0, maxLines);
+      if (lines.length) {
+        let last = lines[lines.length - 1];
+        while (last && ctx.measureText(last + '…').width > maxW && gcs(last).length > 1) last = gcs(last).slice(0, -1).join('');
+        lines[lines.length - 1] = last + '…';
+      }
+      return { size: size, font: font, lines: lines, lh: lh };
+    }
+    function zrSolidLines(lines, x, y, font, size, lh, color, align, lt, delay, alpha) {
+      if (!lines || !lines.length) return y;
+      ctx.save(); ctx.font = font; ctx.textAlign = align || 'left'; ctx.textBaseline = 'top';
+      lines.forEach((line, i) => {
+        const a = zrAlpha(lt, (delay || 0) + i * .035) * (alpha == null ? 1 : alpha);
+        if (a <= 0) return;
+        ctx.globalAlpha = a; ctx.fillStyle = color;
+        ctx.shadowColor = 'rgba(2,8,16,.32)'; ctx.shadowBlur = 4 * U; ctx.shadowOffsetY = 1.5 * U;
+        ctx.fillText(line, x, y + i * lh);
+      });
+      ctx.restore();
+      return y + lines.length * lh;
+    }
+    function zrGradLines(lines, x, y, size, lh, stops, align, lt, delay, alpha) {
+      if (!lines || !lines.length) return y;
+      ctx.save(); ctx.font = zrFont(size, 700); ctx.textAlign = align || 'center'; ctx.textBaseline = 'top';
+      lines.forEach((line, i) => {
+        const a = zrAlpha(lt, (delay || 0) + i * .07) * (alpha == null ? 1 : alpha);
+        if (a <= 0) return;
+        const yy = y + i * lh, st = stops[i % stops.length] || stops[0];
+        const g = ctx.createLinearGradient(0, yy, 0, yy + size);
+        st.forEach(s => g.addColorStop(s[0], s[1]));
+        ctx.globalAlpha = a; ctx.fillStyle = g;
+        ctx.shadowColor = 'rgba(2,8,16,.55)'; ctx.shadowBlur = 9 * U; ctx.shadowOffsetY = 2 * U;
+        ctx.fillText(line, x, yy);
+      });
+      ctx.restore();
+      return y + lines.length * lh;
+    }
+    function zrPill(text, cx, y, size, color, alpha) {
+      ctx.save(); ctx.font = zrFont(size, 700); ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+      const tw = ctx.measureText(text).width, w = tw + 38 * U, h = size + 20 * U, x = cx - w / 2;
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      ctx.beginPath(); rrPath(ctx, x, y, w, h, h / 2);
+      ctx.fillStyle = 'rgba(5,18,32,.58)'; ctx.fill();
+      ctx.strokeStyle = color; ctx.lineWidth = 1.6 * U; ctx.globalAlpha = (alpha == null ? 1 : alpha) * .8; ctx.stroke();
+      ctx.globalAlpha = alpha == null ? 1 : alpha; ctx.fillStyle = color;
+      ctx.fillText(text, cx, y + h / 2 + 1 * U);
+      ctx.restore();
+      return y + h;
+    }
+    function zrGlass(x, y, w, h, r, tone, light) {
+      ctx.save(); ctx.beginPath(); rrPath(ctx, x, y, w, h, r);
+      const g = ctx.createLinearGradient(x, y, x + w, y + h);
+      if (light) {
+        g.addColorStop(0, 'rgba(250,254,255,.97)'); g.addColorStop(.55, 'rgba(229,242,248,.95)'); g.addColorStop(1, 'rgba(204,225,236,.93)');
+      } else {
+        g.addColorStop(0, 'rgba(7,28,46,.92)'); g.addColorStop(.6, 'rgba(5,21,36,.90)'); g.addColorStop(1, 'rgba(3,14,25,.94)');
+      }
+      ctx.fillStyle = g; ctx.fill();
+      ctx.shadowColor = tone; ctx.shadowBlur = 18 * U;
+      ctx.lineWidth = 3 * U; ctx.strokeStyle = tone; ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.beginPath(); rrPath(ctx, x + 2 * U, y + 2 * U, w - 4 * U, h - 4 * U, Math.max(2, r - 2 * U));
+      ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1 * U; ctx.stroke();
+      ctx.restore();
+    }
+    function zrNumBadge(txt, cx, cy, r, tone) {
+      ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7);
+      const g = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+      g.addColorStop(0, '#0A2136'); g.addColorStop(1, '#123A52');
+      ctx.fillStyle = g; ctx.fill();
+      ctx.lineWidth = 2 * U; ctx.strokeStyle = tone; ctx.stroke();
+      ctx.fillStyle = tone; ctx.font = zrFont(r * 1.05, 700); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(txt, cx, cy + 1 * U);
+      ctx.restore();
+    }
+    function zrAurora(t) {
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      const bands = [
+        { y: .27, a: .035, th: .09, ph: 0, c1: 'rgba(0,255,190,0)', c2: 'rgba(26,240,190,.24)', c3: 'rgba(40,170,255,0)' },
+        { y: .34, a: .045, th: .07, ph: 1.7, c1: 'rgba(0,255,150,0)', c2: 'rgba(90,255,170,.17)', c3: 'rgba(0,210,255,0)' },
+        { y: .20, a: .025, th: .10, ph: 3.2, c1: 'rgba(70,120,255,0)', c2: 'rgba(50,200,255,.13)', c3: 'rgba(0,255,190,0)' }
+      ];
+      bands.forEach(b => {
+        const pts = [], step = Math.max(24, W / 28);
+        for (let x = -step; x <= W + step; x += step) {
+          const yy = H * b.y + Math.sin(x / W * 5.4 + t * .13 + b.ph) * H * b.a + Math.sin(x / W * 11.5 + t * .09 + b.ph * 1.3) * H * b.a * .35;
+          pts.push([x, yy]);
+        }
+        let minY = 1e9, maxY = -1e9;
+        pts.forEach(p => { minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]) });
+        const g = ctx.createLinearGradient(0, minY, 0, maxY + H * b.th);
+        g.addColorStop(0, b.c1); g.addColorStop(.5, b.c2); g.addColorStop(1, b.c3);
+        ctx.beginPath();
+        pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
+        for (let i = pts.length - 1; i >= 0; i--) ctx.lineTo(pts[i][0], pts[i][1] + H * b.th);
+        ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+      });
+      ctx.restore();
+    }
+    function zrStars(t) {
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 150; i++) {
+        const x = zrHash(i, 1) * W, y = zrHash(i, 2) * H * .76, r = (.6 + zrHash(i, 3) * 1.7) * U;
+        const a = (.22 + .78 * Math.abs(Math.sin(t * .7 + i * 1.63))) * (.35 + .65 * zrHash(i, 4));
+        ctx.fillStyle = 'rgba(220,245,255,' + a.toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+      }
+      for (let i = 0; i < 7; i++) {
+        const x = zrHash(i, 7) * W, y = zrHash(i, 8) * H * .55, r = (4 + zrHash(i, 9) * 5) * U;
+        const a = .35 + .5 * Math.abs(Math.sin(t * .9 + i));
+        ctx.strokeStyle = 'rgba(220,248,255,' + a.toFixed(2) + ')'; ctx.lineWidth = 1.1 * U;
+        ctx.beginPath(); ctx.moveTo(x - r, y); ctx.lineTo(x + r, y); ctx.moveTo(x, y - r); ctx.lineTo(x, y + r); ctx.stroke();
+      }
+      const cons = [[.60, .10], [.66, .14], [.72, .11], [.77, .17], [.83, .13], [.88, .19]];
+      ctx.strokeStyle = 'rgba(105,215,255,.18)'; ctx.lineWidth = 1.1 * U; ctx.beginPath();
+      cons.forEach((p, i) => { const x = p[0] * W, y = p[1] * H; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y) });
+      ctx.stroke();
+      cons.forEach((p, i) => { ctx.fillStyle = 'rgba(190,240,255,' + (.4 + .4 * Math.abs(Math.sin(t + i))).toFixed(2) + ')'; ctx.beginPath(); ctx.arc(p[0] * W, p[1] * H, 2.2 * U, 0, 7); ctx.fill() });
+      ctx.restore();
+    }
+    function zrMoon(t) {
+      const x = W * .795, y = H * .225, r = 58 * U;
+      let g = ctx.createRadialGradient(x, y, r * .4, x, y, r * 4.8);
+      g.addColorStop(0, 'rgba(255,236,180,.30)'); g.addColorStop(.45, 'rgba(255,210,130,.12)'); g.addColorStop(1, 'rgba(255,190,100,0)');
+      ctx.fillStyle = g; ctx.fillRect(x - r * 5, y - r * 5, r * 10, r * 10);
+      g = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
+      g.addColorStop(0, '#FFFFFF'); g.addColorStop(.5, '#FFF7DC'); g.addColorStop(1, '#FFD98A');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+      ctx.save(); ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.clip();
+      const craters = [[-.3, -.2, .18], [.24, -.28, .12], [.12, .2, .22], [-.28, .34, .1]];
+      craters.forEach(c => { ctx.fillStyle = 'rgba(196,152,72,.16)'; ctx.beginPath(); ctx.arc(x + c[0] * r, y + c[1] * r, c[2] * r, 0, 7); ctx.fill() });
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(255,245,200,.30)'; ctx.lineWidth = 1.4 * U; ctx.beginPath(); ctx.arc(x, y, r + 3 * U, 0, 7); ctx.stroke();
+    }
+    function zrMountains() {
+      const back = [[0, .78], [.08, .72], [.16, .77], [.27, .66], [.38, .75], [.5, .68], [.6, .76], [.72, .64], [.84, .73], [1, .68]];
+      const front = [[0, .86], [.12, .8], [.24, .86], [.36, .78], [.5, .85], [.64, .79], [.76, .86], [.88, .8], [1, .85]];
+      const ridge = (pts, col) => {
+        ctx.beginPath(); ctx.moveTo(0, H); ctx.lineTo(0, pts[0][1] * H);
+        pts.forEach(p => ctx.lineTo(p[0] * W, p[1] * H)); ctx.lineTo(W, H); ctx.closePath();
+        ctx.fillStyle = col; ctx.fill();
+      };
+      ridge(back, 'rgba(7,26,40,.92)');
+      ridge(front, 'rgba(3,13,22,.97)');
+      ctx.fillStyle = 'rgba(2,8,15,.98)'; ctx.fillRect(0, H * .93, W, H * .07);
+    }
+    function zrBg(t) {
+      ctx.save();
+      let g = ctx.createLinearGradient(0, 0, W * .35, H);
+      g.addColorStop(0, '#020616'); g.addColorStop(.38, '#051a2e'); g.addColorStop(.62, '#072a37'); g.addColorStop(.82, '#0a2330'); g.addColorStop(1, '#030b14');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      g = ctx.createRadialGradient(W * .18, H * .12, 0, W * .18, H * .12, W * .7);
+      g.addColorStop(0, 'rgba(38,45,120,.38)'); g.addColorStop(.55, 'rgba(18,45,100,.14)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H * .8);
+      zrAurora(t);
+      zrStars(t);
+      zrMoon(t);
+      zrMountains();
+      g = ctx.createRadialGradient(W * .5, H * 1.02, 0, W * .5, H * 1.02, W * .72);
+      g.addColorStop(0, 'rgba(255,140,55,.28)'); g.addColorStop(.45, 'rgba(255,120,40,.10)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, H * .55, W, H * .45);
+      g = ctx.createRadialGradient(W * .5, H * .46, W * .24, W * .5, H * .5, W * .78);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.52)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    }
+    function zrCardCover(z, lt, gt) {
+      const cx = W / 2;
+      const k = zrPill(z.typeLabel || '', cx, H * .052, 23 * U, ZR_VIS.cyan, zrAlpha(lt, .02));
+      const hf = zrFitText(z.heading || z.typeLabel || '', W - 76 * U, 2, 82 * U, 54 * U, 700);
+      let y = zrGradLines(hf.lines, cx, Math.max(k + 26 * U, H * .112), hf.size, hf.size * 1.1, ZR_H_COLORS, 'center', lt, .08, 1);
+      const df = zrFitText(z.date || '', W - 88 * U, 1, 44 * U, 30 * U, 600);
+      y += 16 * U;
+      y = zrSolidLines(df.lines, cx, y, df.font, df.size, df.size * 1.2, '#D8F7FF', 'center', lt, .2, .95);
+      y += 20 * U;
+      const sf = zrFitText((z.sign || '') + ' राशि', W - 56 * U, 1, 122 * U, 78 * U, 700);
+      const gl = ctx.createRadialGradient(cx, y + sf.size * .55, 0, cx, y + sf.size * .55, 280 * U);
+      gl.addColorStop(0, 'rgba(150,235,255,.20)'); gl.addColorStop(1, 'rgba(80,190,255,0)');
+      ctx.fillStyle = gl; ctx.fillRect(cx - 300 * U, y - 60 * U, 600 * U, 380 * U);
+      y = zrGradLines(sf.lines, cx, y, sf.size, sf.size * 1.06, ZR_SIGN_COLORS, 'center', lt, .28, 1);
+      const artTop = Math.max(y + 20 * U, H * .44);
+      const artH = Math.min(H * .42, H - artTop - 150 * U);
+      if (artH > 60 * U) zrDrawArt(z.img, cx, artTop + artH / 2 + Math.sin(gt * .9) * 5 * U, W * .72, artH, zrAlpha(lt, .12), .24, true);
+      ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.globalAlpha = zrAlpha(lt, .42);
+      ctx.font = zrFont(22 * U, 600); ctx.fillStyle = 'rgba(220,248,255,.78)';
+      ctx.fillText('वैदिक ज्योतिष • राशि-आधारित मार्गदर्शन', cx, H - 106 * U);
+      ctx.globalAlpha = zrAlpha(lt, .5) * .75;
+      ctx.font = zrFont(19 * U, 500); ctx.fillStyle = 'rgba(255,244,214,.62)';
+      ctx.fillText('सामान्य राशिफल — व्यक्तिगत जन्मकुण्डली होइन', cx, H - 70 * U);
+      ctx.restore();
+    }
+    function zrCardSummary(z, lt) {
+      const cx = W / 2;
+      const k = zrPill('सारांश', cx, H * .05, 22 * U, ZR_VIS.gold, zrAlpha(lt, .02));
+      const hf = zrFitText(z.title || '', W - 84 * U, 3, 58 * U, 42 * U, 700);
+      let y = zrGradLines(hf.lines, cx, k + 24 * U, hf.size, hf.size * 1.14, ZR_TITLE_COLORS, 'center', lt, .1, 1);
+      zrDrawArt(z.img, W * .85, H * .66, W * .56, H * .44, .11, .05, true);
+      const bx = 34 * U, bw = W - 68 * U, gap = 14 * U;
+      const top = Math.max(H * .26, y + 18 * U);
+      const bh = Math.min(172 * U, (H - 40 * U - top - gap * 4) / 5);
+      const boxes = (z.boxes || []).slice(0, 5);
+      boxes.forEach((b, i) => {
+        const by = top + i * (bh + gap), tone = ZR_TONE[i % ZR_TONE.length];
+        const a = zrAlpha(lt, .14 + i * .07);
+        ctx.save(); ctx.globalAlpha = a;
+        zrGlass(bx, by, bw, bh, 20 * U, tone, true);
+        zrNumBadge(neNum(i + 1), bx + 39 * U, by + bh / 2, 21 * U, tone);
+        ctx.restore();
+        const innerX = bx + 80 * U, innerW = bw - 100 * U;
+        const hn = zrFitText(b.h || '', innerW, 2, 34 * U, 24 * U, 700);
+        const headH = hn.lines.length * hn.size * 1.15;
+        const bf = zrFitBody(b.b || '', innerW, Math.max(28 * U, bh - 20 * U - headH - 4 * U), 30 * U, 21 * U, 500, 1.28);
+        const contentH = headH + 4 * U + bf.lines.length * bf.lh;
+        const cy = by + Math.max(10 * U, (bh - contentH) / 2);
+        const hy = zrSolidLines(hn.lines, innerX, cy, hn.font, hn.size, hn.size * 1.15, ZR_VIS.ink, 'left', lt, .2 + i * .07, a);
+        zrSolidLines(bf.lines, innerX, hy + 4 * U, bf.font, bf.size, bf.lh, '#25445C', 'left', lt, .24 + i * .07, a);
+      });
+    }
+    function zrCardDetail(z, lt) {
+      const cx = W / 2, idx = z.idx || 0, tone = ZR_TONE[idx % ZR_TONE.length];
+      let kick = z.typeLabel || '';
+      if (z.total) kick += ' • ' + neNum(idx + 1) + '/' + neNum(z.total);
+      if (z.parts > 1) kick += ' • भाग ' + neNum(z.part);
+      const k = zrPill(kick, cx, H * .045, 21 * U, tone, zrAlpha(lt, .02));
+      const hf = zrFitText(z.title || '', W - 84 * U, 2, 60 * U, 42 * U, 700);
+      const y = zrGradLines(hf.lines, cx, k + 22 * U, hf.size, hf.size * 1.14, ZR_TITLE_COLORS, 'center', lt, .08, 1);
+      const panX = 34 * U, panW = W - 68 * U;
+      const innerX = panX + 34 * U, innerW = panW - 68 * U;
+      const areaTop = Math.max(H * .205, y + 18 * U), areaBot = H - 44 * U;
+      const avail = Math.max(300 * U, areaBot - areaTop);
+      const pts = (z.points || []).slice(0, 3);
+      /* A split section's continuation card has no suggestion rows. Give the
+         body the full stage with larger type instead of leaving a small box
+         floating in the middle of the poster. */
+      if (!pts.length) {
+        const bf = zrFitBody(z.body || '', innerW, avail * .74, 52 * U, 34 * U, 500, 1.55);
+        const textH = bf.lines.length * bf.lh;
+        const panH = Math.max(260 * U, textH + 96 * U);
+        const panTop = areaTop + Math.max(0, (avail - panH) / 2);
+        ctx.save(); ctx.globalAlpha = zrAlpha(lt, .1);
+        zrGlass(panX, panTop, panW, panH, 24 * U, tone, true); ctx.restore();
+        ctx.save(); ctx.globalAlpha = zrAlpha(lt, .12);
+        ctx.font = zrFont(300 * U, 700); ctx.fillStyle = 'rgba(11,29,44,.06)';
+        ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+        ctx.fillText(neNum(idx + 1), panX + panW - 30 * U, panTop + (panH - 300 * U) / 2);
+        ctx.restore();
+        zrSolidLines(bf.lines, innerX, panTop + Math.max(38 * U, (panH - textH) / 2), bf.font, bf.size, bf.lh, ZR_VIS.ink, 'left', lt, .2, 1);
+        return;
+      }
+      const ptFits = pts.map(p => zrFitText(p, innerW - 48 * U, 3, 34 * U, 25 * U, 600));
+      const baseRows = ptFits.map(p => Math.max(104 * U, p.lines.length * p.size * 1.36 + 34 * U));
+      const labelH = pts.length ? 44 * U : 0;
+      const gapTitle = 18 * U, gapLabel = 22 * U, gapRows = 11 * U;
+      const bodyMax = Math.max(180 * U, avail - labelH - baseRows.reduce((a, b) => a + b, 0) - gapTitle - gapLabel - gapRows * Math.max(0, pts.length - 1) - 4 * U);
+      const bf = zrFitBody(z.body || '', innerW, bodyMax - 66 * U, 42 * U, 29 * U, 500, 1.5);
+      const bodyH = Math.max(184 * U, bf.lines.length * bf.lh + 66 * U);
+      let used = bodyH + labelH + baseRows.reduce((a, b) => a + b, 0) + gapTitle + gapLabel + gapRows * Math.max(0, pts.length - 1);
+      let extra = Math.max(0, avail - used);
+      /* Prefer tall reference-style suggestion rows over one large empty panel. */
+      const rowAdd = pts.length ? Math.min(extra * .62 / pts.length, 60 * U) : 0;
+      const rowsH = baseRows.map(h => h + rowAdd);
+      used = bodyH + labelH + rowsH.reduce((a, b) => a + b, 0) + gapTitle + gapLabel + gapRows * Math.max(0, pts.length - 1);
+      extra = Math.max(0, avail - used);
+      const gGrow = Math.min(extra / 4, 18 * U);
+      const gT = gapTitle + gGrow, gL = gapLabel + gGrow, gR = gapRows + gGrow;
+      used = bodyH + labelH + rowsH.reduce((a, b) => a + b, 0) + gT + gL + gR * Math.max(0, pts.length - 1);
+      let yy = areaTop + Math.max(0, (avail - used) / 2);
+      /* Body panel */
+      ctx.save(); ctx.globalAlpha = zrAlpha(lt, .06);
+      zrGlass(panX, yy, panW, bodyH, 23 * U, tone, true); ctx.restore();
+      const bodyTextH = bf.lines.length * bf.lh;
+      zrSolidLines(bf.lines, innerX, yy + Math.max(28 * U, (bodyH - bodyTextH) / 2), bf.font, bf.size, bf.lh, ZR_VIS.ink, 'left', lt, .16, 1);
+      yy += bodyH + gT;
+      if (pts.length) {
+        ctx.save(); ctx.globalAlpha = zrAlpha(lt, .26);
+        const dg = ctx.createLinearGradient(innerX, 0, innerX + innerW, 0);
+        dg.addColorStop(0, 'rgba(11,29,44,.05)'); dg.addColorStop(.5, tone); dg.addColorStop(1, 'rgba(11,29,44,.05)');
+        ctx.fillStyle = dg; ctx.fillRect(innerX, yy, innerW, 1.6 * U);
+        ctx.font = zrFont(26 * U, 700); ctx.fillStyle = ZR_VIS.goldDeep;
+        ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText('व्यावहारिक सुझाव', innerX, yy + 10 * U);
+        ctx.restore();
+        yy += labelH + gL;
+        rowsH.forEach((rh, i) => {
+          const p = ptFits[i], rt = ZR_TONE[(idx + i) % ZR_TONE.length];
+          ctx.save(); ctx.globalAlpha = zrAlpha(lt, .2 + i * .06);
+          zrGlass(panX, yy, panW, rh, 20 * U, rt, true); ctx.restore();
+          zrNumBadge(neNum(i + 1), panX + 38 * U, yy + rh / 2, 19 * U, rt);
+          const textH = p.lines.length * p.size * 1.36;
+          zrSolidLines(p.lines, innerX + 42 * U, yy + Math.max(18 * U, (rh - textH) / 2), p.font, p.size, p.size * 1.36, '#203D52', 'left', lt, .3 + i * .06, 1);
+          yy += rh + gR;
+        });
+      }
+    }
+    function zrCardAdvice(z, lt) {
+      const cx = W / 2;
+      const k = zrPill(z.parts > 1 ? 'सुझाव • भाग ' + neNum(z.part) : 'उपाय', cx, H * .06, 22 * U, ZR_VIS.gold, zrAlpha(lt, .02));
+      const hf = zrFitText(z.parts > 1 ? 'सुझाव' : 'शुभ उपाय र सुझाव', W - 88 * U, 2, 62 * U, 44 * U, 700);
+      const y = zrGradLines(hf.lines, cx, k + 26 * U, hf.size, hf.size * 1.14, ZR_H_COLORS, 'center', lt, .1, 1);
+      const panX = 46 * U, panW = W - 92 * U, innerW = panW - 76 * U;
+      const areaTop = Math.max(H * .24, y + 24 * U), areaBot = H - 60 * U;
+      const bf = zrFitBody(z.body || '', innerW, Math.max(220 * U, (areaBot - areaTop) * .78), 46 * U, 30 * U, 500, 1.56);
+      const textH = bf.lines.length * bf.lh;
+      const panH = Math.max(230 * U, textH + 92 * U);
+      const panTop = areaTop + Math.max(0, (areaBot - areaTop - panH) / 2);
+      ctx.save(); ctx.globalAlpha = zrAlpha(lt, .1);
+      zrGlass(panX, panTop, panW, panH, 26 * U, ZR_VIS.gold, true); ctx.restore();
+      ctx.save(); ctx.globalAlpha = zrAlpha(lt, .18) * .1; ctx.font = '700 ' + (210 * U) + 'px "Mukta",sans-serif';
+      ctx.fillStyle = '#8A4E00'; ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+      ctx.fillText('ॐ', panX + panW - 26 * U, panTop + (panH - 210 * U) / 2); ctx.restore();
+      zrSolidLines(bf.lines, panX + 38 * U, panTop + Math.max(38 * U, (panH - textH) / 2), bf.font, bf.size, bf.lh, ZR_VIS.ink, 'left', lt, .2, 1);
+      ctx.save(); ctx.globalAlpha = zrAlpha(lt, .4) * .65; ctx.textAlign = 'center'; ctx.font = zrFont(20 * U, 500);
+      ctx.fillStyle = 'rgba(190,235,255,.7)'; ctx.fillText(z.sign + ' राशि • ' + z.typeLabel, cx, H - 44 * U); ctx.restore();
+    }
+    function zrCardNote(z, lt) {
+      const cx = W / 2;
+      const k = zrPill('नोट', cx, H * .115, 22 * U, ZR_VIS.cyan, zrAlpha(lt, .04));
+      const hf = zrFitText('राशिफलको सीमा', W - 96 * U, 1, 52 * U, 38 * U, 700);
+      const y = zrGradLines(hf.lines, cx, k + 26 * U, hf.size, hf.size * 1.14, ZR_TITLE_COLORS, 'center', lt, .1, 1);
+      zrDrawArt(z.img, W * .87, H * .84, W * .56, H * .36, .11, .06, true);
+      const panX = 50 * U, panW = W - 100 * U, innerW = panW - 72 * U;
+      const areaTop = y + 30 * U, areaBot = H - 130 * U;
+      const bf = zrFitBody(z.body || '', innerW, Math.max(160 * U, areaBot - areaTop - 80 * U), 37 * U, 28 * U, 500, 1.58);
+      const textH = bf.lines.length * bf.lh;
+      const panH = Math.max(190 * U, textH + 82 * U);
+      const panTop = areaTop + Math.max(0, (areaBot - areaTop - panH) / 2);
+      ctx.save(); ctx.globalAlpha = zrAlpha(lt, .1);
+      zrGlass(panX, panTop, panW, panH, 24 * U, ZR_TONE[0], true); ctx.restore();
+      zrSolidLines(bf.lines, panX + 36 * U, panTop + Math.max(34 * U, (panH - textH) / 2), bf.font, bf.size, bf.lh, ZR_VIS.ink, 'left', lt, .2, 1);
+      ctx.save(); ctx.globalAlpha = zrAlpha(lt, .5) * .7; ctx.textAlign = 'center'; ctx.font = zrFont(21 * U, 500);
+      ctx.fillStyle = 'rgba(190,235,255,.75)'; ctx.fillText(z.sign + ' राशि • ' + z.typeLabel + ' • ' + z.period, cx, H - 76 * U); ctx.restore();
+    }
+    function drawZrPoster(s, lt, th, gt) {
+      const z = s.zr;
+      if (!z) { drawText(s, lt, th); return }
+      zrBg(gt || 0);
+      ctx.save();
+      const en = eo(clamp(lt / .55));
+      ctx.translate(0, (1 - en) * 22 * U);
+      ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+      if (z.kind === 'cover') zrCardCover(z, lt, gt || 0);
+      else if (z.kind === 'summary') zrCardSummary(z, lt);
+      else if (z.kind === 'detail') zrCardDetail(z, lt);
+      else if (z.kind === 'advice') zrCardAdvice(z, lt);
+      else if (z.kind === 'note') zrCardNote(z, lt);
+      else drawText(s, lt, th);
+      ctx.restore();
+      tbox = null;
+    }
+
     let ac, dest, musGain, monGain, voiceBus, voiceMon, musSrc, musName = ''; const aud = new Audio(); aud.loop = true;
     let musURL = '', voiceSrcs = [];
     function ensureAudio() {
@@ -7418,16 +8222,17 @@ ${adEl ? `<div class="kli-info" style="border-top:none;padding-top:4px">
       const chunks = raw.replace(/\r/g, '').split(/\n[ \t]*\n[ \t]*\n\s*/).map(c => c.replace(/^\s*\n/, '').replace(/\s+$/, '')).filter(c => c.trim());
       let firstLine = true;
       return chunks.map(c => {
-        const ti = [], su = [], bo = []; let m, q = '', link = '';
+        const ti = [], su = [], bo = []; let m, q = '', link = '', zr = null;
         c.split('\n').forEach(l => {
           if (m = /^\s*@imglink\s*:\s*(.+)$/i.exec(l)) { link = m[1].trim().replace(/^["']+|["']+$/g, ''); return }
+          if (m = /^\s*@zrjson\s*:\s*(.+)$/i.exec(l)) { try { zr = JSON.parse(m[1]) } catch (e) { } return }
           if (m = /^\s*@(?:img|image|pic)\s*:\s*(.+)$/i.exec(l)) { q = m[1].trim(); return }
           if (m = /^\s*##\s*(.*)$/.exec(l)) { ti.push(m[1].trim()); if (l.trim()) firstLine = false }
           else if (m = /^\s*#\s*(.*)$/.exec(l)) { su.push(m[1].trim()); if (l.trim()) firstLine = false }
           else if (firstLine && l.trim()) { ti.push(l.trim()); firstLine = false }   /* the very first line is always the heading */
           else bo.push(l)
         });
-        const sl = mk(ti.join('\n'), su.join('\n'), bo.join('\n').replace(/^\n+|\n+$/g, '')); sl.q = q; sl.link = link; return sl;
+        const sl = mk(ti.join('\n'), su.join('\n'), bo.join('\n').replace(/^\n+|\n+$/g, '')); sl.q = q; sl.link = link; if (zr) sl.zr = zr; return sl;
       });
     }
     /* Bikram Sambat calendar data for the date picker (2070-2100 BS).
@@ -11120,44 +11925,92 @@ EXAMPLE:
       flush();
       return out;
     }
-    function zrBlock(title, sub, body, extra) {
-      const lines = ['## ' + zrCleanText(title, 90)];
-      if (sub) lines.push('# ' + zrCleanText(sub, 100));
+    function zrCoverHeading(type) {
+      if (type.id === 'daily') return 'तपाइको आजको राशीफल';
+      if (type.id === 'monthly') return 'तपाइको यो महिनाको राशीफल';
+      if (type.id === 'yearly') return 'तपाइको यो वर्षको राशीफल';
+      return 'तपाइको सम्पूर्ण जीवनफल';
+    }
+    function zrCoverDate(type, period) {
+      if (type.id === 'daily' && period.bs) {
+        const bs = period.bs;
+        return neNum(bs.y) + ' ' + BS_MONTHS[bs.m - 1] + ' ' + neNum(bs.d) + ' गते (' + BS_WEEK[bsWeekday(bs.y, bs.m, bs.d)] + 'बार)';
+      }
+      if (type.id === 'monthly' && period.bs) return 'वि.सं. ' + neNum(period.bs.y) + ' ' + BS_MONTHS[period.bs.m - 1] + ' महिना';
+      if (type.id === 'yearly' && period.bs) return 'वि.सं. ' + neNum(period.bs.y) + ' वर्ष';
+      return 'राशि-आधारित व्यापक जीवन झलक';
+    }
+    /* A short, complete first sentence for the numbered summary boxes. */
+    function zrGist(v, max) {
+      const t = zrCleanText(v);
+      if (!t) return '';
+      const m = t.match(/[^।!?॥]+[।!?॥]?/);
+      const first = (m ? m[0] : t).trim();
+      return zrCut(first || t, max);
+    }
+    function zrBlock(title, sub, body, meta) {
+      const lines = ['## ' + zrCleanText(title, 110)];
+      if (sub) lines.push('# ' + zrCleanText(sub, 110));
       if (body && body.trim()) lines.push(body.trim());
-      if (extra) lines.push(extra);
+      if (meta) lines.push('@zrjson : ' + JSON.stringify(meta));
       return lines.join('\n');
     }
     function zrRaw(sign, type, period, data) {
       const blocks = [];
-      const introSub = sign.ne + ' राशि • ' + period.cardLabel;
-      const introChunks = zrSplitText(data.summary, 250);
-      introChunks.forEach((chunk, i) => {
-        const title = i === 0 ? data.headline : sign.ne + ' राशि';
-        const sub = i === 0 ? introSub : period.cardLabel + ' • परिचय ' + neNum(i + 1);
-        blocks.push(zrBlock(title, sub, chunk, i === 0 ? '@imglink : "' + sign.img + '.png"' : ''));
+      const dateLabel = zrCoverDate(type, period);
+      const base = {
+        v: 1, sign: sign.ne, signEn: sign.en, img: sign.img,
+        typeId: type.id, typeLabel: type.label, period: period.pickLabel, date: dateLabel
+      };
+      const sub = type.label + ' • ' + period.pickLabel;
+
+      /* 1. Cover — heading, BS date and the largest sign name. The zodiac
+         art is painted by the poster renderer (no picture clip needed). */
+      const coverHeading = zrCoverHeading(type);
+      blocks.push(zrBlock(coverHeading, sub, sign.ne + ' राशि', Object.assign({}, base, {
+        kind: 'cover', heading: coverHeading
+      })));
+
+      /* 2. Summary poster — one summary plus four key areas, five numbered
+         light glass boxes in the reference layout. */
+      const boxes = [{ h: 'सारांश', b: zrGist(data.summary, 72) }];
+      data.sections.slice(0, 4).forEach(sec => {
+        boxes.push({ h: sec.title, b: zrGist(sec.body || (sec.points && sec.points[0]) || '', 72) });
       });
-      data.sections.forEach(sec => {
-        const bullets = sec.points.length ? sec.points.map(p => '- ' + p).join('\n') : '';
-        const chunks = sec.body ? zrSplitText(sec.body, 250) : [];
-        if (!chunks.length) {
-          if (bullets) blocks.push(zrBlock(sec.title, '', bullets));
-          return;
-        }
-        chunks.forEach((chunk, i) => {
-          const last = i === chunks.length - 1;
-          const title = i === 0 ? sec.title : sec.title + ' (' + neNum(i + 1) + ')';
-          if (last && bullets && (chunk + '\n' + bullets).length <= 620) {
-            blocks.push(zrBlock(title, '', chunk + '\n' + bullets));
-          } else {
-            blocks.push(zrBlock(title, '', chunk));
-            if (last && bullets) blocks.push(zrBlock('व्यावहारिक सुझाव', sign.ne + ' राशि • ' + sec.title, bullets));
-          }
+      const summaryBody = boxes.map((b, i) => neNum(i + 1) + '. ' + b.h + ' — ' + b.b).join('\n');
+      blocks.push(zrBlock(data.headline, sub, summaryBody, Object.assign({}, base, {
+        kind: 'summary', title: data.headline, boxes: boxes
+      })));
+
+      /* 3. Detail cards — every section keeps its exact title, body and
+         practical points. Long bodies are split without cutting a sentence. */
+      data.sections.forEach((sec, si) => {
+        const pts = (sec.points || []).slice(0, 3);
+        let chunks = sec.body ? zrSplitText(sec.body, 230) : [];
+        if (!chunks.length) chunks = [''];
+        chunks.forEach((chunk, ci) => {
+          const last = ci === chunks.length - 1;
+          const pointTxt = last && pts.length ? pts.map(p => '- ' + p).join('\n') : '';
+          const body = [chunk, pointTxt].filter(Boolean).join('\n');
+          const dsub = sub + (chunks.length > 1 ? ' • भाग ' + neNum(ci + 1) : '');
+          blocks.push(zrBlock(sec.title, dsub, body, Object.assign({}, base, {
+            kind: 'detail', title: sec.title, body: chunk, points: last ? pts : [],
+            idx: si, total: data.sections.length, part: ci + 1, parts: chunks.length
+          })));
         });
       });
-      zrSplitText(data.advice, 250).forEach((chunk, i) => {
-        blocks.push(zrBlock(i === 0 ? 'सुझाव' : 'सुझाव (' + neNum(i + 1) + ')', sign.ne + ' राशि • ' + period.cardLabel, chunk));
+
+      /* 4. Advice card. */
+      const adv = zrSplitText(data.advice, 260);
+      (adv.length ? adv : ['']).forEach((chunk, i) => {
+        blocks.push(zrBlock(i ? 'सुझाव (क्रम ' + neNum(i + 1) + ')' : 'शुभ उपाय र सुझाव', sub, chunk, Object.assign({}, base, {
+          kind: 'advice', body: chunk, part: i + 1, parts: adv.length
+        })));
       });
-      blocks.push(zrBlock('नोट', 'राशि-आधारित सामान्य मार्गदर्शन', 'यो राशिफल राशि र चयनित समयमा आधारित सामान्य पराशरी मार्गदर्शन हो; व्यक्तिगत जन्मकुण्डलीको गणना वा विश्लेषण होइन।'));
+
+      /* 5. Note card with the personal-reading disclaimer. */
+      const note = 'यो राशिफल राशि र चयनित समयमा आधारित सामान्य पराशरी मार्गदर्शन हो; व्यक्तिगत जन्मकुण्डलीको गणना वा विश्लेषण होइन।';
+      blocks.push(zrBlock('नोट', sub, note, Object.assign({}, base, { kind: 'note', body: note })));
       return blocks.join('\n\n\n');
     }
     function zrValidateRaw(raw, sign, type) {
@@ -11175,6 +12028,8 @@ EXAMPLE:
         if (!slideText(s).trim()) throw new Error('कार्ड ' + (i + 1) + ' खाली छ।');
         if (s.title.length > 120) throw new Error('कार्ड ' + (i + 1) + ' को शीर्षक धेरै लामो छ।');
         if (s.body.length > 700) throw new Error('कार्ड ' + (i + 1) + ' को सामग्री धेरै लामो छ।');
+        if (!s.zr || s.zr.v !== 1 || !s.zr.kind) throw new Error('कार्ड ' + (i + 1) + ' को पोस्टर डिजाइन जानकारी मिलेन।');
+        if (s.zr.sign !== sign.ne || s.zr.typeId !== type.id) throw new Error('कार्ड ' + (i + 1) + ' को राशि वा प्रकार मिलेन।');
       });
       return parsed;
     }

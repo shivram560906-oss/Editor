@@ -4050,6 +4050,20 @@
       color: var(--mut);
     }
 
+    .zr-cal {
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+    .zr-cal .rcal-nav {
+      margin-bottom: 8px;
+    }
+
+    .zr-cal .rcal-day {
+      font-size: 12px;
+      border-radius: 9px;
+    }
+
     #zr_pick {
       display: block;
       font-size: 12px;
@@ -5144,8 +5158,19 @@
       </div>
       <div class="zr-when" id="zr_when" hidden>
         <div id="zr_daily" hidden>
-          <label for="zr_date">मिति (ईस्वी)</label>
-          <input type="date" id="zr_date">
+          <label>मिति (विक्रम संवत्)</label>
+          <div class="zr-cal">
+            <div class="rcal-nav">
+              <button type="button" id="zr_cal_prev" class="rcal-navb" title="अघिल्लो महिना" aria-label="अघिल्लो महिना">‹</button>
+              <div class="rcal-sel">
+                <select id="zr_cal_y" aria-label="वर्ष"></select>
+                <select id="zr_cal_m" aria-label="महिना"></select>
+              </div>
+              <button type="button" id="zr_cal_next" class="rcal-navb" title="अर्को महिना" aria-label="अर्को महिना">›</button>
+            </div>
+            <div id="zr_cal_week" class="rcal-week"></div>
+            <div id="zr_cal_days" class="rcal-days"></div>
+          </div>
           <p class="zr-hint" id="zr_date_preview"></p>
         </div>
         <div id="zr_monthly" hidden>
@@ -10652,12 +10677,13 @@ EXAMPLE:
       lifetime: 'lifetime', life: 'lifetime', lifelong: 'lifetime', 'जीवन': 'lifetime', 'जीवनफल': 'lifetime',
       'सम्पूर्ण जीवनफल': 'lifetime', 'lifetime horoscope': 'lifetime'
     };
-    const ZR = { sign: null, type: null, busy: false, seq: 0, ac: null, bub: null };
+    const ZR = { sign: null, type: null, busy: false, seq: 0, ac: null, bub: null, calSel: null, calView: null };
     const ZR_CACHE = new Map();
     const ZR_SYS = `तपाईं बृहत् पाराशर होरा शास्त्र (BPHS) को पराशरी परम्परामा दक्ष, संयमित र भरपर्दो वैदिक ज्योतिषी हुनुहुन्छ। तपाईंले नेपाली (देवनागरी) मा राशिफल लेख्नुहुन्छ।
 यो अनुरोध राशि-आधारित सामान्य राशिफल हो। यो व्यक्तिगत जन्मकुण्डली, जन्मकुण्डली गणना वा व्यक्तिगत भविष्यवाणी होइन। जन्म मिति, जन्म समय र जन्म स्थान दिइएको छैन, त्यसैले व्यक्तिगत दाबी नगर्नुहोस्।
 राशिको स्वामी ग्रह, तत्त्व, स्वभाव, केन्द्रादि गुण र भावको सामान्य पराशरी अर्थ प्रयोग गर्नुहोस्। यो अनुरोधमा वास्तविक ग्रहगोचर, दशा, गोचर वा गणना गरिएको भाव-स्थिति दिइएको छैन; त्यसैले कुनै विशिष्ट ग्रहस्थिति, गोचर, दशा, भाव-स्थिति वा घटना भएको/हुने दाबी नगर्नुहोस्। यकिन डेटा नभएको कुरा आवश्यक परे स्पष्ट भन्नुहोस्।
 भाषा शुद्ध, स्वाभाविक र बहने नेपाली होस्। यान्त्रिक दोहोरो वाक्य, भरिएको शब्द वा अंग्रेजी वाक्य नराख्नुहोस्। सन्तुलित, आकर्षक तर संयमित शैली अपनाउनुहोस्; १८ वर्षदेखि ७०+ उमेरका पाठकलाई उपयोगी हुने भाषा प्रयोग गर्नुहोस्।
+सबै मिति, महिना, वर्ष, अवधि र समय विक्रम संवत् (वि.सं.) मा मात्र लेख्नुहोस्। ईस्वी (AD), सन्, ई.सं., A.D. वा ग्रेगोरियन मिति कहीँ पनि नलेख्नुहोस्; JSON को period key मात्र दिइएको प्राविधिक ढाँचामा राख्नुहोस्, तर headline, summary, sections, points र advice मा सबै मिति/वर्ष वि.सं. मै हुनुपर्छ।
 मृत्यु, गम्भीर रोग, दुर्घटना, अपंगता वा अनिवार्य असफलताको डर देखाउने भाषा प्रयोग नगर्नुहोस्। "निश्चित हुनेछ" भन्ने अति-दाबी नगर्नुहोस्। प्रत्येक खण्डमा व्यावहारिक सुझाव दिनुहोस् र एउटै कुरा दोहोर्याएर खण्ड नभर्नुहोस्।
 केवल मान्य JSON फर्काउनुहोस्। markdown, code fence, HTML, emoji, तालिका वा अतिरिक्त व्याख्या नराख्नुहोस्।`;
     function zrCut(s, max) {
@@ -10675,22 +10701,58 @@ EXAMPLE:
       return max ? zrCut(s, max) : s;
     }
     function zrList(v) {
-      const one = x => zrCleanText(x, 100).replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').trim();
+      const one = x => zrDisplayText(x, 100).replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').trim();
       if (Array.isArray(v)) return v.map(one).filter(Boolean).slice(0, 4);
       if (typeof v === 'string') return v.replace(/\r/g, '').split(/\n+|(?:\s*•\s*)/).map(one).filter(Boolean).slice(0, 4);
       return [];
     }
-    function zrNepalAdDate() {
-      const t = new Date(Date.now() + 5.75 * 3600000);
-      return t.getUTCFullYear() + '-' + String(t.getUTCMonth() + 1).padStart(2, '0') + '-' + String(t.getUTCDate()).padStart(2, '0');
-    }
-    function zrAdToBs(adStr) {
-      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(adStr || ''));
-      if (!m) return null;
-      return adToBs(new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])));
-    }
     function zrBsLabel(bs) {
       return neNum(bs.d) + ' ' + BS_MONTHS[bs.m - 1] + ' ' + neNum(bs.y);
+    }
+    function zrAsciiDigits(s) {
+      return String(s == null ? '' : s).replace(/[०-९]/g, d => String('०१२३४५६७८९'.indexOf(d)));
+    }
+    /* Gemini must write every visible date in Bikram Sambat. This is a safety
+       net for the rare case where a model still echoes an AD/ISO date: the
+       value is converted to a BS label before it can reach a slide or the UI. */
+    function zrAdYearRange(y) {
+      const a = adToBs(new Date(Date.UTC(y, 0, 1))), b = adToBs(new Date(Date.UTC(y, 11, 31)));
+      if (!a || !b) return '';
+      return a.y === b.y ? neNum(a.y) : neNum(a.y) + '–' + neNum(b.y);
+    }
+    function zrBsOnlyText(v) {
+      let s = String(v == null ? '' : v);
+      s = s.replace(/\b((?:19|20)\d{2})[-/.](\d{1,2})[-/.](\d{1,2})\b/g, (m, y, mo, d) => {
+        const yy = +y, mm = +mo, dd = +d;
+        const bs = adToBs(new Date(Date.UTC(yy, mm - 1, dd)));
+        if (bs) return zrBsLabel(bs);
+        /* A year such as 2083 can only be a BS year here, so keep it as BS
+           instead of deleting an already-correct date. */
+        if (yy >= BS_MIN && yy <= BS_MAX && mm >= 1 && mm <= 12 && dd >= 1 && dd <= bsMonthDays(yy, mm)) return zrBsLabel({ y: yy, m: mm, d: dd });
+        return '';
+      });
+      /* "सन्" is also the first syllable of common words such as सन्तुलित;
+         only a standalone सन् (not followed by another Devanagari letter)
+         counts as an AD marker. */
+      const adMarker = '(?:सन्(?![\\u0900-\\u097F])|ई\\.?\\s*सं\\.?|ईस्वी|\\bA\\.D\\.|\\bAD\\b)';
+      const adYear = '((?:19|20)\\d{2}|[०-९]{4})';
+      s = s.replace(new RegExp(adMarker + '\\s*[:\\-]?\\s*' + adYear, 'gi'), (m, y) => {
+        const r = zrAdYearRange(+zrAsciiDigits(y));
+        return r ? 'वि.सं. ' + r : '';
+      });
+      s = s.replace(new RegExp(adYear + '\\s*' + adMarker, 'gi'), (m, y) => {
+        const r = zrAdYearRange(+zrAsciiDigits(y));
+        return r ? 'वि.सं. ' + r : '';
+      });
+      return s;
+    }
+    function zrDisplayText(v, max) {
+      return zrCleanText(zrBsOnlyText(v), max);
+    }
+    function zrHasAdDate(s) {
+      const t = String(s || '');
+      return /(?:सन्(?![\u0900-\u097F])|ई\.?\s*सं\.?|ईस्वी|\bA\.D\.|\bAD\b)/i.test(t) ||
+        /\b(?:19|20)\d{2}[-/.]\d{1,2}[-/.]\d{1,2}\b/.test(t);
     }
     function zrNormSign(v) {
       let s = zrCleanText(v, 80).replace(/\s*राशि\s*$/i, '').trim();
@@ -10715,40 +10777,40 @@ EXAMPLE:
     function zrPeriodInfo() {
       const type = ZR.type; if (!type) return null;
       if (type.id === 'daily') {
-        const adStr = $('zr_date').value, bs = zrAdToBs(adStr);
-        if (!bs) return null;
+        const bs = ZR.calSel;
+        if (!bs || !(bs.y >= BS_MIN && bs.y <= BS_MAX) || !(bs.m >= 1 && bs.m <= 12) || !(bs.d >= 1 && bs.d <= bsMonthDays(bs.y, bs.m))) return null;
+        /* AD is used only as an internal period key/cache key, never shown in the UI. */
+        const adStr = bsToAd(bs.y, bs.m, bs.d).toISOString().slice(0, 10);
         const wd = BS_WEEK[bsWeekday(bs.y, bs.m, bs.d)], label = zrBsLabel(bs);
         return {
-          key: 'daily:' + adStr, bs, adStr,
+          key: 'daily:' + adStr, bs: { y: bs.y, m: bs.m, d: bs.d }, adStr,
           cardLabel: 'आजको राशिफल • ' + label,
-          pickLabel: label + ' (' + adStr + ')',
-          userLabel: label + ' (' + adStr + ')',
-          promptPeriod: label + ', ' + wd + ' (' + adStr + ' AD)'
+          pickLabel: label,
+          userLabel: 'वि.सं. ' + label,
+          promptPeriod: 'वि.सं. ' + label + ', ' + wd
         };
       }
       if (type.id === 'monthly') {
         const y = +$('zr_year').value, m = +$('zr_month').value;
         if (!(y >= BS_MIN && y <= BS_MAX) || !(m >= 1 && m <= 12)) return null;
-        const first = bsToAd(y, m, 1).toISOString().slice(0, 10), last = bsToAd(y, m, bsMonthDays(y, m)).toISOString().slice(0, 10);
-        const label = BS_MONTHS[m - 1] + ' ' + neNum(y);
+        const days = bsMonthDays(y, m), label = BS_MONTHS[m - 1] + ' ' + neNum(y);
         return {
           key: 'monthly:' + y + '-' + m, bs: { y, m, d: 1 },
           cardLabel: 'यो महिनाको राशिफल • ' + label,
-          pickLabel: label + ' (' + first + ' – ' + last + ')',
-          userLabel: label + ' (' + first + ' – ' + last + ' AD)',
-          promptPeriod: label + ' (ई.सं. ' + first + ' देखि ' + last + ' सम्म)'
+          pickLabel: 'वि.सं. ' + label,
+          userLabel: 'वि.सं. ' + label,
+          promptPeriod: 'वि.सं. ' + label + ' (१ देखि ' + neNum(days) + ' गतेसम्मको पूरा महिना)'
         };
       }
       if (type.id === 'yearly') {
         const y = +$('zr_year2').value;
         if (!(y >= BS_MIN && y <= BS_MAX)) return null;
-        const first = bsToAd(y, 1, 1).toISOString().slice(0, 10), last = bsToAd(y, 12, bsMonthDays(y, 12)).toISOString().slice(0, 10);
         return {
           key: 'yearly:' + y, bs: { y, m: 1, d: 1 },
-          cardLabel: 'यो वर्षको राशिफल • ' + neNum(y) + ' BS',
-          pickLabel: neNum(y) + ' BS (' + first + ' – ' + last + ')',
-          userLabel: neNum(y) + ' BS (' + first + ' – ' + last + ' AD)',
-          promptPeriod: neNum(y) + ' BS (ई.सं. ' + first + ' देखि ' + last + ' सम्म)'
+          cardLabel: 'यो वर्षको राशिफल • वि.सं. ' + neNum(y),
+          pickLabel: 'वि.सं. ' + neNum(y),
+          userLabel: 'वि.सं. ' + neNum(y),
+          promptPeriod: 'वि.सं. ' + neNum(y) + ' (वैशाखदेखि चैतसम्मको पूरा वर्ष)'
         };
       }
       return {
@@ -10767,21 +10829,75 @@ EXAMPLE:
       go.disabled = !!on || !zrCanGo();
       go.textContent = on ? 'Gemini ले लेख्दैछ…' : 'राशिफल बनाउनुहोस्';
     }
+    function zrCalSyncSelection() {
+      const max = bsMonthDays(ZR.calView.y, ZR.calView.m);
+      ZR.calSel = {
+        y: ZR.calView.y, m: ZR.calView.m,
+        d: clamp(ZR.calSel ? ZR.calSel.d : 1, 1, max)
+      };
+    }
+    function zrCalBuild() {
+      const ySel = $('zr_cal_y'), mSel = $('zr_cal_m');
+      if (!ySel || !mSel) return;
+      if (!ySel.options.length) {
+        for (let y = BS_MIN; y <= BS_MAX; y++) ySel.add(new Option(neNum(y), y));
+        BS_MONTHS.forEach((n, i) => mSel.add(new Option(n, i + 1)));
+        $('zr_cal_week').innerHTML = BS_WEEK.map(d => '<span>' + d + '</span>').join('');
+      }
+      ySel.onchange = () => {
+        if (ZR.busy) return;
+        ZR.calView.y = +ySel.value;
+        zrCalSyncSelection(); zrCalRender(); zrUpdatePick();
+      };
+      mSel.onchange = () => {
+        if (ZR.busy) return;
+        ZR.calView.m = +mSel.value;
+        zrCalSyncSelection(); zrCalRender(); zrUpdatePick();
+      };
+      $('zr_cal_prev').onclick = () => zrCalStep(-1);
+      $('zr_cal_next').onclick = () => zrCalStep(1);
+    }
+    function zrCalRender() {
+      const y = ZR.calView.y, m = ZR.calView.m;
+      const days = bsMonthDays(y, m), first = bsWeekday(y, m, 1), today = nepalTodayBs();
+      $('zr_cal_y').value = y; $('zr_cal_m').value = m;
+      let html = '';
+      for (let i = 0; i < first; i++) html += '<span class="rcal-day blank"></span>';
+      for (let d = 1; d <= days; d++) {
+        const on = ZR.calSel && ZR.calSel.y === y && ZR.calSel.m === m && ZR.calSel.d === d;
+        const isToday = today && today.y === y && today.m === m && today.d === d;
+        html += '<button type="button" class="rcal-day' + (on ? ' on' : '') + (isToday ? ' today' : '') + '" data-d="' + d + '" aria-label="' + neNum(d) + ' ' + BS_MONTHS[m - 1] + '">' + neNum(d) + '</button>';
+      }
+      $('zr_cal_days').innerHTML = html;
+      $('zr_cal_days').querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
+        if (ZR.busy) return;
+        ZR.calSel = { y, m, d: +b.dataset.d };
+        zrCalRender(); zrUpdatePick();
+      });
+      $('zr_cal_prev').disabled = y === BS_MIN && m === 1;
+      $('zr_cal_next').disabled = y === BS_MAX && m === 12;
+    }
+    function zrCalStep(n) {
+      if (ZR.busy) return;
+      let y = ZR.calView.y, m = ZR.calView.m + n;
+      if (m < 1) { m = 12; y-- } else if (m > 12) { m = 1; y++ }
+      if (y < BS_MIN || y > BS_MAX) return;
+      ZR.calView = { y, m };
+      zrCalSyncSelection(); zrCalRender(); zrUpdatePick();
+    }
     function zrRenderPreview() {
-      const bs = zrAdToBs($('zr_date').value);
-      $('zr_date_preview').textContent = !$('zr_date').value ? 'मिति छान्नुहोस्।'
-        : !bs ? 'वि.सं. १९७५–२१०० भित्रको मिति छान्नुहोस्।'
-          : 'वि.सं. ' + zrBsLabel(bs) + ' (' + BS_WEEK[bsWeekday(bs.y, bs.m, bs.d)] + ')';
+      const bs = ZR.calSel, wd = bs ? BS_WEEK[bsWeekday(bs.y, bs.m, bs.d)] : '';
+      $('zr_date_preview').textContent = bs
+        ? 'छानिएको मिति: वि.सं. ' + zrBsLabel(bs) + ' (' + wd + ')'
+        : 'मिति छान्नुहोस्।';
       const my = +$('zr_year').value, mm = +$('zr_month').value;
-      if (my >= BS_MIN && my <= BS_MAX && mm >= 1 && mm <= 12) {
-        const first = bsToAd(my, mm, 1).toISOString().slice(0, 10), last = bsToAd(my, mm, bsMonthDays(my, mm)).toISOString().slice(0, 10);
-        $('zr_month_preview').textContent = 'ई.सं. ' + first + ' देखि ' + last + ' सम्म';
-      }
+      $('zr_month_preview').textContent = (my >= BS_MIN && my <= BS_MAX && mm >= 1 && mm <= 12)
+        ? 'छानिएको महिना: वि.सं. ' + BS_MONTHS[mm - 1] + ' ' + neNum(my) + ' (१–' + neNum(bsMonthDays(my, mm)) + ' गते)'
+        : '';
       const yy = +$('zr_year2').value;
-      if (yy >= BS_MIN && yy <= BS_MAX) {
-        const first = bsToAd(yy, 1, 1).toISOString().slice(0, 10), last = bsToAd(yy, 12, bsMonthDays(yy, 12)).toISOString().slice(0, 10);
-        $('zr_year_preview').textContent = 'ई.सं. ' + first + ' देखि ' + last + ' सम्म';
-      }
+      $('zr_year_preview').textContent = (yy >= BS_MIN && yy <= BS_MAX)
+        ? 'छानिएको वर्ष: वि.सं. ' + neNum(yy) + ' (वैशाखदेखि चैतसम्म)'
+        : '';
     }
     function zrUpdatePick() {
       const sign = ZR.sign, type = ZR.type, go = $('zr_go');
@@ -10812,16 +10928,19 @@ EXAMPLE:
         $('zr_monthly').hidden = type.id !== 'monthly';
         $('zr_yearly').hidden = type.id !== 'yearly';
         $('zr_life').hidden = type.id !== 'lifetime';
+        if (type.id === 'daily' && ZR.calView) zrCalRender();
       }
       zrUpdatePick();
     }
     function zrResetSelection() {
       ZR.sign = null; ZR.type = null;
-      const today = nepalTodayBs();
-      $('zr_date').value = zrNepalAdDate();
+      const today = nepalTodayBs() || { y: BS_MIN, m: 1, d: 1 };
+      ZR.calSel = { y: today.y, m: today.m, d: today.d };
+      ZR.calView = { y: today.y, m: today.m };
       $('zr_month').value = today.m;
       $('zr_year').value = today.y;
       $('zr_year2').value = today.y;
+      zrCalRender();
     }
     function zrBuildControls() {
       const ySel = $('zr_year'), y2 = $('zr_year2'), mSel = $('zr_month');
@@ -10832,9 +10951,7 @@ EXAMPLE:
         }
         BS_MONTHS.forEach((n, i) => mSel.add(new Option(n, i + 1)));
       }
-      const first = bsToAd(BS_MIN, 1, 1).toISOString().slice(0, 10);
-      const last = bsToAd(BS_MAX, 12, bsMonthDays(BS_MAX, 12)).toISOString().slice(0, 10);
-      $('zr_date').min = first; $('zr_date').max = last;
+      zrCalBuild();
     }
     function openZodiacDialog() {
       const el = $('zr'); if (!el) return;
@@ -10885,6 +11002,7 @@ EXAMPLE:
         '- यो अनुरोधमा वास्तविक ग्रहगोचर, दशा, जन्मकुण्डली वा गणना गरिएको भाव-स्थिति दिइएको छैन। त्यसैले कुनै विशिष्ट ग्रहस्थिति, गोचर, दशा, भाव-स्थिति वा घटना भएको/हुने दाबी नगर्नुहोस्। यकिन डेटा नभएको कुरा आवश्यक परे स्पष्ट भन्नुहोस्।\n' +
         '- यो राशि-आधारित सामान्य राशिफल हो, व्यक्तिगत जन्मकुण्डली विश्लेषण होइन। जन्म मिति, समय वा स्थान नभएकोले व्यक्तिगत दाबी नगर्नुहोस्।\n' +
         '- प्रत्येक खण्डमा १–२ वाक्यको स्पष्ट विषयवस्तु र २–३ छोटा व्यावहारिक बुँदा दिनुहोस्।\n' +
+        '- सबै मिति, महिना, वर्ष र अवधि विक्रम संवत् (वि.सं.) मा मात्र लेख्नुहोस्; headline, summary, body, points र advice मा ईस्वी/AD/सन्/ई.सं. वा ग्रेगोरियन मिति कहीँ पनि नलेख्नुहोस्।\n' +
         '- भाषा शुद्ध, स्वाभाविक, बहने नेपाली (देवनागरी) होस्; यान्त्रिक दोहोरो वाक्य, भरिएको शब्द वा अंग्रेजी वाक्य नराख्नुहोस्।\n' +
         '- आकर्षक तर संयमित; १८–७०+ उमेरका पाठकलाई उपयोगी; आशा र यथार्थको सन्तुलन राख्नुहोस्।\n' +
         '- मृत्यु, गम्भीर रोग, दुर्घटना, अपंगता वा अनिवार्य असफलताको डर देखाउने भाषा प्रयोग नगर्नुहोस्; "निश्चित हुनेछ" भन्ने अति-दाबी नगर्नुहोस्।\n' +
@@ -10906,14 +11024,28 @@ EXAMPLE:
     }
     function zrPeriodMatches(got, type, period) {
       if (!got) return false;
-      const g = got.toLowerCase(), exp = period.key.toLowerCase();
+      /* Devenagari digits are normalized so both "२०८३" and "2083" match. */
+      const g = zrAsciiDigits(got).toLowerCase(), exp = period.key.toLowerCase();
       if (g === exp) return true;
       if (type.id === 'daily') {
         if (g.indexOf(period.adStr.toLowerCase()) >= 0) return true;
-        return g.indexOf('आज') >= 0;
+        if (g.indexOf('आज') >= 0) return true;
+        if (period.bs) {
+          if (g.indexOf(zrAsciiDigits(zrBsLabel(period.bs))) >= 0) return true;
+          if (g.indexOf([period.bs.y, period.bs.m, period.bs.d].join('-')) >= 0) return true;
+        }
+        return false;
       }
-      if (type.id === 'monthly') return g.indexOf('महिना') >= 0 || (g.indexOf(String(period.bs.y)) >= 0 && g.indexOf(String(period.bs.m)) >= 0);
-      if (type.id === 'yearly') return g.indexOf('वर्ष') >= 0 || g.indexOf(String(period.bs.y)) >= 0;
+      if (type.id === 'monthly') {
+        if (g.indexOf('महिना') >= 0 || g.indexOf('मासिक') >= 0) return true;
+        if (!period.bs) return false;
+        return g.indexOf(zrAsciiDigits(BS_MONTHS[period.bs.m - 1] + ' ' + neNum(period.bs.y))) >= 0 ||
+          (g.indexOf(String(period.bs.y)) >= 0 && g.indexOf(String(period.bs.m)) >= 0);
+      }
+      if (type.id === 'yearly') {
+        if (g.indexOf('वर्ष') >= 0 || g.indexOf('वार्षिक') >= 0) return true;
+        return !!(period.bs && g.indexOf(String(period.bs.y)) >= 0);
+      }
       return g.indexOf('जीवन') >= 0 || g === 'lifetime';
     }
     function zrExtractJson(text) {
@@ -10941,9 +11073,9 @@ EXAMPLE:
       if (!gotType) throw new Error('Gemini ले राशिफलको प्रकार स्पष्ट पारेन।');
       if (gotType !== type.id) throw new Error('Gemini ले ' + type.label + ' को सट्टा अर्को प्रकारको राशिफल फर्कायो।');
       const gotPeriod = zrCleanText(d.period || d.timeframe || '', 80);
-      if (!zrPeriodMatches(gotPeriod, type, period)) throw new Error('Gemini ले चयनित अवधि (' + period.key + ') मिलाएन।');
-      const headline = zrCleanText(d.headline || d.title, 80);
-      const summary = zrCleanText(d.summary || d.overview || d.intro || d.description, 380);
+      if (!zrPeriodMatches(gotPeriod, type, period)) throw new Error('Gemini ले चयनित अवधि (' + period.userLabel + ') मिलाएन।');
+      const headline = zrDisplayText(d.headline || d.title, 80);
+      const summary = zrDisplayText(d.summary || d.overview || d.intro || d.description, 380);
       if (!headline) throw new Error('Gemini ले शीर्षक दिएन।');
       if (!summary) throw new Error('Gemini ले सारांश दिएन।');
       let raw = d.sections || d.cards;
@@ -10954,14 +11086,14 @@ EXAMPLE:
       const sections = [];
       raw.forEach(x => {
         if (!x || typeof x !== 'object') return;
-        const title = zrCleanText(x.title || x.heading || x.name, 64);
-        const body = zrCleanText(x.body || x.text || x.content || x.description, 1200);
+        const title = zrDisplayText(x.title || x.heading || x.name, 64);
+        const body = zrDisplayText(x.body || x.text || x.content || x.description, 1200);
         const points = zrList(x.points || x.bullets || x.tips || x.list);
         if (!title || (!body && !points.length)) return;
         sections.push({ title: title, body: body, points: points });
       });
       if (sections.length < type.min) throw new Error('Gemini ले आवश्यक खण्डहरू पूरा दिएन (' + sections.length + '/' + type.sections.length + ')।');
-      const advice = zrCleanText(d.advice || d.suggestion || d.upay || d.tip, 340);
+      const advice = zrDisplayText(d.advice || d.suggestion || d.upay || d.tip, 340);
       if (!advice) throw new Error('Gemini ले अन्तिम सुझाव दिएन।');
       return { headline: headline, summary: summary, sections: sections.slice(0, 8), advice: advice };
     }
@@ -11033,6 +11165,7 @@ EXAMPLE:
       if (/\uFFFD|\u0000/.test(raw)) throw new Error('सामग्रीमा अमान्य वर्ण भेटियो।');
       const dev = (raw.match(/[\u0900-\u097F]/g) || []).length;
       if (dev < 80) throw new Error('नेपाली (देवनागरी) सामग्री अपर्याप्त छ।');
+      if (zrHasAdDate(raw)) throw new Error('कार्डमा ईस्वी मिति भेटियो; सबै मिति वि.सं. मा हुनुपर्छ।');
       if (raw.indexOf(sign.ne) < 0) throw new Error('कार्डमा छानिएको राशि भेटिएन।');
       if (raw.indexOf(type.label) < 0) throw new Error('कार्डमा छानिएको राशिफल प्रकार भेटिएन।');
       const parsed = mdParse(raw);
@@ -11174,7 +11307,7 @@ EXAMPLE:
         ZR.type = ZR_TYPES.find(t => t.id === b.dataset.type) || null;
         zrRender();
       });
-      ['zr_date', 'zr_month', 'zr_year', 'zr_year2'].forEach(id => { $(id).oninput = $(id).onchange = () => zrUpdatePick() });
+      ['zr_month', 'zr_year', 'zr_year2'].forEach(id => { $(id).oninput = $(id).onchange = () => zrUpdatePick() });
       $('zr_x').onclick = closeZodiacDialog;
       $('zr_cancel').onclick = closeZodiacDialog;
       $('zr_go').onclick = zrMakeSlides;

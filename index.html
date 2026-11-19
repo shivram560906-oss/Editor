@@ -3812,6 +3812,283 @@
       }
     }
 
+    /* ============================ Rashi (one-sign) picker ============================ */
+    #zr {
+      position: fixed;
+      inset: 0;
+      z-index: 421;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    #zr[hidden] {
+      display: none;
+    }
+
+    .zr-back {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, .72);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .zr-card {
+      position: relative;
+      width: min(560px, 96vw);
+      max-height: calc(100dvh - 32px);
+      overflow: auto;
+      background: var(--panel);
+      border: 1px solid var(--line-2);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .zr-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .zr-head b {
+      display: block;
+      font-size: 16px;
+      font-weight: 750;
+      letter-spacing: -.01em;
+    }
+
+    .zr-head span {
+      display: block;
+      color: var(--mut);
+      font-size: 11.5px;
+      margin-top: 2px;
+    }
+
+    .zr-x {
+      margin-left: auto;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 auto;
+      border-radius: 9px;
+      color: var(--mut);
+      font-size: 22px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .zr-x:hover {
+      color: var(--fg);
+      background: var(--panel-3);
+    }
+
+    .zr-step {
+      margin-top: 12px;
+    }
+
+    .zr-step[hidden] {
+      display: none;
+    }
+
+    .zr-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--fg);
+    }
+
+    .zr-label i {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--panel-3);
+      color: var(--mut);
+      font-style: normal;
+      font-size: 10px;
+    }
+
+    .zr-signs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .zr-sign {
+      min-height: 54px;
+      padding: 7px 6px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--fg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+    }
+
+    .zr-sign b {
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.2;
+    }
+
+    .zr-sign span {
+      font-size: 9.5px;
+      color: var(--mut);
+      line-height: 1.2;
+    }
+
+    .zr-sign:hover {
+      border-color: var(--line-2);
+      background: var(--panel-3);
+    }
+
+    .zr-sign.on {
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--ac), var(--ac-2));
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(255, 59, 92, .32);
+    }
+
+    .zr-sign.on span {
+      color: rgba(255, 255, 255, .82);
+    }
+
+    .zr-types {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .zr-type {
+      min-height: 50px;
+      padding: 7px 9px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--fg);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1px;
+    }
+
+    .zr-type b {
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .zr-type span {
+      font-size: 9.5px;
+      color: var(--mut);
+    }
+
+    .zr-type:hover {
+      border-color: var(--line-2);
+      background: var(--panel-3);
+    }
+
+    .zr-type.on {
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--ac), var(--ac-2));
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(255, 59, 92, .32);
+    }
+
+    .zr-type.on span {
+      color: rgba(255, 255, 255, .82);
+    }
+
+    .zr-when {
+      margin-top: 12px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel-2);
+    }
+
+    .zr-when[hidden],
+    .zr-when > [hidden] {
+      display: none;
+    }
+
+    .zr-when label {
+      display: block;
+      margin: 0 0 6px;
+      font-size: 10.5px;
+      font-weight: 650;
+      color: var(--mut);
+    }
+
+    .zr-row {
+      display: flex;
+      gap: 7px;
+    }
+
+    .zr-row > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .zr-hint {
+      margin: 7px 0 0;
+      font-size: 10.5px;
+      line-height: 1.5;
+      color: var(--mut);
+    }
+
+    #zr_pick {
+      display: block;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--mut);
+      margin-bottom: 9px;
+    }
+
+    .zr-foot {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    #zr.busy .zr-signs,
+    #zr.busy .zr-types,
+    #zr.busy .zr-when {
+      pointer-events: none;
+      opacity: .55;
+    }
+
+    #zr.busy .zr-card {
+      cursor: progress;
+    }
+
+    @media (max-width: 430px) {
+      .zr-card {
+        padding: 13px;
+      }
+
+      .zr-signs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .zr-types {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* ==================== Kundali CapCut-style inspector (Phase 9 redesign) ==================== */
 
     /* ── Layer-row helpers (kept for timeline sub-tracks) ── */
@@ -4845,6 +5122,53 @@
         <div class="rcal-actions">
           <button id="rcal_cancel" class="btn">रद्द</button>
           <button id="rcal_ok" class="btn btn-primary">यो मितिको राशिफल बनाउनुहोस्</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="zr" hidden>
+    <div class="zr-back" data-zr-close></div>
+    <div class="zr-card" role="dialog" aria-modal="true" aria-labelledby="zr_title">
+      <div class="zr-head">
+        <div><b id="zr_title">राशी</b><span>राशि र राशिफलको समय छान्नुहोस्</span></div>
+        <button id="zr_x" class="zr-x" title="Close" aria-label="Close">×</button>
+      </div>
+      <div class="zr-step">
+        <div class="zr-label"><i>१</i> राशि छान्नुहोस्</div>
+        <div id="zr_signs" class="zr-signs" role="group" aria-label="१२ राशि"></div>
+      </div>
+      <div class="zr-step" id="zr_types_step" hidden>
+        <div class="zr-label"><i>२</i> राशिफलको प्रकार छान्नुहोस्</div>
+        <div id="zr_types" class="zr-types" role="group" aria-label="राशिफलको प्रकार"></div>
+      </div>
+      <div class="zr-when" id="zr_when" hidden>
+        <div id="zr_daily" hidden>
+          <label for="zr_date">मिति (ईस्वी)</label>
+          <input type="date" id="zr_date">
+          <p class="zr-hint" id="zr_date_preview"></p>
+        </div>
+        <div id="zr_monthly" hidden>
+          <label for="zr_month">महिना</label>
+          <div class="zr-row">
+            <select id="zr_month"></select>
+            <select id="zr_year" aria-label="वर्ष"></select>
+          </div>
+          <p class="zr-hint" id="zr_month_preview"></p>
+        </div>
+        <div id="zr_yearly" hidden>
+          <label for="zr_year2">वर्ष (वि.सं.)</label>
+          <select id="zr_year2"></select>
+          <p class="zr-hint" id="zr_year_preview"></p>
+        </div>
+        <p class="zr-hint" id="zr_life" hidden>सम्पूर्ण जीवनफल राशि-आधारित व्यापक झलक हो — व्यक्तिगत जन्मकुण्डली विश्लेषण होइन।</p>
+      </div>
+      <div class="zr-foot">
+        <span id="zr_pick"></span>
+        <div id="zr_msg" class="rcal-msg" role="status" aria-live="polite" hidden></div>
+        <div class="rcal-actions">
+          <button id="zr_cancel" class="btn">रद्द</button>
+          <button id="zr_go" class="btn btn-primary" disabled>राशिफल बनाउनुहोस्</button>
         </div>
       </div>
     </div>
@@ -10039,7 +10363,8 @@ EXAMPLE:
 @img: green meadow
 \`\`\``;
     const RASHI_CHIP = 'आजको राशिफल (१२ राशि)';
-    const CHIPS = [RASHI_CHIP, '५ वटा प्रेरक विचार', 'आरती / मन्त्र स्लाइड', 'Make it shorter', 'Add bullet points', 'Fix the format'];
+    const ZRASHI_CHIP = 'राशी';
+    const CHIPS = [RASHI_CHIP, ZRASHI_CHIP, '५ वटा प्रेरक विचार', 'आरती / मन्त्र स्लाइड', 'Make it shorter', 'Add bullet points', 'Fix the format'];
     /* Nepali (Bikram Sambat) date picker. The 12 rashi points are generated
        by Gemini for the chosen date; only the template structure is fixed. */
     const RCAL = { sel: null, view: null };
@@ -10187,6 +10512,678 @@ EXAMPLE:
     $('rcal_ok').onclick = makeRashiSlides;
     document.querySelector('[data-rcal-close]').onclick = closeRashiCal;
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('rcal').hidden) closeRashiCal() });
+
+    /* ===================== One-sign Rashi horoscope (AI panel) =====================
+       This is a separate, isolated flow. It reuses the existing slide parser,
+       card renderer, picture loader and timeline insertion (autoGen), while the
+       original 12-sign daily rashi flow above stays untouched. */
+    const ZR_SIGNS = [
+      {
+        key: 'aries', ne: 'मेष', en: 'Aries', img: 1,
+        lord: 'मंगल', element: 'अग्नि', nature: 'चर',
+        house: 'पहिलो राशि — आत्म-परिचय, पहल, साहस, जीवनशक्ति, शरीर र नयाँ सुरुवातसँग सम्बन्धित',
+        strengths: 'पहल-क्षमता, साहस, ऊर्जा, नेतृत्व, स्पष्टता, प्रतिस्पर्धात्मक भावना, छिटो निर्णय र नयाँ काम सुरु गर्ने उत्साह',
+        watch: 'हतार, आवेग, रिस, धैर्यको कमी, अरूको भावना कम विचार गर्ने, धेरै काम सुरु गरेर अधुरो छोड्ने प्रवृत्ति',
+        style: 'पहल, साहस र स्पष्टतालाई केन्द्रमा राख्नुहोस्; धैर्य, सुन्ने बानी, निरन्तरता र अरूसँग मिलेर काम गर्ने व्यावहारिक सुझाव दिनुहोस्'
+      },
+      {
+        key: 'taurus', ne: 'वृषभ', en: 'Taurus', img: 2,
+        lord: 'शुक्र', element: 'पृथ्वी', nature: 'स्थिर',
+        house: 'दोस्रो राशि — धन, वाणी, परिवार, आत्म-मूल्य र भौतिक सुरक्षासँग सम्बन्धित',
+        strengths: 'धैर्य, स्थिरता, व्यावहारिकता, भरपर्दो निरन्तरता, आर्थिक अनुशासन, सौन्दर्य र कलाप्रति संवेदनशीलता',
+        watch: 'जिद्दी, परिवर्तनप्रति प्रतिरोध, अत्यधिक सञ्चय वा सुख-सुविधामा झुकाव, ढिलो निर्णय',
+        style: 'भावनालाई दीर्घकालीन सुरक्षा र व्यावहारिक कदमसँग जोड्नुहोस्; छिटो परिवर्तनभन्दा स्थिर प्रगतिको भाषा प्रयोग गर्नुहोस्'
+      },
+      {
+        key: 'gemini', ne: 'मिथुन', en: 'Gemini', img: 3,
+        lord: 'बुध', element: 'वायु', nature: 'द्विस्वभाव',
+        house: 'तेस्रो राशि — सञ्चार, सीप, साहस, दाजुभाई-दिदीबहिनी र छोटा यात्रासँग सम्बन्धित',
+        strengths: 'जिज्ञासा, छिटो सिक्ने क्षमता, सञ्चार-कौशल, अनुकूलनशीलता, बहुमुखी प्रतिभा र सामाजिक सहजता',
+        watch: 'चञ्चलता, ध्यान छरिने प्रवृत्ति, अत्यधिक सोच, निरन्तरताको कमी र हतारमा निष्कर्ष निकाल्ने बानी',
+        style: 'सञ्चार, सिकाइ र अनुकूलनलाई केन्द्रमा राख्नुहोस्; विकल्प धेरै भए पनि एउटा प्राथमिकता टुंग्याउने व्यावहारिक सुझाव दिनुहोस्'
+      },
+      {
+        key: 'cancer', ne: 'कर्क', en: 'Cancer', img: 4,
+        lord: 'चन्द्र', element: 'जल', nature: 'चर',
+        house: 'चौथो राशि — घर, माता, भावना, आन्तरिक शान्ति, जरा र सुरक्षासँग सम्बन्धित',
+        strengths: 'संवेदनशीलता, भावनात्मक बुद्धि, हेरचाह, स्मरणशक्ति, अन्तर्ज्ञान, निष्ठा र सुरक्षा दिने क्षमता',
+        watch: 'भावनात्मक संवेदनशीलता, मनको उतारचढाव, विगतमा अड्किने प्रवृत्ति, अत्यधिक रक्षात्मकता र परोक्ष सञ्चार',
+        style: 'भावनात्मक सुरक्षा, घर-परिवार र अन्तर्ज्ञानलाई केन्द्रमा राख्नुहोस्; सीमा र स्पष्ट संवादका व्यावहारिक सुझाव दिनुहोस्'
+      },
+      {
+        key: 'leo', ne: 'सिंह', en: 'Leo', img: 5,
+        lord: 'सूर्य', element: 'अग्नि', nature: 'स्थिर',
+        house: 'पाँचौं राशि — सिर्जनशीलता, आत्म-अभिव्यक्ति, बुद्धि, सन्तान, नेतृत्व र प्रतिष्ठासँग सम्बन्धित',
+        strengths: 'आत्मविश्वास, नेतृत्व, उदारता, सिर्जनशीलता, निष्ठा, गर्मजोशी र प्रतिष्ठा कायम राख्ने क्षमता',
+        watch: 'अहंकार, प्रशंसाको आवश्यकता, प्रभुत्व देखाउने प्रवृत्ति, जिद्दी र अत्यधिक देखावटीपन',
+        style: 'आत्मविश्वासलाई विनम्रता र सेवासँग जोड्नुहोस्; नेतृत्व, सिर्जनशीलता र मान्यताका व्यावहारिक सुझाव दिनुहोस्'
+      },
+      {
+        key: 'virgo', ne: 'कन्या', en: 'Virgo', img: 6,
+        lord: 'बुध', element: 'पृथ्वी', nature: 'द्विस्वभाव',
+        house: 'छैटौं राशि — सेवा, स्वास्थ्य, कार्य, अनुशासन, विश्लेषण, दैनिक दिनचर्या र अवरोधसँग सम्बन्धित',
+        strengths: 'विश्लेषण, सूक्ष्मता, सेवाभाव, संगठन, छुट्याउने क्षमता, व्यावहारिक सीप र भरपर्दो परिश्रम',
+        watch: 'पूर्णतावाद, आत्म-आलोचना, अत्यधिक सोच, चिन्ता, अरूको आलोचना र अत्यधिक काममा डुब्ने प्रवृत्ति',
+        style: 'व्यावहारिक सेवा, सूक्ष्म विवरण, स्वास्थ्य-दिनचर्या र स्पष्ट विश्लेषणमा केन्द्रित रहनुहोस्; कठोर आलोचना र चिन्ताबाट बच्ने सुझाव दिनुहोस्'
+      },
+      {
+        key: 'libra', ne: 'तुला', en: 'Libra', img: 7,
+        lord: 'शुक्र', element: 'वायु', nature: 'चर',
+        house: 'सातौं राशि — साझेदारी, विवाह, व्यापार, सन्तुलन, न्याय र अरूसँगको सम्बन्धसँग सम्बन्धित',
+        strengths: 'कूटनीति, निष्पक्षता, सन्तुलन, सम्बन्ध-निर्माण, सौन्दर्यबोध, समझदारी र सामाजिक शिष्टता',
+        watch: 'निर्णयमा ढिलाइ, सबैलाई खुशी बनाउने चेष्टा, द्वन्द्वबाट बच्ने प्रवृत्ति, अरूको स्वीकृतिमा निर्भरता र असन्तुलन',
+        style: 'सन्तुलन, साझेदारी र निष्पक्षतालाई केन्द्रमा राख्नुहोस्; स्पष्ट सीमा, आत्म-मूल्य र समयमै निर्णयका व्यावहारिक सुझाव दिनुहोस्'
+      },
+      {
+        key: 'scorpio', ne: 'वृश्चिक', en: 'Scorpio', img: 8,
+        lord: 'मंगल', element: 'जल', nature: 'स्थिर',
+        house: 'आठौं राशि — गहिराइ, रूपान्तरण, साझा स्रोत, गोप्यता, अनुसन्धान, उत्तराधिकार र संकट-व्यवस्थापनसँग सम्बन्धित',
+        strengths: 'गहिरो केन्द्रितता, भावनात्मक तीव्रता, अनुसन्धान-क्षमता, लचिलो पुनर्निर्माण, निष्ठा, संकटमा धैर्य र रहस्य बुझ्ने सूक्ष्मता',
+        watch: 'अत्यधिक गोप्यता, शंका, नियन्त्रण गर्ने प्रवृत्ति, ईर्ष्या, पुरानो कुरा समातिरहने बानी र विश्वासको डर',
+        style: 'गहिराइ, रूपान्तरण र भावनात्मक सत्यलाई केन्द्रमा राख्नुहोस्; विश्वास, स्वस्थ सीमा, क्षमा र क्रमिक परिवर्तनका व्यावहारिक सुझाव दिनुहोस्'
+      },
+      {
+        key: 'sagittarius', ne: 'धनु', en: 'Sagittarius', img: 9,
+        lord: 'गुरु', element: 'अग्नि', nature: 'द्विस्वभाव',
+        house: 'नवौं राशि — धर्म, दर्शन, उच्च शिक्षा, गुरु, दीर्घ यात्रा, भाग्य र नैतिक दृष्टिकोणसँग सम्बन्धित',
+        strengths: 'आशावाद, दूरदृष्टि, ज्ञान, शिक्षण-क्षमता, इमानदारी, अनुकूलनशीलता, साहसिक यात्रा-प्रवृत्ति र विश्वास',
+        watch: 'अत्यधिक वाचा गर्ने, अस्थिरता, हतारमा स्पष्ट बोल्ने, धैर्यको कमी, अति-उत्साह र काम अधुरो छोड्ने प्रवृत्ति',
+        style: 'दूरदृष्टि, सिकाइ र नैतिक उद्देश्यलाई केन्द्रमा राख्नुहोस्; व्यावहारिक जमीन, पूरा गर्ने बानी र स्पष्ट सञ्चारका सुझाव दिनुहोस्'
+      },
+      {
+        key: 'capricorn', ne: 'मकर', en: 'Capricorn', img: 10,
+        lord: 'शनि', element: 'पृथ्वी', nature: 'चर',
+        house: 'दशौं राशि — करियर, कर्म, जिम्मेवारी, सार्वजनिक जीवन, अनुशासन, संरचना र दीर्घकालीन उपलब्धिसँग सम्बन्धित',
+        strengths: 'अनुशासन, धैर्य, जिम्मेवारी, व्यावहारिकता, संगठन-क्षमता, दीर्घकालीन योजना, सहनशीलता र भरपर्दो परिश्रम',
+        watch: 'अत्यधिक काम, कठोरता, निराशावाद, जोखिमबाट अत्यधिक बच्ने, स्थिति-प्रतिष्ठाको चिन्ता र भावनात्मक दूरी',
+        style: 'दीर्घकालीन लक्ष्य, अनुशासन र जिम्मेवारीलाई केन्द्रमा राख्नुहोस्; काम र विश्राम, महत्वाकांक्षा र नाता, कठोरता र लचिलोपनबीच सन्तुलनका सुझाव दिनुहोस्'
+      },
+      {
+        key: 'aquarius', ne: 'कुम्भ', en: 'Aquarius', img: 11,
+        lord: 'शनि', element: 'वायु', nature: 'स्थिर',
+        house: 'एघारौं राशि — समूह, मित्रता, सामाजिक सञ्जाल, नवीनता, सामूहिक उद्देश्य, लाभ र भविष्यप्रतिको दृष्टिसँग सम्बन्धित',
+        strengths: 'मौलिकता, मानवीय दृष्टि, मित्रता, नवीन सोच, स्वतन्त्रता, वस्तुनिष्ठता, सञ्जाल-निर्माण र प्रगतिशील परिकल्पना',
+        watch: 'भावनात्मक दूरी, जिद्दी, अनावश्यक विद्रोह, अलगाव, अत्यधिक सैद्धान्तिक सोच र व्यावहारिक कार्यान्वयनको कमी',
+        style: 'नवीनता, सामाजिक योगदान र मित्रतालाई केन्द्रमा राख्नुहोस्; स्वतन्त्रता र जोडाइ, विचार र कार्यान्वयनबीच सन्तुलनका व्यावहारिक सुझाव दिनुहोस्'
+      },
+      {
+        key: 'pisces', ne: 'मीन', en: 'Pisces', img: 12,
+        lord: 'गुरु', element: 'जल', nature: 'द्विस्वभाव',
+        house: 'बाह्रौं राशि — आध्यात्मिकता, करुणा, कल्पना, विश्राम, विलय, एकान्त, विदेश र अवचेतनसँग सम्बन्धित',
+        strengths: 'सहानुभूति, कल्पना, अन्तर्ज्ञान, करुणा, अनुकूलनशीलता, कलात्मक संवेदनशीलता, आध्यात्मिक झुकाव र निःस्वार्थ भावना',
+        watch: 'अत्यधिक आदर्शवाद, वास्तविकताबाट भाग्ने प्रवृत्ति, कमजोर सीमा, निर्णयमा द्विविधा, भावनात्मक बोझ र आफ्नो आवश्यकता बिर्सने बानी',
+        style: 'करुणा, कल्पना र आन्तरिक शान्तिलाई केन्द्रमा राख्नुहोस्; व्यावहारिक सीमा, जमीनमा टेकेका साना कदम र आत्म-हेरचाहका सुझाव दिनुहोस्'
+      },
+    ];
+    const ZR_TYPES = [
+      {
+        id: 'daily', label: 'आजको राशिफल', en: 'Daily Horoscope', min: 4,
+        sections: ['काम र करियर', 'पैसा र आर्थिक पक्ष', 'स्वास्थ्य र ऊर्जा', 'परिवार र सम्बन्ध'],
+        focus: 'आजको मितिका लागि मात्र लेख्नुहोस्। भोलिको, यो महिनाको वा यो वर्षको भविष्य नलेख्नुहोस्। आजको दिनको ऊर्जा, कामको गति, आर्थिक सावधानी, स्वास्थ्य र सम्बन्धमा के गर्ने र के नगर्ने भन्नेमा केन्द्रित हुनुहोस्।'
+      },
+      {
+        id: 'monthly', label: 'यो महिनाको राशिफल', en: 'Monthly Horoscope', min: 4,
+        sections: ['महिनाको समग्र दृष्टि', 'काम र करियर', 'आर्थिक पक्ष', 'स्वास्थ्य र ऊर्जा', 'सम्बन्ध र परिवार'],
+        focus: 'चयनित महिनाभरको समग्र प्रवृत्ति लेख्नुहोस्। दैनिक भविष्यवाणी वा वर्षभरको विस्तृत विवरण नलेख्नुहोस्। महिनाभरि काम, पैसा, स्वास्थ्य र सम्बन्धमा ध्यान दिनुपर्ने कुरा र व्यावहारिक योजना समावेश गर्नुहोस्।'
+      },
+      {
+        id: 'yearly', label: 'यो वर्षको राशिफल', en: 'Yearly Horoscope', min: 5,
+        sections: ['वर्षको समग्र दृष्टि', 'करियर र शिक्षा', 'आर्थिक पक्ष', 'स्वास्थ्य र जीवनशैली', 'सम्बन्ध र परिवार', 'आध्यात्मिक विकास'],
+        focus: 'चयनित वर्षभरको समग्र प्रवृत्ति लेख्नुहोस्। दैनिक वा महिनावारी विस्तृत भविष्यवाणी नलेख्नुहोस्। वर्षका मुख्य अवसर, चुनौती, करियर/शिक्षा, आर्थिक तयारी, स्वास्थ्य र सम्बन्धका दीर्घकालीन सूत्र समावेश गर्नुहोस्।'
+      },
+      {
+        id: 'lifetime', label: 'सम्पूर्ण जीवनफल', en: 'Lifetime Horoscope', min: 6,
+        sections: ['व्यक्तित्व र स्वभाव', 'करियर र क्षमता', 'आर्थिक प्रवृत्ति', 'सम्बन्ध र परिवार', 'स्वास्थ्य प्रवृत्ति', 'आध्यात्मिक यात्रा', 'जीवनको मुख्य पाठ'],
+        focus: 'राशि आधारित व्यापक जीवन-प्रवृत्ति लेख्नुहोस्। यो व्यक्तिगत जन्मकुण्डली विश्लेषण होइन; जन्म मिति, समय वा स्थान नभएकोले व्यक्तिगत दाबी नगर्नुहोस्। कुनै निश्चित घटना, उमेर, मिति वा परिणामको भविष्यवाणी नगर्नुहोस्। स्वभाव, क्षमता, करियर प्रवृत्ति, आर्थिक बानी, सम्बन्ध, स्वास्थ्य-प्रवृत्ति, आध्यात्मिक विकास र जीवनका सामान्य पाठमा केन्द्रित हुनुहोस्।'
+      }
+    ];
+    const ZR_SIGN_ALIASES = {
+      'वृष': 'वृषभ', 'कर्कट': 'कर्क',
+      aries: 'मेष', taurus: 'वृषभ', gemini: 'मिथुन', cancer: 'कर्क', leo: 'सिंह', virgo: 'कन्या',
+      libra: 'तुला', scorpio: 'वृश्चिक', sagittarius: 'धनु', capricorn: 'मकर', aquarius: 'कुम्भ', pisces: 'मीन'
+    };
+    const ZR_TYPE_ALIASES = {
+      daily: 'daily', day: 'daily', today: 'daily', 'दैनिक': 'daily', 'आज': 'daily', 'आजको': 'daily',
+      'आजको राशिफल': 'daily', 'daily horoscope': 'daily',
+      monthly: 'monthly', month: 'monthly', 'मासिक': 'monthly', 'महिना': 'monthly', 'महिनाको': 'monthly',
+      'यो महिनाको राशिफल': 'monthly', 'monthly horoscope': 'monthly',
+      yearly: 'yearly', year: 'yearly', annual: 'yearly', 'वार्षिक': 'yearly', 'वर्ष': 'yearly', 'वर्षको': 'yearly',
+      'यो वर्षको राशिफल': 'yearly', 'yearly horoscope': 'yearly',
+      lifetime: 'lifetime', life: 'lifetime', lifelong: 'lifetime', 'जीवन': 'lifetime', 'जीवनफल': 'lifetime',
+      'सम्पूर्ण जीवनफल': 'lifetime', 'lifetime horoscope': 'lifetime'
+    };
+    const ZR = { sign: null, type: null, busy: false, seq: 0, ac: null, bub: null };
+    const ZR_CACHE = new Map();
+    const ZR_SYS = `तपाईं बृहत् पाराशर होरा शास्त्र (BPHS) को पराशरी परम्परामा दक्ष, संयमित र भरपर्दो वैदिक ज्योतिषी हुनुहुन्छ। तपाईंले नेपाली (देवनागरी) मा राशिफल लेख्नुहुन्छ।
+यो अनुरोध राशि-आधारित सामान्य राशिफल हो। यो व्यक्तिगत जन्मकुण्डली, जन्मकुण्डली गणना वा व्यक्तिगत भविष्यवाणी होइन। जन्म मिति, जन्म समय र जन्म स्थान दिइएको छैन, त्यसैले व्यक्तिगत दाबी नगर्नुहोस्।
+राशिको स्वामी ग्रह, तत्त्व, स्वभाव, केन्द्रादि गुण र भावको सामान्य पराशरी अर्थ प्रयोग गर्नुहोस्। यो अनुरोधमा वास्तविक ग्रहगोचर, दशा, गोचर वा गणना गरिएको भाव-स्थिति दिइएको छैन; त्यसैले कुनै विशिष्ट ग्रहस्थिति, गोचर, दशा, भाव-स्थिति वा घटना भएको/हुने दाबी नगर्नुहोस्। यकिन डेटा नभएको कुरा आवश्यक परे स्पष्ट भन्नुहोस्।
+भाषा शुद्ध, स्वाभाविक र बहने नेपाली होस्। यान्त्रिक दोहोरो वाक्य, भरिएको शब्द वा अंग्रेजी वाक्य नराख्नुहोस्। सन्तुलित, आकर्षक तर संयमित शैली अपनाउनुहोस्; १८ वर्षदेखि ७०+ उमेरका पाठकलाई उपयोगी हुने भाषा प्रयोग गर्नुहोस्।
+मृत्यु, गम्भीर रोग, दुर्घटना, अपंगता वा अनिवार्य असफलताको डर देखाउने भाषा प्रयोग नगर्नुहोस्। "निश्चित हुनेछ" भन्ने अति-दाबी नगर्नुहोस्। प्रत्येक खण्डमा व्यावहारिक सुझाव दिनुहोस् र एउटै कुरा दोहोर्याएर खण्ड नभर्नुहोस्।
+केवल मान्य JSON फर्काउनुहोस्। markdown, code fence, HTML, emoji, तालिका वा अतिरिक्त व्याख्या नराख्नुहोस्।`;
+    function zrCut(s, max) {
+      if (s.length <= max) return s;
+      let cut = s.slice(0, max), i = Math.max(cut.lastIndexOf(' '), cut.lastIndexOf('।'), cut.lastIndexOf(','));
+      if (i > max * .55) cut = cut.slice(0, i);
+      return cut.replace(/[\s,;:।-]+$/, '').trim() + '…';
+    }
+    function zrCleanText(v, max) {
+      let s = v == null ? '' : String(v);
+      s = s.replace(/<[^>]*>/g, ' ').replace(/```+/g, ' ').replace(/\*\*|__|~~|`/g, '')
+        .replace(/^[ \t]*#{1,6}[ \t]*/gm, '').replace(/\u00a0/g, ' ').replace(/\r/g, ' ')
+        .replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim();
+      s = s.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '').trim();
+      return max ? zrCut(s, max) : s;
+    }
+    function zrList(v) {
+      const one = x => zrCleanText(x, 100).replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').trim();
+      if (Array.isArray(v)) return v.map(one).filter(Boolean).slice(0, 4);
+      if (typeof v === 'string') return v.replace(/\r/g, '').split(/\n+|(?:\s*•\s*)/).map(one).filter(Boolean).slice(0, 4);
+      return [];
+    }
+    function zrNepalAdDate() {
+      const t = new Date(Date.now() + 5.75 * 3600000);
+      return t.getUTCFullYear() + '-' + String(t.getUTCMonth() + 1).padStart(2, '0') + '-' + String(t.getUTCDate()).padStart(2, '0');
+    }
+    function zrAdToBs(adStr) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(adStr || ''));
+      if (!m) return null;
+      return adToBs(new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])));
+    }
+    function zrBsLabel(bs) {
+      return neNum(bs.d) + ' ' + BS_MONTHS[bs.m - 1] + ' ' + neNum(bs.y);
+    }
+    function zrNormSign(v) {
+      let s = zrCleanText(v, 80).replace(/\s*राशि\s*$/i, '').trim();
+      if (!s) return '';
+      const low = s.toLowerCase();
+      if (ZR_SIGN_ALIASES[low]) return ZR_SIGN_ALIASES[low];
+      for (const x of ZR_SIGNS) if (s === x.ne || low === x.en.toLowerCase()) return x.ne;
+      return '';
+    }
+    function zrNormType(v) {
+      const s = zrCleanText(v, 80).toLowerCase();
+      if (ZR_TYPE_ALIASES[s]) return ZR_TYPE_ALIASES[s];
+      for (const k of ['daily', 'monthly', 'yearly', 'lifetime', 'दैनिक', 'मासिक', 'वार्षिक', 'जीवन']) if (s.includes(k)) return ZR_TYPE_ALIASES[k] || (k === 'दैनिक' ? 'daily' : k === 'मासिक' ? 'monthly' : k === 'वार्षिक' ? 'yearly' : 'lifetime');
+      return '';
+    }
+    function zrSetMsg(msg, err) {
+      const el = $('zr_msg'); if (!el) return;
+      el.textContent = msg || '';
+      el.hidden = !msg;
+      el.classList.toggle('err', !!err);
+    }
+    function zrPeriodInfo() {
+      const type = ZR.type; if (!type) return null;
+      if (type.id === 'daily') {
+        const adStr = $('zr_date').value, bs = zrAdToBs(adStr);
+        if (!bs) return null;
+        const wd = BS_WEEK[bsWeekday(bs.y, bs.m, bs.d)], label = zrBsLabel(bs);
+        return {
+          key: 'daily:' + adStr, bs, adStr,
+          cardLabel: 'आजको राशिफल • ' + label,
+          pickLabel: label + ' (' + adStr + ')',
+          userLabel: label + ' (' + adStr + ')',
+          promptPeriod: label + ', ' + wd + ' (' + adStr + ' AD)'
+        };
+      }
+      if (type.id === 'monthly') {
+        const y = +$('zr_year').value, m = +$('zr_month').value;
+        if (!(y >= BS_MIN && y <= BS_MAX) || !(m >= 1 && m <= 12)) return null;
+        const first = bsToAd(y, m, 1).toISOString().slice(0, 10), last = bsToAd(y, m, bsMonthDays(y, m)).toISOString().slice(0, 10);
+        const label = BS_MONTHS[m - 1] + ' ' + neNum(y);
+        return {
+          key: 'monthly:' + y + '-' + m, bs: { y, m, d: 1 },
+          cardLabel: 'यो महिनाको राशिफल • ' + label,
+          pickLabel: label + ' (' + first + ' – ' + last + ')',
+          userLabel: label + ' (' + first + ' – ' + last + ' AD)',
+          promptPeriod: label + ' (ई.सं. ' + first + ' देखि ' + last + ' सम्म)'
+        };
+      }
+      if (type.id === 'yearly') {
+        const y = +$('zr_year2').value;
+        if (!(y >= BS_MIN && y <= BS_MAX)) return null;
+        const first = bsToAd(y, 1, 1).toISOString().slice(0, 10), last = bsToAd(y, 12, bsMonthDays(y, 12)).toISOString().slice(0, 10);
+        return {
+          key: 'yearly:' + y, bs: { y, m: 1, d: 1 },
+          cardLabel: 'यो वर्षको राशिफल • ' + neNum(y) + ' BS',
+          pickLabel: neNum(y) + ' BS (' + first + ' – ' + last + ')',
+          userLabel: neNum(y) + ' BS (' + first + ' – ' + last + ' AD)',
+          promptPeriod: neNum(y) + ' BS (ई.सं. ' + first + ' देखि ' + last + ' सम्म)'
+        };
+      }
+      return {
+        key: 'lifetime', bs: null,
+        cardLabel: 'सम्पूर्ण जीवनफल • राशि आधारित',
+        pickLabel: 'राशि-आधारित व्यापक जीवनफल',
+        userLabel: 'राशि-आधारित व्यापक जीवनफल',
+        promptPeriod: 'सम्पूर्ण जीवनफल (राशि-आधारित व्यापक झलक; व्यक्तिगत जन्मकुण्डली होइन)'
+      };
+    }
+    function zrCanGo() { return !!(ZR.sign && ZR.type && zrPeriodInfo()); }
+    function zrBusyState(on) {
+      const el = $('zr'); if (!el) return;
+      el.classList.toggle('busy', !!on);
+      const go = $('zr_go');
+      go.disabled = !!on || !zrCanGo();
+      go.textContent = on ? 'Gemini ले लेख्दैछ…' : 'राशिफल बनाउनुहोस्';
+    }
+    function zrRenderPreview() {
+      const bs = zrAdToBs($('zr_date').value);
+      $('zr_date_preview').textContent = !$('zr_date').value ? 'मिति छान्नुहोस्।'
+        : !bs ? 'वि.सं. १९७५–२१०० भित्रको मिति छान्नुहोस्।'
+          : 'वि.सं. ' + zrBsLabel(bs) + ' (' + BS_WEEK[bsWeekday(bs.y, bs.m, bs.d)] + ')';
+      const my = +$('zr_year').value, mm = +$('zr_month').value;
+      if (my >= BS_MIN && my <= BS_MAX && mm >= 1 && mm <= 12) {
+        const first = bsToAd(my, mm, 1).toISOString().slice(0, 10), last = bsToAd(my, mm, bsMonthDays(my, mm)).toISOString().slice(0, 10);
+        $('zr_month_preview').textContent = 'ई.सं. ' + first + ' देखि ' + last + ' सम्म';
+      }
+      const yy = +$('zr_year2').value;
+      if (yy >= BS_MIN && yy <= BS_MAX) {
+        const first = bsToAd(yy, 1, 1).toISOString().slice(0, 10), last = bsToAd(yy, 12, bsMonthDays(yy, 12)).toISOString().slice(0, 10);
+        $('zr_year_preview').textContent = 'ई.सं. ' + first + ' देखि ' + last + ' सम्म';
+      }
+    }
+    function zrUpdatePick() {
+      const sign = ZR.sign, type = ZR.type, go = $('zr_go');
+      zrRenderPreview();
+      if (!sign) { $('zr_pick').textContent = 'पहिले राशि छान्नुहोस्।'; go.disabled = true; return; }
+      if (!type) { $('zr_pick').textContent = sign.ne + ' राशि छानिएको छ — अब राशिफलको प्रकार छान्नुहोस्।'; go.disabled = true; return; }
+      const p = zrPeriodInfo();
+      if (!p) { $('zr_pick').textContent = type.id === 'daily' ? 'मान्य मिति छान्नुहोस्।' : 'मान्य अवधि छान्नुहोस्।'; go.disabled = true; return; }
+      $('zr_pick').textContent = sign.ne + ' राशि • ' + type.label + ' • ' + p.pickLabel;
+      go.disabled = !!ZR.busy;
+    }
+    function zrRender() {
+      const sign = ZR.sign, type = ZR.type;
+      document.querySelectorAll('#zr_signs .zr-sign').forEach(b => {
+        const on = !!sign && b.dataset.sign === sign.key;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      $('zr_types_step').hidden = !sign;
+      document.querySelectorAll('#zr_types .zr-type').forEach(b => {
+        const on = !!type && b.dataset.type === type.id;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      $('zr_when').hidden = !type;
+      if (type) {
+        $('zr_daily').hidden = type.id !== 'daily';
+        $('zr_monthly').hidden = type.id !== 'monthly';
+        $('zr_yearly').hidden = type.id !== 'yearly';
+        $('zr_life').hidden = type.id !== 'lifetime';
+      }
+      zrUpdatePick();
+    }
+    function zrResetSelection() {
+      ZR.sign = null; ZR.type = null;
+      const today = nepalTodayBs();
+      $('zr_date').value = zrNepalAdDate();
+      $('zr_month').value = today.m;
+      $('zr_year').value = today.y;
+      $('zr_year2').value = today.y;
+    }
+    function zrBuildControls() {
+      const ySel = $('zr_year'), y2 = $('zr_year2'), mSel = $('zr_month');
+      if (!ySel.options.length) {
+        for (let y = BS_MIN; y <= BS_MAX; y++) {
+          ySel.add(new Option(neNum(y), y));
+          y2.add(new Option(neNum(y), y));
+        }
+        BS_MONTHS.forEach((n, i) => mSel.add(new Option(n, i + 1)));
+      }
+      const first = bsToAd(BS_MIN, 1, 1).toISOString().slice(0, 10);
+      const last = bsToAd(BS_MAX, 12, bsMonthDays(BS_MAX, 12)).toISOString().slice(0, 10);
+      $('zr_date').min = first; $('zr_date').max = last;
+    }
+    function openZodiacDialog() {
+      const el = $('zr'); if (!el) return;
+      if (!ZR.busy) zrResetSelection();
+      zrRender();
+      el.hidden = false;
+      const key = $('ch_key').value.trim();
+      if (!key) zrSetMsg('Gemini API key छैन। AI settings (⚙) बाट key हाल्नुहोस्।', true);
+      else if (ZR.busy) zrSetMsg('Gemini ले राशिफल लेख्दैछ…');
+      else zrSetMsg('');
+    }
+    function closeZodiacDialog() {
+      const wasBusy = ZR.busy;
+      ZR.seq++;
+      if (ZR.ac) { try { ZR.ac.abort() } catch (e) { } ZR.ac = null }
+      ZR.busy = false;
+      if (ZR.bub) { ZR.bub.className = 'm a'; ZR.bub.textContent = 'राशिफल रद्द गरियो।'; ZR.bub = null }
+      $('zr').hidden = true;
+      zrBusyState(false);
+      zrSetMsg('');
+      if (wasBusy) {
+        $('ch_stat').textContent = 'रद्द गरियो।';
+        $('st').textContent = 'राशिफल रद्द भयो।';
+      }
+    }
+    function zrPrompt(sign, type, period) {
+      const sectionList = type.sections.map((s, i) => (i + 1) + '. ' + s).join('\n');
+      const profile = sign.lord ? (
+        'राशि-प्रोफाइल (स्थिर पराशरी तथ्य — गोचर वा दशा होइन):\n' +
+        '- स्वामी ग्रह: ' + sign.lord + '\n' +
+        '- तत्त्व: ' + sign.element + '\n' +
+        '- स्वभाव: ' + sign.nature + '\n' +
+        '- राशिभाव: ' + sign.house + '\n' +
+        '- स्वाभाविक बल: ' + sign.strengths + '\n' +
+        '- सन्तुलन चाहिने पक्ष: ' + sign.watch + '\n' +
+        '- लेखन संकेत: ' + sign.style + '\n\n'
+      ) : '';
+      return 'राशि: ' + sign.ne + ' (' + sign.en + ')\n' +
+        'राशिफलको प्रकार: ' + type.label + ' (' + type.id + ')\n' +
+        'चयनित अवधि: ' + period.promptPeriod + '\n' +
+        'स्थान: नेपाल (Asia/Kathmandu)\n\n' +
+        profile +
+        type.focus + '\n\n' +
+        'अनिवार्य खण्डहरू (यही क्रममा, ठ्याक्कै ' + type.sections.length + ' वटा):\n' + sectionList + '\n\n' +
+        'सामग्री निर्देश:\n' +
+        (profile ? '- माथिको राशि-प्रोफाइललाई स्थिर स्वभावका रूपमा प्रयोग गर्नुहोस्; यसलाई वास्तविक ग्रहगोचर, दशा वा घटनाको प्रमाण बनाउनुहोस्।\n' : '') +
+        '- बृहत् पाराशर होरा शास्त्र (BPHS) को पराशरी परम्पराअनुसार राशिको स्वामी ग्रह, तत्त्व, स्वभाव, केन्द्रादि गुण र भावको सामान्य अर्थ प्रयोग गर्नुहोस्।\n' +
+        '- यो अनुरोधमा वास्तविक ग्रहगोचर, दशा, जन्मकुण्डली वा गणना गरिएको भाव-स्थिति दिइएको छैन। त्यसैले कुनै विशिष्ट ग्रहस्थिति, गोचर, दशा, भाव-स्थिति वा घटना भएको/हुने दाबी नगर्नुहोस्। यकिन डेटा नभएको कुरा आवश्यक परे स्पष्ट भन्नुहोस्।\n' +
+        '- यो राशि-आधारित सामान्य राशिफल हो, व्यक्तिगत जन्मकुण्डली विश्लेषण होइन। जन्म मिति, समय वा स्थान नभएकोले व्यक्तिगत दाबी नगर्नुहोस्।\n' +
+        '- प्रत्येक खण्डमा १–२ वाक्यको स्पष्ट विषयवस्तु र २–३ छोटा व्यावहारिक बुँदा दिनुहोस्।\n' +
+        '- भाषा शुद्ध, स्वाभाविक, बहने नेपाली (देवनागरी) होस्; यान्त्रिक दोहोरो वाक्य, भरिएको शब्द वा अंग्रेजी वाक्य नराख्नुहोस्।\n' +
+        '- आकर्षक तर संयमित; १८–७०+ उमेरका पाठकलाई उपयोगी; आशा र यथार्थको सन्तुलन राख्नुहोस्।\n' +
+        '- मृत्यु, गम्भीर रोग, दुर्घटना, अपंगता वा अनिवार्य असफलताको डर देखाउने भाषा प्रयोग नगर्नुहोस्; "निश्चित हुनेछ" भन्ने अति-दाबी नगर्नुहोस्।\n' +
+        '- एउटै कुरा दोहोर्याएर खण्ड नभर्नुहोस्; प्रत्येक खण्ड फरक विषयमा होस्।\n' +
+        '- शीर्षक अधिकतम ८ शब्द; summary अधिकतम ३५ शब्द; प्रत्येक body अधिकतम ४० शब्द; प्रत्येक point अधिकतम १२ शब्द; advice अधिकतम ३० शब्द।\n' +
+        '- कुनै markdown, code fence, HTML, emoji, तालिका वा अतिरिक्त व्याख्या नराख्नुहोस्। केवल मान्य JSON फर्काउनुहोस्।\n\n' +
+        'JSON ढाँचा (यही keys प्रयोग गर्नुहोस्; period मा ठ्याक्कै "' + period.key + '" राख्नुहोस्):\n' +
+        '{\n' +
+        '  "sign": "' + sign.ne + '",\n' +
+        '  "type": "' + type.id + '",\n' +
+        '  "period": "' + period.key + '",\n' +
+        '  "headline": "छोटो आकर्षक शीर्षक",\n' +
+        '  "summary": "समग्र सार १–२ वाक्य",\n' +
+        '  "sections": [\n' +
+        '    {"title": "खण्ड १ को शीर्षक", "body": "१–२ वाक्य", "points": ["बुँदा १", "बुँदा २"]}\n' +
+        '  ],\n' +
+        '  "advice": "अन्तिम व्यावहारिक सुझाव"\n' +
+        '}';
+    }
+    function zrPeriodMatches(got, type, period) {
+      if (!got) return false;
+      const g = got.toLowerCase(), exp = period.key.toLowerCase();
+      if (g === exp) return true;
+      if (type.id === 'daily') {
+        if (g.indexOf(period.adStr.toLowerCase()) >= 0) return true;
+        return g.indexOf('आज') >= 0;
+      }
+      if (type.id === 'monthly') return g.indexOf('महिना') >= 0 || (g.indexOf(String(period.bs.y)) >= 0 && g.indexOf(String(period.bs.m)) >= 0);
+      if (type.id === 'yearly') return g.indexOf('वर्ष') >= 0 || g.indexOf(String(period.bs.y)) >= 0;
+      return g.indexOf('जीवन') >= 0 || g === 'lifetime';
+    }
+    function zrExtractJson(text) {
+      let s = String(text || '').replace(/^\uFEFF/, '').trim();
+      if (!s) throw new Error('Gemini ले खाली जवाफ फर्कायो।');
+      s = s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+      try { return JSON.parse(s) } catch (e) { }
+      const a = s.indexOf('{'), b = s.lastIndexOf('}');
+      if (a >= 0 && b > a) { try { return JSON.parse(s.slice(a, b + 1)) } catch (e) { } }
+      throw new Error('Gemini ले मान्य JSON फर्काएन।');
+    }
+    function zrParseResponse(text, sign, type, period) {
+      const obj = zrExtractJson(text);
+      let d = obj;
+      if (d && typeof d === 'object' && !Array.isArray(d)) {
+        for (const k of ['horoscope', 'result', 'data']) {
+          if (d[k] && typeof d[k] === 'object' && !Array.isArray(d[k]) && (d[k].sections || d[k].cards || d[k].headline)) { d = d[k]; break }
+        }
+      }
+      if (!d || typeof d !== 'object' || Array.isArray(d)) throw new Error('Gemini को जवाफ अपेक्षित ढाँचामा छैन।');
+      const gotSign = zrNormSign(d.sign || d.rashi || d.zodiac);
+      if (!gotSign) throw new Error('Gemini ले राशि स्पष्ट पारेन।');
+      if (gotSign !== sign.ne) throw new Error('Gemini ले ' + sign.ne + ' राशिको सट्टा ' + gotSign + ' राशिको सामग्री फर्कायो।');
+      const gotType = zrNormType(d.type || d.periodType || d.horoscopeType);
+      if (!gotType) throw new Error('Gemini ले राशिफलको प्रकार स्पष्ट पारेन।');
+      if (gotType !== type.id) throw new Error('Gemini ले ' + type.label + ' को सट्टा अर्को प्रकारको राशिफल फर्कायो।');
+      const gotPeriod = zrCleanText(d.period || d.timeframe || '', 80);
+      if (!zrPeriodMatches(gotPeriod, type, period)) throw new Error('Gemini ले चयनित अवधि (' + period.key + ') मिलाएन।');
+      const headline = zrCleanText(d.headline || d.title, 80);
+      const summary = zrCleanText(d.summary || d.overview || d.intro || d.description, 380);
+      if (!headline) throw new Error('Gemini ले शीर्षक दिएन।');
+      if (!summary) throw new Error('Gemini ले सारांश दिएन।');
+      let raw = d.sections || d.cards;
+      if (raw && !Array.isArray(raw) && typeof raw === 'object') {
+        raw = Object.entries(raw).map(([k, v]) => (v && typeof v === 'object') ? Object.assign({ title: k }, v) : { title: k, body: v });
+      }
+      if (!Array.isArray(raw) || !raw.length) throw new Error('Gemini ले खण्डहरू दिएन।');
+      const sections = [];
+      raw.forEach(x => {
+        if (!x || typeof x !== 'object') return;
+        const title = zrCleanText(x.title || x.heading || x.name, 64);
+        const body = zrCleanText(x.body || x.text || x.content || x.description, 1200);
+        const points = zrList(x.points || x.bullets || x.tips || x.list);
+        if (!title || (!body && !points.length)) return;
+        sections.push({ title: title, body: body, points: points });
+      });
+      if (sections.length < type.min) throw new Error('Gemini ले आवश्यक खण्डहरू पूरा दिएन (' + sections.length + '/' + type.sections.length + ')।');
+      const advice = zrCleanText(d.advice || d.suggestion || d.upay || d.tip, 340);
+      if (!advice) throw new Error('Gemini ले अन्तिम सुझाव दिएन।');
+      return { headline: headline, summary: summary, sections: sections.slice(0, 8), advice: advice };
+    }
+    function zrSplitText(text, max) {
+      const clean = zrCleanText(text);
+      if (!clean) return [];
+      if (clean.length <= max) return [clean];
+      const parts = clean.match(/[^।!?॥]+[।!?॥]+|[^।!?॥]+$/g) || [clean];
+      const out = []; let cur = '';
+      const flush = () => { if (cur.trim()) out.push(cur.trim()); cur = '' };
+      const addWords = s => {
+        const ws = s.split(/\s+/).filter(Boolean);
+        for (const w of ws) {
+          if (cur && (cur + ' ' + w).length > max) flush();
+          cur = cur ? cur + ' ' + w : w;
+        }
+      };
+      parts.forEach(p => {
+        p = p.trim(); if (!p) return;
+        if (p.length > max) { flush(); addWords(p); flush(); return }
+        if (cur && (cur + ' ' + p).length > max) flush();
+        cur = cur ? cur + ' ' + p : p;
+      });
+      flush();
+      return out;
+    }
+    function zrBlock(title, sub, body, extra) {
+      const lines = ['## ' + zrCleanText(title, 90)];
+      if (sub) lines.push('# ' + zrCleanText(sub, 100));
+      if (body && body.trim()) lines.push(body.trim());
+      if (extra) lines.push(extra);
+      return lines.join('\n');
+    }
+    function zrRaw(sign, type, period, data) {
+      const blocks = [];
+      const introSub = sign.ne + ' राशि • ' + period.cardLabel;
+      const introChunks = zrSplitText(data.summary, 250);
+      introChunks.forEach((chunk, i) => {
+        const title = i === 0 ? data.headline : sign.ne + ' राशि';
+        const sub = i === 0 ? introSub : period.cardLabel + ' • परिचय ' + neNum(i + 1);
+        blocks.push(zrBlock(title, sub, chunk, i === 0 ? '@imglink : "' + sign.img + '.png"' : ''));
+      });
+      data.sections.forEach(sec => {
+        const bullets = sec.points.length ? sec.points.map(p => '- ' + p).join('\n') : '';
+        const chunks = sec.body ? zrSplitText(sec.body, 250) : [];
+        if (!chunks.length) {
+          if (bullets) blocks.push(zrBlock(sec.title, '', bullets));
+          return;
+        }
+        chunks.forEach((chunk, i) => {
+          const last = i === chunks.length - 1;
+          const title = i === 0 ? sec.title : sec.title + ' (' + neNum(i + 1) + ')';
+          if (last && bullets && (chunk + '\n' + bullets).length <= 620) {
+            blocks.push(zrBlock(title, '', chunk + '\n' + bullets));
+          } else {
+            blocks.push(zrBlock(title, '', chunk));
+            if (last && bullets) blocks.push(zrBlock('व्यावहारिक सुझाव', sign.ne + ' राशि • ' + sec.title, bullets));
+          }
+        });
+      });
+      zrSplitText(data.advice, 250).forEach((chunk, i) => {
+        blocks.push(zrBlock(i === 0 ? 'सुझाव' : 'सुझाव (' + neNum(i + 1) + ')', sign.ne + ' राशि • ' + period.cardLabel, chunk));
+      });
+      blocks.push(zrBlock('नोट', 'राशि-आधारित सामान्य मार्गदर्शन', 'यो राशिफल राशि र चयनित समयमा आधारित सामान्य पराशरी मार्गदर्शन हो; व्यक्तिगत जन्मकुण्डलीको गणना वा विश्लेषण होइन।'));
+      return blocks.join('\n\n\n');
+    }
+    function zrValidateRaw(raw, sign, type) {
+      if (!raw || !raw.trim()) throw new Error('कार्ड सामग्री खाली छ।');
+      if (/\uFFFD|\u0000/.test(raw)) throw new Error('सामग्रीमा अमान्य वर्ण भेटियो।');
+      const dev = (raw.match(/[\u0900-\u097F]/g) || []).length;
+      if (dev < 80) throw new Error('नेपाली (देवनागरी) सामग्री अपर्याप्त छ।');
+      if (raw.indexOf(sign.ne) < 0) throw new Error('कार्डमा छानिएको राशि भेटिएन।');
+      if (raw.indexOf(type.label) < 0) throw new Error('कार्डमा छानिएको राशिफल प्रकार भेटिएन।');
+      const parsed = mdParse(raw);
+      if (parsed.length < 3) throw new Error('पर्याप्त कार्ड बन्न सकेन।');
+      parsed.forEach((s, i) => {
+        if (!s.title || !s.title.trim()) throw new Error('कार्ड ' + (i + 1) + ' मा शीर्षक छैन।');
+        if (!slideText(s).trim()) throw new Error('कार्ड ' + (i + 1) + ' खाली छ।');
+        if (s.title.length > 120) throw new Error('कार्ड ' + (i + 1) + ' को शीर्षक धेरै लामो छ।');
+        if (s.body.length > 700) throw new Error('कार्ड ' + (i + 1) + ' को सामग्री धेरै लामो छ।');
+      });
+      return parsed;
+    }
+    function zrWorkingLabel(sign, type) {
+      if (type.id === 'daily') return 'Gemini ले ' + sign.ne + ' राशिको आजको राशिफल लेख्दैछ…';
+      if (type.id === 'monthly') return 'Gemini ले ' + sign.ne + ' राशिको यो महिनाको राशिफल लेख्दैछ…';
+      if (type.id === 'yearly') return 'Gemini ले ' + sign.ne + ' राशिको यो वर्षको राशिफल लेख्दैछ…';
+      return 'Gemini ले ' + sign.ne + ' राशिको सम्पूर्ण जीवनफल लेख्दैछ…';
+    }
+    async function zrGenerate(sign, type, period, signal, onProgress) {
+      const key = $('ch_key').value.trim();
+      if (!key) throw new Error('Gemini API key छैन। AI settings (⚙) बाट key हाल्नुहोस्।');
+      const selected = $('ch_gm').value.trim() || 'gemini-2.5-flash';
+      const ck = [selected, sign.key, type.id, period.key].join('|');
+      if (ZR_CACHE.has(ck)) return ZR_CACHE.get(ck);
+      const user = zrPrompt(sign, type, period);
+      const models = [selected, ...RASHI_MODEL_FALLBACKS.filter(m => m !== selected)];
+      let lastErr = null;
+      for (let mi = 0; mi < models.length; mi++) {
+        const model = models[mi];
+        if (signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
+        if (onProgress) onProgress(mi === 0 ? zrWorkingLabel(sign, type) : 'पहिलो Gemini model व्यस्त छ — अर्को model बाट प्रयास गर्दै…');
+        const attempt = rashiAttempt(signal, mi === 0 ? 25000 : 45000);
+        try {
+          const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, signal: attempt.signal,
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: ZR_SYS }] },
+              contents: [{ role: 'user', parts: [{ text: user }] }],
+              generationConfig: {
+                temperature: 0.85, topP: 0.95, maxOutputTokens: 8192,
+                responseMimeType: 'application/json',
+                thinkingConfig: { thinkingBudget: 0 }
+              }
+            })
+          });
+          let j = null; try { j = await r.json() } catch (e) { }
+          if (!r.ok) {
+            const rawMsg = (j && j.error && j.error.message) || ('HTTP ' + r.status);
+            lastErr = new Error(/high demand|UNAVAILABLE|overloaded/i.test(rawMsg) ? 'Gemini model अहिले व्यस्त छ।' : rawMsg);
+            if ([404, 429, 500, 502, 503, 504].includes(r.status) || (r.status === 400 && /thinking|responseMimeType|response_mime_type/i.test(rawMsg))) continue;
+            throw lastErr;
+          }
+          if (j && j.promptFeedback && j.promptFeedback.blockReason) throw new Error('Gemini ले यो अनुरोध अस्वीकार गर्यो: ' + j.promptFeedback.blockReason);
+          const cand = j && j.candidates && j.candidates[0];
+          if (cand && cand.finishReason === 'MAX_TOKENS') { lastErr = new Error('Gemini को जवाफ धेरै लामो भयो र अपूरो रह्यो।'); continue }
+          const parts = cand && cand.content && cand.content.parts;
+          const text = parts ? parts.map(p => p.text || '').join('') : '';
+          if (!text.trim()) { lastErr = new Error('Gemini ले खाली जवाफ फर्कायो।'); continue }
+          let data;
+          try { data = zrParseResponse(text, sign, type, period) } catch (e) { lastErr = e; continue }
+          ZR_CACHE.set(ck, data);
+          if (ZR_CACHE.size > 24) ZR_CACHE.delete(ZR_CACHE.keys().next().value);
+          return data;
+        } catch (e) {
+          if (signal && signal.aborted) throw e;
+          if (e && e.name === 'AbortError') { lastErr = new Error('Gemini ले समयमा जवाफ दिएन।'); continue }
+          if (e === lastErr) throw e;
+          lastErr = e;
+        } finally {
+          attempt.done();
+        }
+      }
+      throw lastErr || new Error('Gemini बाट जवाफ आएन।');
+    }
+    async function zrMakeSlides() {
+      if (ZR.busy) return;
+      const sign = ZR.sign, type = ZR.type, period = zrPeriodInfo();
+      if (!sign || !type || !period) { zrSetMsg('पहिले राशि, राशिफलको प्रकार र अवधि छान्नुहोस्।', true); return }
+      if (!$('ch_key').value.trim()) {
+        zrSetMsg('Gemini API key छैन। AI settings (⚙) बाट key हाल्नुहोस्।', true);
+        return;
+      }
+      const seq = ++ZR.seq;
+      ZR.busy = true; ZR.ac = new AbortController();
+      zrBusyState(true); zrSetMsg(zrWorkingLabel(sign, type));
+      setChat(true);
+      addMsg('user', 'राशी: ' + sign.ne + ' राशि\n' + type.label + '\n' + period.userLabel);
+      const bub = addMsg('a', '…'); ZR.bub = bub;
+      const say = msg => {
+        if (seq !== ZR.seq) return;
+        $('st').textContent = msg;
+        $('ch_stat').textContent = msg;
+        if (bub) bub.textContent = msg;
+      };
+      try {
+        const data = await zrGenerate(sign, type, period, ZR.ac.signal, say);
+        if (seq !== ZR.seq) return;
+        const raw = zrRaw(sign, type, period, data);
+        const parsed = zrValidateRaw(raw, sign, type);
+        ZR.busy = false; ZR.ac = null;
+        $('zr').hidden = true; zrBusyState(false); zrSetMsg('');
+        $('raw').value = raw;
+        tab('auto');
+        autoGen(false);
+        if (bub) {
+          bub.className = 'm a';
+          bub.textContent = 'राशिफल तयार भयो — ' + parsed.length + ' कार्ड टाइमलाइनमा थपियो।\n\n' + sign.ne + ' राशि • ' + type.label + ' • ' + period.pickLabel;
+          if (document.body.classList.contains('chat-open')) { try { bub.scrollIntoView({ block: 'start' }) } catch (e) { } }
+        }
+        $('ch_stat').textContent = 'तयार भयो।';
+        $('st').textContent = parsed.length + ' कार्ड तयार — ' + sign.ne + ' राशि, ' + type.label + '।';
+      } catch (e) {
+        if (seq !== ZR.seq || e.name === 'AbortError') return;
+        const msg = 'Gemini error: ' + (e.message || e);
+        if (bub) { bub.className = 'm a err'; bub.textContent = msg + '\n\nफेरि प्रयास गर्न राशी बटनबाट राशि र प्रकार छान्नुहोस्।' }
+        $('ch_stat').textContent = 'Gemini error';
+        $('st').textContent = msg;
+        if (!$('zr').hidden) zrSetMsg(msg, true);
+      } finally {
+        if (seq === ZR.seq) {
+          ZR.busy = false; ZR.ac = null; ZR.bub = null;
+          zrBusyState(false);
+          if (!$('zr').hidden) zrUpdatePick();
+        }
+      }
+    }
+    function zrInit() {
+      zrBuildControls();
+      $('zr_signs').innerHTML = ZR_SIGNS.map(s => '<button type="button" class="zr-sign" data-sign="' + s.key + '" aria-pressed="false"><b>' + s.ne + '</b><span>' + s.en + '</span></button>').join('');
+      $('zr_signs').querySelectorAll('[data-sign]').forEach(b => b.onclick = () => {
+        if (ZR.busy) return;
+        ZR.sign = ZR_SIGNS.find(s => s.key === b.dataset.sign) || null;
+        ZR.type = null;
+        zrRender();
+      });
+      $('zr_types').innerHTML = ZR_TYPES.map(t => '<button type="button" class="zr-type" data-type="' + t.id + '" aria-pressed="false"><b>' + t.label + '</b><span>' + t.en + '</span></button>').join('');
+      $('zr_types').querySelectorAll('[data-type]').forEach(b => b.onclick = () => {
+        if (ZR.busy) return;
+        ZR.type = ZR_TYPES.find(t => t.id === b.dataset.type) || null;
+        zrRender();
+      });
+      ['zr_date', 'zr_month', 'zr_year', 'zr_year2'].forEach(id => { $(id).oninput = $(id).onchange = () => zrUpdatePick() });
+      $('zr_x').onclick = closeZodiacDialog;
+      $('zr_cancel').onclick = closeZodiacDialog;
+      $('zr_go').onclick = zrMakeSlides;
+      document.querySelector('[data-zr-close]').onclick = closeZodiacDialog;
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('zr').hidden) closeZodiacDialog() });
+      zrResetSelection();
+      zrRender();
+    }
+    zrInit();
     const chatH = []; let chatAC = null;
     const cfg = (k, d) => { try { return localStorage.getItem('ch_' + k) || d } catch (e) { return d } };
     ['key', 'gm'].forEach(k => { const e = $('ch_' + k), d = e.value; e.value = cfg(k, d); if (e.value === '' && d) e.value = d; e.oninput = e.onchange = () => { try { localStorage.setItem('ch_' + k, e.value) } catch (_) { } } });
@@ -10273,6 +11270,7 @@ EXAMPLE:
       const b = document.createElement('button'); b.textContent = c;
       b.onclick = () => {
         if (c === RASHI_CHIP) { openRashiCal(); return }
+        if (c === ZRASHI_CHIP) { openZodiacDialog(); return }
         if (/shorter|bullet|format/i.test(c)) $('ch_ctx').checked = true;
         chatSend(c);
       };
